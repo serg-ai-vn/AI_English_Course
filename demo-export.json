@@ -1,0 +1,29 @@
+{
+  "name": "mia",
+  "pageTitle": "Mia's World",
+  "theme": "comet-trail",
+  "slots": {
+    "hero-kicker": "Hi, my name is Mia",
+    "site-title": "Football, art and a little bit of magic",
+    "hero-subtitle": "Welcome to my corner of the internet. I built it with AI as my co-pilot.",
+    "about-me": "<p>I am twelve years old and I live in a big city. I love drawing characters, playing football with my friends, and building secret bases in Minecraft. This year I learned how to work with AI: I write prompts, check the results, and make them better, step by step.</p>",
+    "hobby-title-1": "Football",
+    "hobby-text-1": "I play striker for our school team. My dream is to score a bicycle kick in a real match.",
+    "hobby-title-2": "Drawing",
+    "hobby-text-2": "I draw my own comic characters. AI helps me test new styles, but the ideas are always mine.",
+    "hobby-title-3": "Minecraft",
+    "hobby-text-3": "I build castles and secret underground bases with redstone traps. Engineering is fun.",
+    "footer-text": "Made with AI as my co-pilot. I am the Operator.",
+    "author-name": "Mia"
+  },
+  "images": {
+    "background": { "src": "demo-assets/background.jpg", "alt": "" },
+    "avatar": { "src": "demo-assets/avatar.jpg", "alt": "AI-generated avatar of Mia" },
+    "hobby-image-1": { "src": "demo-assets/hobby-1.jpg", "alt": "Football" },
+    "hobby-image-2": { "src": "demo-assets/hobby-2.jpg", "alt": "Drawing" },
+    "hobby-image-3": { "src": "demo-assets/hobby-3.jpg", "alt": "Minecraft" }
+  },
+  "particles": {
+    "avatar": "demo-assets/avatar-particles.js"
+  }
+}

@@ -1,0 +1,917 @@
+﻿/* ============================================================
+   My AI Site - Template v1 (Kimi K3)
+   Design system adapted from Example/DESIGN.md (Dala)
+   applied to the 6 course presets (16_source_theme_presets.md v2)
+
+   Principles:
+   - Hierarchy through SCALE and whitespace, not boxes/borders/shadows
+   - Weight 400 headings at oversized display sizes, negative tracking
+   - Elements float on the background, no card containers
+   - One accent for primary emphasis, one secondary for labels
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka:wght@400;600&family=Inter:wght@400;600&family=Lato:wght@400;700&family=Merriweather:wght@400;700&family=Quicksand:wght@400;600&family=Space+Grotesk:wght@400;600&display=swap');
+
+/* ------------------------------------------------------------
+   1. Design tokens (shared across all themes)
+   ------------------------------------------------------------ */
+:root {
+  /* Type scale (clamp = responsive without media queries) */
+  --text-caption: 0.75rem;                                  /* 12px */
+  --text-label: 0.875rem;                                   /* 14px */
+  --text-body: 1.125rem;                                    /* 18px - larger base for kids */
+  --text-lead: clamp(1.25rem, 1.6vw + 0.85rem, 1.75rem);    /* 20-28px */
+  --text-heading-sm: clamp(1.5rem, 2.4vw + 0.9rem, 2.25rem);/* 24-36px */
+  --text-heading: clamp(2rem, 3.6vw + 1rem, 3.25rem);       /* 32-52px */
+  --text-heading-lg: clamp(2.5rem, 5.5vw + 0.75rem, 4.75rem);/* 40-76px */
+  --text-display: clamp(2.9rem, 8.5vw, 6.75rem);            /* 46-108px */
+
+  --leading-solid: 1;
+  --leading-tight: 1.1;
+  --leading-heading: 1.2;
+  --leading-body: 1.55;
+
+  --tracking-display: -0.04em;   /* Dala signature on huge type */
+  --tracking-heading: -0.02em;
+  --tracking-label: 0.09em;      /* uppercase labels */
+
+  --weight-regular: 400;
+  --weight-semibold: 600;
+
+  /* Spacing scale, 6px base unit */
+  --space-1: 0.375rem;   /* 6 */
+  --space-2: 0.75rem;    /* 12 */
+  --space-3: 1.125rem;   /* 18 */
+  --space-4: 1.5rem;     /* 24 */
+  --space-5: 1.875rem;   /* 30 */
+  --space-6: 2.25rem;    /* 36 */
+  --space-10: 3.75rem;   /* 60 */
+  --space-16: 6rem;      /* 96 */
+  --space-20: 7.5rem;    /* 120 */
+
+  /* Radius */
+  --radius-lg: 1.5rem;   /* 24px - the one consistent radius */
+  --radius-full: 9999px;
+
+  /* Layout */
+  --page-max: 72rem;              /* 1152px */
+  --page-gutter: clamp(1.25rem, 5vw, 4rem);
+  --section-gap: clamp(4.5rem, 11vw, 7.5rem);
+
+  /* Motion tokens (used by JS in week 2, declared now) */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-slow: 900ms;
+}
+
+/* ------------------------------------------------------------
+   2. Theme presets (v2, six presets)
+   Each preset = palette + font pairing + particle accent color.
+   --particle-color is read by the particle system (week 2/3).
+   Muted/soft values are hardcoded (no color-mix) so old
+   tablet WebViews render correctly.
+   ------------------------------------------------------------ */
+:root,
+[data-theme="sunny-day"] {
+  --background: #FFF8E7;
+  --text: #2B2B2B;
+  --text-muted: #6E6656;
+  --accent-primary: #FF9F1C;
+  --accent-secondary: #2EC4B6;
+  --accent-soft: #FFEBCB;   /* primary at low alpha on bg, for slot placeholders */
+  --scrim: rgba(255, 248, 231, 0.68);
+  --font-heading: 'Fredoka', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --particle-color: #FF9F1C;
+  --particle-shape: circle;
+  --radius-avatar: 2rem;
+  --avatar-aspect: 4 / 5;
+}
+
+[data-theme="ocean-calm"] {
+  --background: #EAF4F4;
+  --text: #1D3557;
+  --text-muted: #5A6B85;
+  --accent-primary: #3A86FF;
+  --accent-secondary: #8ECAE6;
+  --accent-soft: #D1E5FF;
+  --scrim: rgba(234, 244, 244, 0.68);
+  --font-heading: 'Quicksand', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --particle-color: #3A86FF;
+  --particle-shape: circle;
+  --radius-avatar: 50%;
+  --avatar-aspect: 1 / 1;
+}
+
+[data-theme="forest-explorer"] {
+  --background: #F2ECE4;
+  --text: #2E2A24;
+  --text-muted: #6B655C;
+  --accent-primary: #4C7A5D;
+  --accent-secondary: #C97C4E;
+  --accent-soft: #DEE3D6;
+  --scrim: rgba(242, 236, 228, 0.68);
+  --font-heading: 'Merriweather', serif;
+  --font-body: 'Lato', sans-serif;
+  --particle-color: #4C7A5D;
+  --particle-shape: diamond;
+  --radius-avatar: 1rem;
+  --avatar-aspect: 4 / 5;
+}
+
+[data-theme="comic-pop"] {
+  --background: #FFFFFF;
+  --text: #000000;
+  --text-muted: #5C5C5C;
+  --accent-primary: #E63946;
+  --accent-secondary: #FFD60A;
+  --accent-soft: #FBE3E5;
+  --scrim: rgba(255, 255, 255, 0.7);
+  --font-heading: 'Bangers', cursive;
+  --font-body: 'Inter', sans-serif;
+  --particle-color: #E63946;
+  /* Bangers has no light weight - it is display by nature.
+     Slightly looser tracking keeps it legible at huge sizes. */
+  --tracking-display: 0.01em;
+  --tracking-heading: 0.01em;
+  --particle-shape: square;
+  --radius-avatar: 0.5rem;
+  --avatar-aspect: 4 / 5;
+}
+
+[data-theme="comet-trail"] {
+  --background: #EAE7F5;
+  --text: #2A2640;
+  --text-muted: #625E7A;
+  --accent-primary: #6C5CE7;
+  --accent-secondary: #00D9C0;
+  --accent-soft: #D8D4F3;
+  --scrim: rgba(234, 231, 245, 0.68);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --particle-color: #6C5CE7;
+  --particle-shape: triangle;
+  --radius-avatar: 1.5rem;
+  --avatar-aspect: 4 / 5;
+}
+
+[data-theme="deep-focus"] {
+  --background: #000000;
+  --text: #FFFFFF;
+  --text-muted: #9A9A9A;
+  --accent-primary: #8052FF;
+  --accent-secondary: #FFB829;
+  --accent-soft: #17102E;
+  --scrim: rgba(0, 0, 0, 0.6);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  --particle-color: #8052FF;
+  --particle-shape: triangle;
+  --radius-avatar: 1.5rem;
+  --avatar-aspect: 4 / 5;
+}
+
+/* ------------------------------------------------------------
+   3. Base
+   ------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--background);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background 400ms ease, color 400ms ease;
+}
+
+h1, h2, h3 {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-weight: var(--weight-regular);   /* hierarchy via scale, not weight */
+  line-height: var(--leading-tight);
+}
+
+p {
+  margin: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--accent-primary);
+  color: var(--background);
+}
+
+:focus-visible {
+  outline: 3px solid var(--accent-primary);
+  outline-offset: 3px;
+  border-radius: var(--space-1);
+}
+
+/* ------------------------------------------------------------
+   4. Shared layout primitives
+   ------------------------------------------------------------ */
+.container {
+  width: 100%;
+  max-width: var(--page-max);
+  margin-inline: auto;
+  padding-inline: var(--page-gutter);
+}
+
+.section {
+  padding-block: var(--section-gap);
+}
+
+/* Small uppercase accent label + index number, Dala-style */
+.section-label {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+  margin: 0 0 var(--space-6);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent-primary);
+}
+
+.section-label .section-index {
+  color: var(--text-muted);
+  font-weight: var(--weight-regular);
+}
+
+.section-title {
+  font-size: var(--text-heading-lg);
+  letter-spacing: var(--tracking-heading);
+  margin-bottom: var(--space-10);
+}
+
+/* ------------------------------------------------------------
+   5. Navigation - transparent, no border, floats on background
+   ------------------------------------------------------------ */
+.site-nav {
+  position: absolute;
+  inset: 0 0 auto 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: var(--space-4);
+}
+
+.nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Small triangular brand mark, echoing the particle motif */
+.nav-mark {
+  width: 0;
+  height: 0;
+  border-left: 9px solid transparent;
+  border-right: 9px solid transparent;
+  border-bottom: 15px solid var(--accent-primary);
+}
+
+.nav-links {
+  display: flex;
+  gap: var(--space-6);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links a {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  transition: color 200ms ease;
+}
+
+.nav-links a:hover {
+  color: var(--text);
+}
+
+/* ------------------------------------------------------------
+   6. Fixed page background + ambient particle field
+   The generated background sits still; all content floats above
+   (the Dala two-layer structure). Pure CSS, zero JS cost.
+   ------------------------------------------------------------ */
+.page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+  background: linear-gradient(135deg, var(--accent-soft), var(--background) 70%);
+}
+
+.page-bg-media {
+  position: absolute;
+  inset: 0;
+}
+
+.page-bg-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Scrim keeps text readable over any generated image */
+.page-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--scrim);
+}
+
+/* Ambient particle field - floating triangles in theme accents */
+.ambient {
+  position: absolute;
+  inset: 0;
+}
+
+.ambient i {
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  background: var(--accent-primary);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  opacity: 0.22;
+  animation: ambient-drift 26s ease-in-out infinite alternate;
+}
+
+.ambient i:nth-child(2n)  { background: var(--accent-secondary); }
+.ambient i:nth-child(1)  { left: 6%;  top: 16%; animation-duration: 26s; }
+.ambient i:nth-child(2)  { left: 13%; top: 62%; width: 9px; height: 9px; animation-duration: 33s; animation-delay: -9s; opacity: 0.22; }
+.ambient i:nth-child(3)  { left: 22%; top: 34%; width: 7px; height: 7px; animation-duration: 22s; animation-delay: -4s; }
+.ambient i:nth-child(4)  { left: 31%; top: 80%; animation-duration: 29s; animation-delay: -14s; opacity: 0.12; }
+.ambient i:nth-child(5)  { left: 44%; top: 12%; width: 8px; height: 8px; animation-duration: 35s; animation-delay: -6s; }
+.ambient i:nth-child(6)  { left: 52%; top: 71%; width: 11px; height: 11px; animation-duration: 24s; animation-delay: -18s; opacity: 0.2; }
+.ambient i:nth-child(7)  { left: 61%; top: 27%; width: 7px; height: 7px; animation-duration: 31s; animation-delay: -3s; }
+.ambient i:nth-child(8)  { left: 68%; top: 85%; width: 9px; height: 9px; animation-duration: 27s; animation-delay: -11s; opacity: 0.14; }
+.ambient i:nth-child(9)  { left: 76%; top: 9%;  animation-duration: 34s; animation-delay: -7s; }
+.ambient i:nth-child(10) { left: 83%; top: 48%; width: 8px; height: 8px; animation-duration: 23s; animation-delay: -16s; opacity: 0.24; }
+.ambient i:nth-child(11) { left: 90%; top: 74%; animation-duration: 30s; animation-delay: -5s; opacity: 0.12; }
+.ambient i:nth-child(12) { left: 38%; top: 52%; width: 6px; height: 6px; animation-duration: 21s; animation-delay: -13s; }
+.ambient i:nth-child(13) { left: 93%; top: 22%; width: 10px; height: 10px; animation-duration: 36s; animation-delay: -10s; opacity: 0.18; }
+.ambient i:nth-child(14) { left: 17%; top: 88%; width: 8px; height: 8px; animation-duration: 25s; animation-delay: -2s; }
+
+/* Ambient motif per preset (Preset v3: each theme its own shape) */
+[data-theme="sunny-day"] .ambient i {
+  clip-path: none;
+  border-radius: 50%;
+}
+
+[data-theme="ocean-calm"] .ambient i {
+  clip-path: none;
+  border-radius: 50%;
+  background: transparent;
+  border: 2px solid var(--accent-primary);
+}
+
+[data-theme="ocean-calm"] .ambient i:nth-child(2n) {
+  background: transparent;
+  border-color: var(--accent-secondary);
+}
+
+[data-theme="forest-explorer"] .ambient i {
+  clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+[data-theme="comic-pop"] .ambient i {
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+[data-theme="deep-focus"] .ambient i {
+  opacity: 0.32;
+}
+
+@keyframes ambient-drift {
+  to {
+    transform: translate3d(26px, -38px, 0) rotate(48deg);
+  }
+}
+
+/* All real content floats above the fixed background */
+body > :not(.page-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+/* ------------------------------------------------------------
+   7. Hero - oversized display headline + avatar, centered
+   ------------------------------------------------------------ */
+.hero {
+  position: relative;
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-block: var(--space-16);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
+  align-items: center;
+  gap: var(--space-10);
+  width: 100%;
+}
+
+.hero-kicker {
+  margin-bottom: var(--space-4);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--accent-primary);
+}
+
+.hero-title {
+  font-size: var(--text-display);
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-solid);
+  text-wrap: balance;
+}
+
+.hero-subtitle {
+  margin-top: var(--space-5);
+  max-width: 34ch;
+  font-size: var(--text-lead);
+  line-height: 1.4;
+  color: var(--text-muted);
+}
+
+/* Avatar docks: invisible anchor frames for the flying avatar */
+.avatar-dock {
+  width: 100%;
+  aspect-ratio: var(--avatar-aspect, 4 / 5);
+}
+
+.hero-avatar-dock {
+  max-width: 26rem;
+  justify-self: end;
+}
+
+.about-avatar-dock {
+  max-width: 22rem;
+}
+
+/* The flying avatar: hidden until flight.js docks it */
+.avatar-flight {
+  display: none;
+  border-radius: var(--radius-avatar, var(--radius-lg));
+  overflow: hidden;
+}
+
+.avatar-flight.is-armed {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  margin: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ------------------------------------------------------------
+   7. Slot system (contract for backend)
+   - data-slot + id on every fillable element
+   - .slot-hint is the pre-fill placeholder label;
+     backend replaces slot innerHTML with real content
+   ------------------------------------------------------------ */
+.slot-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Image slots get a soft theme-tinted placeholder surface */
+.slot-image {
+  background: linear-gradient(135deg, var(--accent-soft), transparent 75%);
+}
+
+.slot-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ------------------------------------------------------------
+   8. About - avatar dock left, editorial text right
+   ------------------------------------------------------------ */
+.about-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.1fr);
+  gap: var(--space-10);
+  align-items: center;
+}
+
+.about-text {
+  max-width: 26ch;
+  font-size: var(--text-lead);
+  line-height: 1.45;
+}
+
+.about-text + .about-text {
+  margin-top: var(--space-4);
+  font-size: var(--text-body);
+  color: var(--text-muted);
+  max-width: 52ch;
+}
+
+/* Editorial drop cap on the first paragraph */
+.about-text > p:first-of-type::first-letter {
+  float: left;
+  padding-right: 0.12em;
+  font-family: var(--font-heading);
+  font-size: 3.1em;
+  line-height: 0.85;
+  color: var(--accent-primary);
+}
+
+/* ------------------------------------------------------------
+   9. Hobbies carousel - center stage, arrows, swipe.
+   Only the center card shows its text.
+   ------------------------------------------------------------ */
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.carousel-stage {
+  position: relative;
+  flex: 1;
+  height: clamp(320px, 40vw, 500px);
+}
+
+.hobby {
+  position: absolute;
+  top: 50%;
+  width: 34%;
+  transition: transform 600ms var(--ease-out),
+              opacity 600ms var(--ease-out);
+}
+
+.hobby.pos-left {
+  left: 4%;
+  transform: translateY(-50%) scale(0.68);
+  opacity: 0.55;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.hobby.pos-right {
+  right: 4%;
+  transform: translateY(-50%) scale(0.68);
+  opacity: 0.55;
+  z-index: 1;
+  cursor: pointer;
+}
+
+.hobby.pos-center {
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1.55);
+  z-index: 3;
+}
+
+/* Text lives only on the center card */
+.hobby-info {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+.hobby.pos-center .hobby-info {
+  opacity: 1;
+  transition-delay: 200ms;
+}
+
+.hobby-media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: var(--space-4);
+}
+
+.hobby-title {
+  font-size: var(--text-heading-sm);
+  letter-spacing: var(--tracking-heading);
+  margin-bottom: var(--space-2);
+}
+
+.hobby-text {
+  color: var(--text-muted);
+  font-size: var(--text-body);
+}
+
+.carousel-btn {
+  flex: none;
+  width: 56px;
+  height: 56px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: var(--accent-primary);
+  color: var(--background);
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 200ms var(--ease-out);
+}
+
+.carousel-btn:hover {
+  transform: scale(1.08);
+}
+
+.carousel-btn:active {
+  transform: scale(0.94);
+}
+
+/* ------------------------------------------------------------
+   10. Footer - quiet, centered, spacious
+   ------------------------------------------------------------ */
+.site-footer {
+  padding-block: var(--space-16) var(--space-10);
+  text-align: center;
+}
+
+.footer-text {
+  font-size: var(--text-heading-sm);
+  letter-spacing: var(--tracking-heading);
+  font-family: var(--font-heading);
+  max-width: 30ch;
+  margin-inline: auto;
+}
+
+.footer-credit {
+  margin-top: var(--space-4);
+  font-size: var(--text-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.footer-credit .slot {
+  color: var(--accent-primary);
+  font-weight: var(--weight-semibold);
+}
+
+/* ------------------------------------------------------------
+   11. Scroll cue (pure CSS, cosmetic)
+   ------------------------------------------------------------ */
+.scroll-cue {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-5);
+  z-index: 1;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-caption);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.scroll-cue::after {
+  content: "";
+  width: 2px;
+  height: var(--space-6);
+  background: var(--accent-primary);
+  animation: cue-drop 1.8s var(--ease-out) infinite;
+  transform-origin: top;
+}
+
+@keyframes cue-drop {
+  0%   { transform: scaleY(0); opacity: 0; }
+  35%  { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1) translateY(var(--space-3)); opacity: 0; }
+}
+
+/* ------------------------------------------------------------
+   12. Motion (week 2: motion.js + particles.js)
+   Default state = fully visible. JS adds .rv to arm the hidden
+   state and .rv-in to animate in. No JS = everything visible.
+   ------------------------------------------------------------ */
+[data-reveal] {
+  will-change: transform, opacity;
+}
+
+.rv {
+  opacity: 0;
+  transition: opacity var(--dur-slow) var(--ease-out),
+              transform var(--dur-slow) var(--ease-out);
+}
+
+.rv[data-reveal="fade-up"] {
+  transform: translateY(28px);
+}
+
+.rv[data-reveal="slide-left"] {
+  transform: translateX(-42px);
+}
+
+.rv[data-reveal="slide-right"] {
+  transform: translateX(42px);
+}
+
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Letter Reveal: parent stays put, characters animate */
+.rv[data-reveal="letters"] {
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+
+.rv-ch {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.4em);
+  transition: opacity 620ms var(--ease-out),
+              transform 620ms var(--ease-out);
+}
+
+.rv-in .rv-ch {
+  opacity: 1;
+  transform: none;
+}
+
+/* Particle Assemble: target image hides instantly, reveals gently */
+.slot-image img.particle-target {
+  opacity: 0;
+}
+
+.slot-image img.particle-target.pt-show {
+  opacity: 1;
+  transition: opacity 480ms ease 120ms;
+}
+
+/* While particles fly, let them overflow the rounded frame */
+.slot-image.particle-running {
+  overflow: visible;
+}
+
+/* CSS fallback: used when canvas is unavailable or fails.
+   The image assembles with a blur+scale settle instead of particles */
+.slot-image img.pa-fallback-img {
+  animation: pa-fallback 900ms var(--ease-out) both;
+}
+
+@keyframes pa-fallback {
+  from {
+    opacity: 0;
+    transform: scale(1.06);
+    filter: blur(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+}
+
+/* ------------------------------------------------------------
+   13. Responsive - tablets and small screens first
+   ------------------------------------------------------------ */
+@media (max-width: 62rem) {
+  .hero {
+    min-height: auto;
+    padding-top: var(--space-20);
+    padding-bottom: var(--space-10);
+  }
+
+  .hero-inner {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .hero-avatar-dock {
+    justify-self: start;
+    max-width: 20rem;
+  }
+
+  .scroll-cue {
+    display: none;
+  }
+
+  .about-grid {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
+  }
+
+  .about-avatar-dock {
+    margin-inline: auto;
+    max-width: 18rem;
+  }
+
+  .carousel {
+    gap: var(--space-2);
+  }
+
+  .carousel-stage {
+    height: clamp(340px, 74vw, 480px);
+  }
+
+  .carousel-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 34rem) {
+  .site-nav {
+    padding-block: var(--space-3);
+  }
+
+  .nav-links {
+    gap: var(--space-3);
+  }
+
+  .nav-links a {
+    font-size: var(--text-caption);
+    letter-spacing: 0.06em;
+  }
+}
+
+/* ------------------------------------------------------------
+   14. Reduced motion
+   ------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .scroll-cue::after {
+    animation: none;
+  }
+
+  body {
+    transition: none;
+  }
+
+  /* Motion is also skipped in JS; this is a belt-and-braces reset */
+  .rv,
+  .rv-ch {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  .slot-image img.pa-fallback-img {
+    animation: none;
+  }
+
+  .ambient i {
+    animation: none;
+  }
+
+  .hobby {
+    transition: none;
+  }
+
+  .hobby-info {
+    transition: none;
+  }
+}

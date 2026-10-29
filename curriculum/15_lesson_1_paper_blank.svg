@@ -1,0 +1,46 @@
+<svg viewBox="0 0 800 1130" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="1130" fill="white"/>
+
+  <text x="400" y="55" text-anchor="middle" font-family="Arial, sans-serif" font-size="30" font-weight="bold" fill="black">MY WEBSITE — Lesson 1</text>
+  <text x="400" y="82" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" fill="black">(Unplugged Planning Sheet)</text>
+
+  <text x="55" y="125" font-family="Arial, sans-serif" font-size="16" fill="black">Class Nickname: ______________________________</text>
+  <text x="520" y="125" font-family="Arial, sans-serif" font-size="16" fill="black">Date: ______________</text>
+
+  <line x1="40" y1="150" x2="760" y2="150" stroke="black" stroke-width="2"/>
+
+  <!-- Central node -->
+  <circle cx="400" cy="380" r="72" fill="white" stroke="black" stroke-width="2.5"/>
+  <text x="400" y="375" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="black">MY</text>
+  <text x="400" y="397" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="black">WEBSITE</text>
+
+  <!-- Branch lines -->
+  <line x1="400" y1="308" x2="400" y2="210" stroke="black" stroke-width="2"/>
+  <line x1="460" y1="340" x2="560" y2="285" stroke="black" stroke-width="2"/>
+  <line x1="460" y1="420" x2="560" y2="475" stroke="black" stroke-width="2"/>
+  <line x1="340" y1="420" x2="240" y2="475" stroke="black" stroke-width="2"/>
+  <line x1="340" y1="340" x2="240" y2="285" stroke="black" stroke-width="2"/>
+
+  <!-- Boxes -->
+  <rect x="325" y="150" width="150" height="60" rx="10" fill="white" stroke="black" stroke-width="2"/>
+  <rect x="560" y="255" width="150" height="60" rx="10" fill="white" stroke="black" stroke-width="2"/>
+  <rect x="560" y="450" width="150" height="60" rx="10" fill="white" stroke="black" stroke-width="2"/>
+  <rect x="90" y="450" width="150" height="60" rx="10" fill="white" stroke="black" stroke-width="2"/>
+  <rect x="90" y="255" width="150" height="60" rx="10" fill="white" stroke="black" stroke-width="2"/>
+
+  <text x="400" y="620" text-anchor="middle" font-family="Arial, sans-serif" font-size="13" fill="#555555">Write one section name (in English) inside each box.</text>
+
+  <line x1="40" y1="660" x2="760" y2="660" stroke="black" stroke-width="2"/>
+
+  <text x="55" y="695" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="black">My First Ideas (Prompt Journal)</text>
+  <text x="55" y="725" font-family="Arial, sans-serif" font-size="15" fill="black">My website is about... (write 1-2 sentences in English)</text>
+
+  <line x1="55" y1="765" x2="745" y2="765" stroke="black" stroke-width="1"/>
+  <line x1="55" y1="805" x2="745" y2="805" stroke="black" stroke-width="1"/>
+  <line x1="55" y1="845" x2="745" y2="845" stroke="black" stroke-width="1"/>
+  <line x1="55" y1="885" x2="745" y2="885" stroke="black" stroke-width="1"/>
+
+  <line x1="40" y1="930" x2="760" y2="930" stroke="black" stroke-width="2"/>
+
+  <text x="400" y="975" text-anchor="middle" font-family="Arial, sans-serif" font-size="15" font-style="italic" fill="black">Remember: write your class nickname above — not your real name!</text>
+</svg>

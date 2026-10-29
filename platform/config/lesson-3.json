@@ -1,0 +1,48 @@
+{
+  "lesson": 3,
+  "title": "Visuals: prompt & hallucination",
+  "source": "Lesson_3.md (sections 2, 5, 6, 7) - v2 model",
+  "targetVocabulary": ["prompt", "avatar", "background", "generate", "concept art", "close-up", "volumetric lighting", "hallucination", "fact", "detail"],
+  "rules": {
+    "minImageIterations": 3,
+    "maxImageIterations": 6,
+    "minBest": 1,
+    "minWorst": 1,
+    "minStructureChanged": 1,
+    "prosMinWords": 3,
+    "consMinWords": 3,
+    "promptMinTargetWords": 1,
+    "imageStructureFields": ["subject", "style", "framing", "lighting"],
+    "structuralWords": [],
+    "presentPerfectFields": []
+  },
+  "hints": {
+    "structure": "Use the formula: Subject:, Style:, Framing:, Lighting:.",
+    "diff": "Change at least one of Subject / Style / Framing / Lighting from your last prompt.",
+    "vocab": "Try using one of today's visual words: concept art, close-up, volumetric lighting, avatar, background, generate, hallucination, fact, detail.",
+    "prosRequired": "Tell what you like about this image (at least 3 words).",
+    "consRequired": "Tell what you don't like or what could be improved (at least 3 words).",
+    "bestReason": "Say why this is your best image.",
+    "worstReason": "Say why this is your worst image.",
+    "empty": "Write a prompt - the text instructions you give to the image AI.",
+    "accept": "You can accept this field once you have at least 3 rated iterations, one best with a reason, and one worst with a reason.",
+    "build": "Image gates open. You can now generate the next field, or ask your teacher to build your site."
+  },
+  "fields": [
+    { "id": "avatar", "label": "Avatar", "input": "ai-image-cycle", "required": true,
+      "spec": { "width": 256, "height": 256, "format": "png", "transparent": true },
+      "alt": "AI-generated avatar of {author-name}",
+      "particles": true,
+      "brief": "Pick a prompt that builds a stylized image of YOU - not a photo. Use the formula Subject: ... Style: ... Framing: ... Lighting: ... . Generate at least 3 versions, rate each one (pros/cons), then pick your best and your worst with reasons.",
+      "guidance": "AI-generated only - no real photos. Transparent background so particles follow the shape. Catch hallucinations (extra fingers, melted hands, wrong details) in your cons and mark that image as worst."
+    },
+    { "id": "background", "label": "Background", "input": "ai-image-cycle", "required": true,
+      "spec": { "width": 1600, "height": 900, "format": "jpg" },
+      "alt": "",
+      "brief": "A thematic picture that sits behind your avatar - your story, your mood. NO people, NO text, NO watermarks. Use the formula Subject: ... Style: ... Framing: ... Lighting: ... . Generate at least 3 versions, rate each one (pros/cons), then pick your best and your worst with reasons.",
+      "guidance": "Catch hallucinations (people, readable text, watermarks) in your cons and mark that image as worst - those are AI flaws you must catch as the Operator."
+    }
+  ],
+  "order": 3,
+  "requiresLesson": 2
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My AI Site - Sign in</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+</head>
+<body class="login-body">
+  <div class="bg-scene" aria-hidden="true"><div class="stars"></div></div>
+  <main class="login-card">
+    <div class="brand-row">
+      <svg class="brand-rings" width="50" height="32" viewBox="0 0 50 32" fill="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="50" y2="32" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stop-color="#8052FF"/>
+            <stop offset="1" stop-color="#00D9C0"/>
+          </linearGradient>
+        </defs>
+        <circle cx="16" cy="16" r="12.5" stroke="url(#ringGrad)" stroke-width="4"/>
+        <circle cx="34" cy="16" r="12.5" stroke="url(#ringGrad)" stroke-width="4"/>
+      </svg>
+      <h1 class="wordmark">My AI Site</h1>
+    </div>
+    <p class="login-sub">Sign in to your workspace</p>
+
+    <div class="role-toggle" role="tablist" aria-label="Sign in as">
+      <button type="button" class="active" id="role-student" role="tab" aria-selected="true">Student</button>
+      <button type="button" id="role-teacher" role="tab" aria-selected="false">Teacher</button>
+    </div>
+
+    <form id="login-form" novalidate>
+      <label>Class code
+        <input id="class-code" type="text" autocomplete="off" placeholder="DEMO" required>
+      </label>
+      <label id="name-label">Your name
+        <input id="student-name" type="text" autocomplete="off" placeholder="Lumi" required>
+      </label>
+      <label id="pin-label">PIN
+        <input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="4 digits" required>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block" id="enter-btn">Enter</button>
+      <p id="login-error" class="error-box" hidden></p>
+    </form>
+
+    <p class="login-demo-note">Students: code <b>DEMO</b> - <b>Lumi/1111</b>, <b>Ziggy/2222</b>, <b>Neo/3333</b><br>Teacher: code <b>DEMO</b>, PIN <b>0000</b></p>
+  </main>
+  <p class="brand-sign">crafted by <span class="sign-name">Teacher Sergey</span></p>
+
+  <script>
+    var role = 'student';
+    var btnS = document.getElementById('role-student');
+    var btnT = document.getElementById('role-teacher');
+    var nameWrap = document.getElementById('name-label');
+    var pinLabel = document.getElementById('pin-label');
+    var pinInput = document.getElementById('pin');
+    var nameInput = document.getElementById('student-name');
+
+    function setRole(r) {
+      role = r;
+      var isT = r === 'teacher';
+      btnS.classList.toggle('active', !isT);
+      btnT.classList.toggle('active', isT);
+      btnS.setAttribute('aria-selected', String(!isT));
+      btnT.setAttribute('aria-selected', String(isT));
+      nameWrap.classList.toggle('collapsed', isT);
+      nameInput.required = !isT;
+      pinLabel.firstChild.textContent = isT ? 'Teacher PIN' : 'PIN';
+      pinInput.placeholder = isT ? '0000' : '4 digits';
+      document.getElementById('login-error').hidden = true;
+    }
+    btnS.addEventListener('click', function () { setRole('student'); });
+    btnT.addEventListener('click', function () { setRole('teacher'); });
+
+    document.getElementById('login-form').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var errBox = document.getElementById('login-error');
+      errBox.hidden = true;
+      var res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          role: role,
+          classCode: document.getElementById('class-code').value,
+          name: nameInput.value,
+          pin: pinInput.value
+        })
+      });
+      var data = await res.json();
+      if (!res.ok) {
+        errBox.textContent = data.error || 'Sign in failed.';
+        errBox.hidden = false;
+        return;
+      }
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('role', data.role || 'student');
+      if (data.role === 'teacher') {
+        location.href = '/teacher.html';
+      } else {
+        localStorage.setItem('studentName', data.student.name);
+        location.href = '/workspace.html';
+      }
+    });
+  </script>
+</body>
+</html>

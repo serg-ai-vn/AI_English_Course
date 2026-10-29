@@ -1,0 +1,25 @@
+{
+  "name": "ai-english-course-platform",
+  "version": "0.5.0",
+  "description": "Interactive Web Creation & AI Literacy Platform for Kids (English + AI Course, Lessons 2-5)",
+  "main": "platform/server.js",
+  "scripts": {
+    "start": "node platform/server.js",
+    "dev": "node --watch platform/server.js",
+    "smoke": "node -e \"fetch('http://localhost:3000/workspace.html').then(r => console.log('Status:', r.status))\""
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "edtech",
+    "english",
+    "ai-literacy",
+    "clil",
+    "pbl",
+    "vietnam"
+  ],
+  "author": "Sergey",
+  "license": "UNLICENSED",
+  "private": true
+}

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My workspace - Lesson 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+</head>
+<body>
+  <div class="bg-scene" aria-hidden="true"><div class="stars"></div></div>
+  <header class="topbar">
+    <span class="lesson-tag" id="lesson-tag">Lesson 2</span>
+    <span class="who" id="who">...</span>
+    <span class="spacer"></span>
+    <span class="progress-pill">Done: <b id="progress-count">0/0</b></span>
+    <button class="btn btn-ghost" id="reset-btn" title="Clear all my progress for the current lesson only">Reset this lesson</button>
+    <button class="btn btn-ghost" id="reset-all-btn" title="Clear ALL progress (every lesson) and start over from Lesson 2">Reset ALL progress</button>
+    <button class="btn btn-ghost" id="logout-btn">Log out</button>
+    <span class="ts-mono" title="Teacher Sergey">TS</span>
+  </header>
+
+  <nav class="lesson-tabs" id="lesson-tabs" hidden></nav>
+
+  <main class="workspace">
+    <div class="driving-question" id="driving-question" hidden></div>
+
+    <div class="vocab-strip" id="vocab-strip"></div>
+
+    <div class="rules-card" id="rules-card">
+      <b>Gate rules for this lesson:</b>
+      <ul id="rules-list"></ul>
+    </div>
+
+    <div id="sections"></div>
+
+    <div class="complete-banner" id="complete-banner" hidden>
+      <h2 id="complete-title">Lesson complete!</h2>
+      <p id="complete-body">All gates passed.</p>
+      <div class="complete-actions">
+        <button class="btn btn-light" id="next-lesson-btn" hidden>Open the next lesson</button>
+        <button class="btn btn-publish big" id="proceed-btn" hidden>Proceed to Website Preview</button>
+      </div>
+      <p class="proceed-msg" id="proceed-msg" hidden></p>
+    </div>
+
+    <div class="error-box warning" id="l5-vocab-warning" hidden></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

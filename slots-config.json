@@ -1,0 +1,130 @@
+{
+  "version": 1,
+  "updated": "2026-07-27",
+  "description": "Backend contract for the student-site platform. Every slot of the template (index.html) described as data. The student workspace renders forms from this, the validation engine gates from this, the exporter consumes the same shape. Companion doc: CONTRACT.md.",
+  "template": {
+    "files": ["index.html", "styles.css", "motion.js", "particles.js", "flight.js", "carousel.js", "tools/fill-slots.js"],
+    "devOnlyFiles": ["dev-preview.js", "particle-demo.html"],
+    "slotMarker": "data-slot",
+    "themeAttribute": "data-theme on <html>"
+  },
+  "themes": [
+    { "id": "sunny-day",       "label": "Sunny Day",       "moodWords": ["happy", "warm", "playful", "friendly"] },
+    { "id": "ocean-calm",      "label": "Ocean Calm",      "moodWords": ["calm", "peaceful", "cool", "gentle"] },
+    { "id": "forest-explorer", "label": "Forest Explorer", "moodWords": ["natural", "adventurous", "earthy", "grounded"] },
+    { "id": "comic-pop",       "label": "Comic Pop",       "moodWords": ["bold", "fun", "loud", "exciting"] },
+    { "id": "comet-trail",     "label": "Comet Trail",     "moodWords": ["energetic", "techy", "futuristic", "exciting"] },
+    { "id": "deep-focus",      "label": "Deep Focus",      "moodWords": ["mysterious", "dramatic", "focused", "intense"] }
+  ],
+  "slots": [
+    {
+      "name": "hero-kicker", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 60,
+      "guidance": "Greeting line above the title. Pattern: 'Hi, my name is {author-name}' (variants welcome)."
+    },
+    {
+      "name": "site-title", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 80,
+      "guidance": "Main headline of the hero. Plain text, no markup."
+    },
+    {
+      "name": "hero-subtitle", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 140,
+      "guidance": "One welcoming sentence under the title."
+    },
+    {
+      "name": "about-me", "type": "text", "lesson": 2, "required": true,
+      "html": true, "allowedTags": ["p"], "maxLength": 600,
+      "guidance": "One paragraph about the student, wrapped in <p>...</p>. The only slot where markup is allowed."
+    },
+    {
+      "name": "hobby-title-1", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 40, "group": "hobby-1"
+    },
+    {
+      "name": "hobby-text-1", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 200, "group": "hobby-1",
+      "guidance": "1-2 sentences about the hobby."
+    },
+    {
+      "name": "hobby-title-2", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 40, "group": "hobby-2"
+    },
+    {
+      "name": "hobby-text-2", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 200, "group": "hobby-2"
+    },
+    {
+      "name": "hobby-title-3", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 40, "group": "hobby-3"
+    },
+    {
+      "name": "hobby-text-3", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 200, "group": "hobby-3"
+    },
+    {
+      "name": "footer-text", "type": "text", "lesson": 2, "required": false,
+      "html": false, "maxLength": 80,
+      "default": "Made with AI as my co-pilot. I am the Operator."
+    },
+    {
+      "name": "author-name", "type": "text", "lesson": 2, "required": true,
+      "html": false, "maxLength": 30,
+      "guidance": "Student alias (pseudonym), shown in the footer credit. No real full names."
+    },
+    {
+      "name": "background", "type": "image", "lesson": 3, "required": true,
+      "spec": { "width": 1600, "height": 900, "format": "jpg", "quality": 82 },
+      "alt": "",
+      "guidance": "Thematic photo matching the student's story. NO people, NO text, NO watermarks. Atmospheric, not distracting (theme scrim sits on top)."
+    },
+    {
+      "name": "avatar", "type": "image", "lesson": 3, "required": true,
+      "spec": { "width": 256, "height": 256, "format": "png", "transparent": true },
+      "alt": "AI-generated avatar of {author-name}",
+      "particles": true,
+      "guidance": "AI-generated only, personal photos are forbidden. Transparent background: pixels with alpha < 128 produce no particles, so the particle shape follows the silhouette."
+    },
+    {
+      "name": "hobby-image-1", "type": "image", "lesson": 3, "required": true,
+      "spec": { "width": 640, "height": 480, "format": "jpg" },
+      "alt": "{hobby-title-1}", "group": "hobby-1"
+    },
+    {
+      "name": "hobby-image-2", "type": "image", "lesson": 3, "required": true,
+      "spec": { "width": 640, "height": 480, "format": "jpg" },
+      "alt": "{hobby-title-2}", "group": "hobby-2"
+    },
+    {
+      "name": "hobby-image-3", "type": "image", "lesson": 3, "required": true,
+      "spec": { "width": 640, "height": 480, "format": "jpg" },
+      "alt": "{hobby-title-3}", "group": "hobby-3"
+    }
+  ],
+  "particles": {
+    "slot": "avatar",
+    "slotMarker": "data-particle-src",
+    "global": "window.PARTICLE_DATA",
+    "sampler": "tools/sample-particles.ps1",
+    "format": {
+      "w": "source image width (256)",
+      "h": "source image height (256)",
+      "step": "sampling grid step in px (4 for 256px avatars)",
+      "points": "[[x, y, luminance], ...] - luminance is 0-255 (Rec.601/709 weighted), pixels with alpha < 128 are skipped"
+    },
+    "luminanceNote": "particles.js consumes luminance as l = value / 100, so values above 100 saturate (brighter, larger particles). This is the gallery-approved look - do not 'normalize' to 0-100.",
+    "runtime": {
+      "durationMs": 1900,
+      "oneWay": true,
+      "budgets": { "low": 700, "mid": 1400, "high": 3000 },
+      "budgetRule": "deviceMemory<=2 or cores<=2 -> 700; mobile or mem<=4 or cores<=4 -> 1400; else 3000",
+      "fallbacks": ["prefers-reduced-motion -> plain image", "no canvas 2d -> CSS blur+scale settle", "no PARTICLE_DATA -> plain image"]
+    }
+  },
+  "contentRules": [
+    "Exactly 3 hobbies (hobby groups 1-3, all required)",
+    "Avatar is AI-generated only; personal photos forbidden",
+    "Background and all photos: no people, no text, no watermarks",
+    "Student identified by alias only (author-name), never a real full name"
+  ]
+}

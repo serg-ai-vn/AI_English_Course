@@ -1,0 +1,41 @@
+{
+  "lesson": 5,
+  "title": "Audit & publish",
+  "source": "Lesson_5.md (sections 2, 6, 7) - platform v1: export triggered by the teacher",
+  "drivingQuestion": "How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?",
+  "targetVocabulary": ["publish", "audit", "operator", "data", "fact", "prompt", "export", "link", "change", "presentation"],
+  "rules": {
+    "reflectionMinWords": 15,
+    "reflectionVocabWords": ["publish", "export", "change", "presentation"],
+    "reflectionVocabMin": 1
+  },
+  "hints": {
+    "auditRequired": "Please confirm you have audited your site to remove all real personal data and AI hallucinations.",
+    "reflectionShort": "Your answer is too short. Add one more sentence - at least 15 words in English.",
+    "reflectionVocab": "Use one of today's words in your reflection: publish, export, change, or presentation.",
+    "exportGated": "The student must complete the final audit and all six reflection questions before the site can be published.",
+    "exportVocab": "The reflection does not use any of today's words yet (publish, export, change, presentation). Ask the student to add one before publishing."
+  },
+  "fields": [
+    { "id": "audit", "label": "Final Operator Audit", "input": "checklist", "required": true,
+      "items": [
+        { "id": "data", "label": "I checked my site: no real personal data (no real name, address, phone)." },
+        { "id": "hallucination", "label": "I checked my site: no AI-invented facts about me." }
+      ],
+      "brief": "Operator's last check before your site goes to the world." },
+    { "id": "reflection-1", "label": "Reflection 1", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "What was the most surprising thing AI did during this course?" },
+    { "id": "reflection-2", "label": "Reflection 2", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "Show one \"before\" and \"after\" from your journal. What did you change, and why?" },
+    { "id": "reflection-3", "label": "Reflection 3", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "What English words or phrases do you feel more confident using now than at the start of the course?" },
+    { "id": "reflection-4", "label": "Reflection 4", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "What was the hardest part of being \"the Operator\"?" },
+    { "id": "reflection-5", "label": "Reflection 5", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "If you made this website again, what would you do differently?" },
+    { "id": "reflection-6", "label": "Reflection 6", "input": "direct", "required": true, "minWords": 15, "maxLength": 400,
+      "question": "What is one thing you want to try with AI outside of class?" }
+  ],
+  "order": 5,
+  "requiresLesson": 4
+}

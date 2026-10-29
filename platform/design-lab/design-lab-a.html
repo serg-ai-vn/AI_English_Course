@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Lab A - Night Lab</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   DESIGN LAB A - "Night Lab" (dark premium studio)
+   Platform = the lab where student sites are crafted.
+   Brand: violet/teal orbits + star dust (echo of Particle
+   Assemble on the student sites). Level-1 Teacher Sergey sign.
+   ============================================================ */
+:root {
+  --bg: #100D1F;
+  --card: rgba(255, 255, 255, 0.045);
+  --card-border: rgba(255, 255, 255, 0.09);
+  --ink: #EDEBFF;
+  --ink-soft: #9B95C4;
+  --ink-dim: #6E6899;
+  --line: rgba(255, 255, 255, 0.12);
+  --iris: #8052FF;
+  --teal: #00D9C0;
+  --amber: #FFB829;
+  --ok: #3DD6A7;
+  --ok-bg: rgba(61, 214, 167, 0.12);
+  --err: #FF7A70;
+  --err-bg: rgba(255, 122, 112, 0.12);
+  --grad: linear-gradient(120deg, #8052FF 0%, #6A5CFF 45%, #00D9C0 100%);
+  --radius: 16px;
+  --font-head: 'Space Grotesk', sans-serif;
+  --font-body: 'Inter', sans-serif;
+  font-size: 16px;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  line-height: 1.5;
+}
+
+::selection { background: rgba(128, 82, 255, 0.4); }
+
+/* ---------- ambient background ---------- */
+
+.bg-scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+.bg-scene {
+  background:
+    radial-gradient(1100px 550px at 85% -10%, rgba(128, 82, 255, 0.26), transparent 60%),
+    radial-gradient(950px 650px at -10% 108%, rgba(0, 217, 192, 0.16), transparent 60%);
+}
+.stars {
+  position: absolute; inset: 0;
+  background-image:
+    radial-gradient(2.6px 2.6px at 30px 40px, rgba(255, 255, 255, 0.5), transparent 70%),
+    radial-gradient(2px 2px at 140px 110px, rgba(201, 191, 255, 0.45), transparent 70%),
+    radial-gradient(1.6px 1.6px at 220px 60px, rgba(255, 255, 255, 0.35), transparent 70%),
+    radial-gradient(2.2px 2.2px at 90px 200px, rgba(0, 217, 192, 0.4), transparent 70%),
+    radial-gradient(1.6px 1.6px at 260px 240px, rgba(255, 255, 255, 0.3), transparent 70%),
+    radial-gradient(2px 2px at 180px 290px, rgba(255, 184, 41, 0.35), transparent 70%);
+  background-size: 300px 300px;
+  opacity: 0.55;
+}
+.stars::before {
+  content: ""; position: absolute; inset: 0;
+  background-image:
+    radial-gradient(1.6px 1.6px at 60px 90px, rgba(255, 255, 255, 0.4), transparent 70%),
+    radial-gradient(1.3px 1.3px at 150px 30px, rgba(201, 191, 255, 0.35), transparent 70%),
+    radial-gradient(1.8px 1.8px at 110px 150px, rgba(255, 255, 255, 0.3), transparent 70%);
+  background-size: 180px 180px;
+  background-position: 60px 90px;
+  opacity: 0.4;
+}
+.blob { display: none; }
+
+/* ---------- dev screen tag ---------- */
+
+.screen-tag {
+  text-align: center;
+  font-family: var(--font-head);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  margin: 22px 0 0;
+}
+
+/* ---------- login ---------- */
+
+.login-wrap {
+  min-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 22px;
+  padding: 38px 34px 30px;
+  box-shadow: 0 28px 70px rgba(4, 2, 16, 0.6);
+}
+
+.brand-row { display: flex; align-items: center; gap: 14px; margin-bottom: 10px; }
+.brand-rings { filter: drop-shadow(0 0 12px rgba(128, 82, 255, 0.5)); }
+.wordmark {
+  font-family: var(--font-head);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.login-sub { margin: 0 0 26px; color: var(--ink-soft); font-size: 0.95rem; }
+
+.login-card label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--ink-soft);
+  margin-bottom: 15px;
+}
+
+.login-card input {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  padding: 12px 14px;
+  background: rgba(8, 6, 20, 0.55);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--ink);
+  caret-color: var(--iris);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.login-card input::placeholder { color: var(--ink-dim); }
+.login-card input:focus {
+  outline: none;
+  border-color: var(--iris);
+  box-shadow: 0 0 0 3px rgba(128, 82, 255, 0.25);
+}
+
+.login-demo-note {
+  margin: 22px 0 0;
+  font-size: 0.76rem;
+  color: var(--ink-dim);
+  text-align: center;
+}
+.login-demo-note b { color: var(--ink-soft); }
+
+.brand-sign {
+  margin: 22px 0 0;
+  font-size: 0.8rem;
+  color: var(--ink-dim);
+  letter-spacing: 0.02em;
+}
+.sign-name {
+  font-weight: 600;
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---------- shared ---------- */
+
+.btn {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.08s ease, filter 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary {
+  background: var(--grad);
+  color: #fff;
+  box-shadow: 0 6px 22px rgba(128, 82, 255, 0.35);
+}
+.btn-primary:hover { filter: brightness(1.1); box-shadow: 0 8px 28px rgba(128, 82, 255, 0.45); }
+.btn-primary:disabled {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ink-dim);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn-ghost { background: transparent; color: var(--ink-soft); }
+.btn-ghost:hover { background: rgba(255, 255, 255, 0.07); color: var(--ink); }
+.btn-block { width: 100%; margin-top: 8px; padding: 13px 18px; font-size: 1rem; }
+
+.error-box {
+  background: var(--err-bg);
+  border: 1px solid rgba(255, 122, 112, 0.25);
+  color: var(--err);
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.9rem;
+  margin: 12px 0 0;
+}
+.error-box ul { margin: 0; padding-left: 18px; }
+
+/* ---------- topbar ---------- */
+
+.topbar {
+  background: rgba(16, 13, 31, 0.75);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 13px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.lesson-tag {
+  background: var(--grad);
+  color: #fff;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  border-radius: 999px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 16px rgba(128, 82, 255, 0.35);
+}
+.topbar .who { font-weight: 600; font-size: 0.95rem; }
+.topbar .spacer { flex: 1; }
+.progress-pill { font-size: 0.86rem; font-weight: 600; color: var(--ink-soft); }
+.progress-pill b {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+}
+.ts-mono {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--grad);
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  display: inline-grid;
+  place-items: center;
+  box-shadow: 0 4px 14px rgba(128, 82, 255, 0.4);
+  cursor: default;
+}
+
+/* ---------- workspace ---------- */
+
+.workspace { max-width: 860px; margin: 0 auto; padding: 26px 20px 90px; }
+
+.vocab-strip { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 10px; }
+.vocab-strip .strip-label { font-size: 0.85rem; color: var(--ink-soft); font-weight: 600; }
+.chip {
+  background: rgba(128, 82, 255, 0.15);
+  border: 1px solid rgba(128, 82, 255, 0.3);
+  color: #CDC4FF;
+  border-radius: 999px;
+  padding: 4px 13px;
+  font-size: 0.84rem;
+  font-weight: 600;
+}
+
+.rules-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px dashed rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius);
+  padding: 15px 20px;
+  margin: 14px 0 28px;
+  font-size: 0.9rem;
+  color: var(--ink-soft);
+}
+.rules-card b { color: var(--ink); }
+.rules-card ul { margin: 6px 0 0; padding-left: 20px; }
+.rules-card li { margin: 3px 0; }
+
+.section-title {
+  font-family: var(--font-head);
+  font-size: 1.12rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 34px 0 12px;
+}
+.section-title .section-index {
+  background: var(--grad);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  margin-right: 10px;
+}
+
+.field-card {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--card-border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  box-shadow: 0 14px 40px rgba(4, 2, 16, 0.35);
+}
+.field-card.done { border-color: rgba(61, 214, 167, 0.35); }
+
+.field-head { display: flex; align-items: baseline; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+.field-head .field-label { font-weight: 700; font-family: var(--font-head); letter-spacing: -0.01em; }
+.field-head .field-brief { color: var(--ink-soft); font-size: 0.84rem; }
+.field-head .spacer { flex: 1; }
+
+.status {
+  font-size: 0.72rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 4px 11px;
+  white-space: nowrap;
+  letter-spacing: 0.03em;
+}
+.status.open {
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ink-soft);
+}
+.status.done {
+  background: var(--ok-bg);
+  border: 1px solid rgba(61, 214, 167, 0.3);
+  color: var(--ok);
+}
+
+.field-card input[type="text"],
+.field-card textarea {
+  width: 100%;
+  background: rgba(8, 6, 20, 0.5);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: var(--ink);
+  caret-color: var(--iris);
+  resize: vertical;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-card input::placeholder, .field-card textarea::placeholder { color: var(--ink-dim); }
+.field-card input:focus, .field-card textarea:focus {
+  outline: none;
+  border-color: var(--iris);
+  box-shadow: 0 0 0 3px rgba(128, 82, 255, 0.22);
+}
+.field-card textarea { min-height: 84px; }
+.field-card .prompt-area { min-height: 70px; }
+.field-card textarea.edit-area { min-height: 100px; }
+
+.field-actions { display: flex; gap: 10px; align-items: center; margin-top: 12px; flex-wrap: wrap; }
+
+.iteration-note { font-size: 0.8rem; color: var(--ink-soft); }
+.iteration-note b { color: #CDC4FF; }
+
+.draft-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--ink-soft);
+  margin: 16px 0 7px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.ai-badge {
+  display: inline-block;
+  background: rgba(255, 184, 41, 0.14);
+  border: 1px solid rgba(255, 184, 41, 0.25);
+  color: #FFD08A;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: none;
+  letter-spacing: 0.02em;
+}
+
+.final-text {
+  background: var(--ok-bg);
+  border: 1px solid rgba(61, 214, 167, 0.22);
+  color: #D7F7EC;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 0.95rem;
+  white-space: pre-wrap;
+}
+
+.complete-banner {
+  background: var(--grad);
+  color: #fff;
+  border-radius: 20px;
+  padding: 30px;
+  text-align: center;
+  margin-top: 38px;
+  box-shadow: 0 18px 50px rgba(0, 217, 192, 0.22);
+}
+.complete-banner h2 { margin: 0 0 6px; font-family: var(--font-head); letter-spacing: -0.01em; }
+.complete-banner p { margin: 0; opacity: 0.92; }
+
+/* ---------- iteration journal ---------- */
+
+.iter-history { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.iter-entry {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.13);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+.iter-entry .iter-head { font-weight: 700; color: var(--ink); margin-bottom: 4px; font-size: 0.84rem; }
+.iter-entry .iter-row { margin: 2px 0; line-height: 1.45; }
+.iter-entry .iter-edited { color: var(--ok); }
+.iter-entry .iter-notes { font-style: italic; }
+
+.ai-draft-box {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 11px 13px;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+  margin-bottom: 6px;
+}
+
+.notes-label { font-size: 0.72rem; }
+
+@media (max-width: 600px) {
+  .topbar { padding: 12px 14px; }
+  .workspace { padding: 18px 12px 60px; }
+}
+</style>
+</head>
+<body>
+  <div class="bg-scene" aria-hidden="true">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="stars"></div>
+  </div>
+
+  <!-- ================= SCREEN 1 : LOGIN ================= -->
+  <section class="screen" data-screen="login">
+    <p class="screen-tag">Design Lab A &middot; Screen 1 - Login</p>
+    <div class="login-wrap">
+      <div class="login-card">
+        <div class="brand-row">
+          <svg class="brand-rings" width="50" height="32" viewBox="0 0 50 32" fill="none" aria-hidden="true">
+            <defs>
+              <linearGradient id="ringGrad" x1="0" y1="0" x2="50" y2="32" gradientUnits="userSpaceOnUse">
+                <stop offset="0" stop-color="#8052FF"/>
+                <stop offset="1" stop-color="#00D9C0"/>
+              </linearGradient>
+            </defs>
+            <circle cx="16" cy="16" r="12.5" stroke="url(#ringGrad)" stroke-width="4"/>
+            <circle cx="34" cy="16" r="12.5" stroke="url(#ringGrad)" stroke-width="4"/>
+          </svg>
+          <span class="wordmark">My AI Site</span>
+        </div>
+        <p class="login-sub">Sign in to your workspace</p>
+
+        <form onsubmit="return false">
+          <label>Class code
+            <input type="text" value="DEMO">
+          </label>
+          <label>Your name
+            <input type="text" value="Ziggy">
+          </label>
+          <label>PIN
+            <input type="password" value="2222">
+          </label>
+          <button class="btn btn-primary btn-block">Enter</button>
+        </form>
+
+        <p class="login-demo-note">Demo class: code <b>DEMO</b>, students <b>Lumi/1111</b>, <b>Ziggy/2222</b>, <b>Neo/3333</b></p>
+      </div>
+      <p class="brand-sign">crafted by <span class="sign-name">Teacher Sergey</span></p>
+    </div>
+  </section>
+
+  <!-- ================= SCREEN 2 : WORKSPACE ================= -->
+  <section class="screen" data-screen="workspace">
+    <p class="screen-tag">Design Lab A &middot; Screen 2 - Workspace</p>
+    <header class="topbar">
+      <span class="lesson-tag">Lesson 2 - Text: the prompt formula</span>
+      <span class="who">Ziggy (DEMO)</span>
+      <span class="spacer"></span>
+      <span class="progress-pill">Done: <b>2/10</b></span>
+      <button class="btn btn-ghost">Reset progress</button>
+      <button class="btn btn-ghost">Log out</button>
+      <span class="ts-mono" title="Teacher Sergey">TS</span>
+    </header>
+
+    <main class="workspace">
+      <div class="vocab-strip">
+        <span class="strip-label">Today's words:</span>
+        <span class="chip">role</span>
+        <span class="chip">context</span>
+        <span class="chip">task</span>
+        <span class="chip">format</span>
+        <span class="chip">energetic</span>
+        <span class="chip">boring</span>
+        <span class="chip">creative</span>
+        <span class="chip">paragraph</span>
+        <span class="chip">hobby</span>
+        <span class="chip">experience</span>
+      </div>
+
+      <div class="rules-card">
+        <b>Gate rules for this lesson:</b>
+        <ul>
+          <li>Every prompt must use the formula: <b>Role + Context + Task + Format</b>.</li>
+          <li>First prompt: at least <b>5 words</b>. Every next prompt: <b>3+ words longer</b> than your previous accepted one.</li>
+          <li><b>About Me</b>: <b>2 accepted prompts</b> + <b>2 of today's words</b> + <b>Present Perfect</b> ("I have played..." or "I have been playing...").</li>
+          <li><b>Hobbies</b>: <b>1 accepted prompt</b>, structure + Present Perfect only. Today's words are optional. Edit the AI draft if you want - your edit is saved in the journal.</li>
+        </ul>
+      </div>
+
+      <h2 class="section-title"><span class="section-index">01</span>Your site header</h2>
+
+      <div class="field-card done">
+        <div class="field-head">
+          <span class="field-label">Greeting line</span>
+          <span class="spacer"></span>
+          <span class="status done">Done</span>
+        </div>
+        <div class="final-text">Yo, my name is Ziggy</div>
+      </div>
+
+      <div class="field-card">
+        <div class="field-head">
+          <span class="field-label">Site title</span>
+          <span class="spacer"></span>
+          <span class="status open">Open</span>
+        </div>
+        <input type="text" placeholder="Site title">
+        <div class="field-actions">
+          <button class="btn btn-primary">Save</button>
+          <span class="iteration-note">Max 80 characters</span>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="section-index">02</span>About Me</h2>
+
+      <div class="field-card">
+        <div class="field-head">
+          <span class="field-label">About Me</span>
+          <span class="field-brief">One paragraph about you. Must include Present Perfect: "I have played...", "I have visited..."</span>
+          <span class="spacer"></span>
+          <span class="status open">Open</span>
+        </div>
+
+        <div class="iter-history">
+          <div class="iter-entry">
+            <div class="iter-head">Iteration 1</div>
+            <div class="iter-row">Prompt: Role: a 12-year-old skater. Context: I skate for three years. Task: Write about me. Format: One paragraph.</div>
+            <div class="iter-row">AI draft: I am a 12-year-old skater from Vietnam. I have skated for three years...</div>
+            <div class="iter-row iter-edited">Your edit: Yo, I am Ziggy, a skater from Vietnam. I have skated for three years...</div>
+          </div>
+        </div>
+
+        <div class="draft-label">Your prompt <span class="ai-badge">formula: Role + Context + Task + Format</span></div>
+        <textarea class="prompt-area" placeholder="Role: A 12-year-old student. Context: I have ... Task: Write ... Format: One paragraph, energetic tone."></textarea>
+        <div class="field-actions">
+          <button class="btn btn-primary">Generate</button>
+          <span class="iteration-note">Accepted prompts: <b>1</b> / 2 - 1 more before you can submit</span>
+        </div>
+
+        <div class="draft-label">Latest AI draft (read it, then edit or accept)</div>
+        <div class="ai-draft-box">I am Ziggy, a 12-year-old skater from Vietnam. I have skated for three years and I have landed my first kickflip this spring. I am loud, I am fast, and I love anything with a POW in it.</div>
+
+        <div class="draft-label">Your edit (required: rewrite the draft in your own words)</div>
+        <textarea class="edit-area">Yo, I am Ziggy, a skater from Vietnam. I have skated for three years and I have landed my first kickflip this spring. I am loud, I am fast, and I love anything with a POW in it.</textarea>
+
+        <div class="draft-label notes-label">Notes - hard words, what you changed, why (optional)</div>
+        <input type="text" class="notes-input" placeholder='e.g., "generic" was too hard, I changed it'>
+
+        <div class="field-actions">
+          <button class="btn btn-ghost">Save edit &amp; write next prompt</button>
+          <button class="btn btn-primary" disabled>Submit (locked - 1 more)</button>
+        </div>
+      </div>
+
+      <h2 class="section-title"><span class="section-index">03</span>My Hobbies</h2>
+
+      <div class="field-card">
+        <div class="field-head">
+          <span class="field-label">Hobby 1 - name</span>
+          <span class="spacer"></span>
+          <span class="status open">Open</span>
+        </div>
+        <input type="text" placeholder="Hobby 1 - name">
+        <div class="field-actions">
+          <button class="btn btn-primary">Save</button>
+          <span class="iteration-note">Max 40 characters</span>
+        </div>
+      </div>
+
+      <div class="complete-banner">
+        <h2>Lesson 2 complete!</h2>
+        <p>All your texts passed the gates. Your teacher can now review your site.</p>
+      </div>
+    </main>
+  </section>
+
+  <script>
+    var s = new URLSearchParams(location.search).get('screen');
+    if (s) {
+      document.querySelectorAll('.screen').forEach(function (el) {
+        if (el.dataset.screen !== s) el.style.display = 'none';
+      });
+    }
+  </script>
+</body>
+</html>

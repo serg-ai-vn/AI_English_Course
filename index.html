@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="sunny-day">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My AI Site</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- ==================================================
+       Fixed page background: generated image + scrim +
+       ambient drifting particles. Content floats above.
+       ================================================== -->
+  <div class="page-bg" aria-hidden="true">
+    <div class="slot slot-image page-bg-media"
+         data-slot="background" data-slot-type="image" id="slot-background">
+      <span class="slot-hint">[ slot: background ]</span>
+    </div>
+    <div class="ambient">
+      <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+    </div>
+  </div>
+
+  <!-- ==================================================
+       Flying avatar: lives above the page, travels between
+       the hero dock and the About dock on scroll (flight.js)
+       ================================================== -->
+  <div class="slot slot-image avatar-flight"
+       data-slot="avatar" data-slot-type="image" id="slot-avatar"
+       data-particle-src>
+    <span class="slot-hint">[ slot: avatar ]</span>
+  </div>
+
+  <!-- ==================================================
+       Navigation (template-level, not a student slot)
+       ================================================== -->
+  <header class="site-nav container">
+    <span class="nav-brand" aria-hidden="true">
+      <span class="nav-mark"></span>
+      <span class="nav-mark" style="border-bottom-color: var(--accent-secondary); margin-left: -8px;"></span>
+    </span>
+    <nav aria-label="Site">
+      <ul class="nav-links">
+        <li><a href="#about">About Me</a></li>
+        <li><a href="#hobbies">My Hobbies</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+    <!-- ==================================================
+         Hero: display headline + avatar
+         ================================================== -->
+    <section class="hero">
+      <div class="hero-inner container">
+        <div class="hero-copy">
+          <p class="slot slot-text hero-kicker"
+             data-slot="hero-kicker" data-slot-type="text" id="slot-hero-kicker"
+             data-reveal="fade-up">Hi, my name is Mia</p>
+
+          <h1 class="slot slot-text hero-title"
+              data-slot="site-title" data-slot-type="text" id="slot-site-title"
+              data-reveal="letters">Football, art and a little bit of magic</h1>
+
+          <p class="slot slot-text hero-subtitle"
+             data-slot="hero-subtitle" data-slot-type="text" id="slot-hero-subtitle"
+             data-reveal="fade-up">Welcome to my corner of the internet. I built it with AI as my co-pilot.</p>
+        </div>
+
+        <div class="avatar-dock hero-avatar-dock" id="avatar-dock-hero" aria-hidden="true"></div>
+      </div>
+
+      <span class="scroll-cue" aria-hidden="true">Scroll</span>
+    </section>
+
+    <!-- ==================================================
+         01 - About Me (avatar flies here from the hero)
+         ================================================== -->
+    <section class="section container" id="about">
+      <p class="section-label" data-reveal="fade-up">
+        <span class="section-index">01</span> About Me
+      </p>
+
+      <div class="about-grid">
+        <div class="avatar-dock about-avatar-dock" id="avatar-dock-about" aria-hidden="true"></div>
+
+        <div class="slot slot-text about-text"
+             data-slot="about-me" data-slot-type="text" id="slot-about-me"
+             data-reveal="slide-right">
+          <p>I am twelve years old and I live in a big city. I love drawing characters, playing football with my friends, and building secret bases in Minecraft. This year I learned how to work with AI: I write prompts, check the results, and make them better, step by step.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================================================
+         02 - My Hobbies
+         ================================================== -->
+    <section class="section container" id="hobbies">
+      <p class="section-label" data-reveal="fade-up">
+        <span class="section-index">02</span> My Hobbies
+      </p>
+      <h2 class="section-title" data-reveal="fade-up">Things I can talk about for hours</h2>
+
+      <div class="carousel" id="hobby-carousel" data-reveal="fade-up">
+        <button class="carousel-btn carousel-prev" type="button" aria-label="Previous hobby">&lt;</button>
+
+        <div class="carousel-stage">
+          <article class="hobby">
+            <div class="slot slot-image hobby-media"
+                 data-slot="hobby-image-1" data-slot-type="image" id="slot-hobby-image-1">
+              <span class="slot-hint">[ slot: hobby image 1 ]</span>
+            </div>
+            <div class="hobby-info">
+              <h3 class="slot slot-text hobby-title"
+                  data-slot="hobby-title-1" data-slot-type="text" id="slot-hobby-title-1">Football</h3>
+              <p class="slot slot-text hobby-text"
+                 data-slot="hobby-text-1" data-slot-type="text" id="slot-hobby-text-1">I play striker for our school team. My dream is to score a bicycle kick in a real match.</p>
+            </div>
+          </article>
+
+          <article class="hobby">
+            <div class="slot slot-image hobby-media"
+                 data-slot="hobby-image-2" data-slot-type="image" id="slot-hobby-image-2">
+              <span class="slot-hint">[ slot: hobby image 2 ]</span>
+            </div>
+            <div class="hobby-info">
+              <h3 class="slot slot-text hobby-title"
+                  data-slot="hobby-title-2" data-slot-type="text" id="slot-hobby-title-2">Drawing</h3>
+              <p class="slot slot-text hobby-text"
+                 data-slot="hobby-text-2" data-slot-type="text" id="slot-hobby-text-2">I draw my own comic characters. AI helps me test new styles, but the ideas are always mine.</p>
+            </div>
+          </article>
+
+          <article class="hobby">
+            <div class="slot slot-image hobby-media"
+                 data-slot="hobby-image-3" data-slot-type="image" id="slot-hobby-image-3">
+              <span class="slot-hint">[ slot: hobby image 3 ]</span>
+            </div>
+            <div class="hobby-info">
+              <h3 class="slot slot-text hobby-title"
+                  data-slot="hobby-title-3" data-slot-type="text" id="slot-hobby-title-3">Minecraft</h3>
+              <p class="slot slot-text hobby-text"
+                 data-slot="hobby-text-3" data-slot-type="text" id="slot-hobby-text-3">I build castles and secret underground bases with redstone traps. Engineering is fun.</p>
+            </div>
+          </article>
+        </div>
+
+        <button class="carousel-btn carousel-next" type="button" aria-label="Next hobby">&gt;</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==================================================
+       Footer
+       ================================================== -->
+  <footer class="site-footer container">
+    <p class="slot slot-text footer-text"
+       data-slot="footer-text" data-slot-type="text" id="slot-footer-text"
+       data-reveal="fade-up">Made with AI as my co-pilot. I am the Operator.</p>
+    <p class="footer-credit">
+      Created by
+      <span class="slot slot-text"
+            data-slot="author-name" data-slot-type="text" id="slot-author-name">Mia</span>
+    </p>
+  </footer>
+
+  <!-- Production modules -->
+  <script src="motion.js"></script>
+  <script src="particles.js"></script>
+  <script src="flight.js"></script>
+  <script src="carousel.js"></script>
+  <!-- DEV PREVIEW ONLY - remove before production -->
+  <script src="dev-preview.js"></script>
+</body>
+</html>

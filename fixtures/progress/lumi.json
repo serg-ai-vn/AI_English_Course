@@ -1,0 +1,391 @@
+{
+  "studentId": "lumi",
+  "lesson": 4,
+  "complete": true,
+  "unlockedLessons": [
+    2,
+    3,
+    4
+  ],
+  "fields": {
+    "hero-kicker": {
+      "value": "Hi, I'm Lumi",
+      "status": "done"
+    },
+    "site-title": {
+      "value": "Lumi's Skate World",
+      "status": "done"
+    },
+    "hero-subtitle": {
+      "value": "Welcome to my site about skating, art, and gaming",
+      "status": "done"
+    },
+    "about-me": {
+      "value": "I'm Lumi, a 12-year-old skater and artist. I have skated for two years now, and I have drawn so many pictures of my friends at the skatepark. My board is my favourite thing - I ride it every day after school. I think skating and art are the same thing: you create something new every time. Welcome to my world!",
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "stage": 1,
+          "prompt": "Role: A 12-year-old student. Context: I have skated for two years and I have drawn many pictures. Task: Write a short paragraph about me. Format: One energetic paragraph.",
+          "draft": "I am a student. I have skated for two years. I have drawn many pictures. I like skating and drawing. They are my hobbies.",
+          "good": "The text has Present Perfect and my hobbies",
+          "needsChange": "It is too boring and short, needs more energy"
+        },
+        {
+          "stage": 2,
+          "prompt": "Role: A 12-year-old student who loves skating and art. Context: I have skated for two years and I have drawn many pictures of my friends. Task: Write a short paragraph about me and my hobbies. Format: One energetic paragraph with colorful details.",
+          "draft": "I am Lumi, a 12-year-old skater and artist. I have skated for two years now, and I have drawn so many pictures of my friends at the skatepark. My board is my favourite thing. I ride it every day after school. I think skating and art are the same thing: you create something new every time.",
+          "good": "Much more energetic and personal with details",
+          "needsChange": "Add a welcome line at the end for my site"
+        }
+      ],
+      "acceptedPrompts": [
+        "Role: A 12-year-old student. Context: I have skated for two years and I have drawn many pictures. Task: Write a short paragraph about me. Format: One energetic paragraph.",
+        "Role: A 12-year-old student who loves skating and art. Context: I have skated for two years and I have drawn many pictures of my friends. Task: Write a short paragraph about me and my hobbies. Format: One energetic paragraph with colorful details."
+      ]
+    },
+    "hobby-title-1": {
+      "value": "Skateboarding",
+      "status": "done"
+    },
+    "hobby-text-1": {
+      "value": "Skateboarding is my passion. I have skated for two years now. I love the feeling of freedom when I ride. Every day after school, I go to the skatepark with my friends. It is the best part of my day.",
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "stage": 1,
+          "prompt": "Role: A 12-year-old skater. Context: I have skated for two years. Task: Write a short paragraph about why I love skating. Format: One paragraph, energetic tone.",
+          "draft": "Skateboarding is my passion. I have skated for two years now. I love the feeling of freedom when I ride. Every day after school, I go to the skatepark with my friends. It is the best part of my day."
+        }
+      ],
+      "acceptedPrompts": [
+        "Role: A 12-year-old skater. Context: I have skated for two years. Task: Write a short paragraph about why I love skating. Format: One paragraph, energetic tone."
+      ],
+      "bonusClaimed": false
+    },
+    "hobby-title-2": {
+      "value": "Drawing",
+      "status": "done"
+    },
+    "hobby-text-2": {
+      "value": "Drawing is my favourite hobby. I have drawn pictures for three years now. I love to draw my friends at the skatepark and my cat Luna. Art makes me happy and calm. When I draw, I feel free.",
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "stage": 1,
+          "prompt": "Role: A 12-year-old artist. Context: I have drawn pictures for three years. Task: Write a short paragraph about my art. Format: One paragraph.",
+          "draft": "Drawing is my favourite hobby. I have drawn pictures for three years. I like to draw my friends and animals.",
+          "edited": "Drawing is my favourite hobby. I have drawn pictures for three years now. I love to draw my friends at the skatepark and my cat Luna. Art makes me happy and calm. When I draw, I feel free.",
+          "reason": "The text was boring, so I added my cat Luna and the skatepark to make it personal"
+        }
+      ],
+      "acceptedPrompts": [
+        "Role: A 12-year-old artist. Context: I have drawn pictures for three years. Task: Write a short paragraph about my art. Format: One paragraph."
+      ],
+      "bonusClaimed": true
+    },
+    "hobby-title-3": {
+      "value": "Gaming",
+      "status": "done"
+    },
+    "hobby-text-3": {
+      "value": "Gaming is fun. I have played games for five years. I like racing games the most. They are fast and exciting. My favourite game is Rocket Kart because I can build my own tracks.",
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "stage": 1,
+          "prompt": "Role: A 12-year-old gamer. Context: I have played games for five years. Task: Write a short paragraph about my gaming hobby. Format: One paragraph.",
+          "draft": "Gaming is fun. I have played games for five years. I like racing games the most. They are fast and exciting. My favourite game is Rocket Kart because I can build my own tracks."
+        }
+      ],
+      "acceptedPrompts": [
+        "Role: A 12-year-old gamer. Context: I have played games for five years. Task: Write a short paragraph about my gaming hobby. Format: One paragraph."
+      ],
+      "bonusClaimed": false
+    },
+    "footer-text": {
+      "value": "Made with AI as my co-pilot. I am the Operator.",
+      "status": "done"
+    },
+    "avatar": {
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "prompt": "Subject: a 12-year-old Vietnamese girl with short black hair\nStyle: stylized concept art portrait\nFraming: close-up face and shoulders\nLighting: soft volumetric lighting from the side",
+          "image": {
+            "path": "rehearsal/assets/lumi-avatar.png",
+            "url": "/preview/rehearsal/assets/lumi-avatar.png"
+          },
+          "structure": {
+            "subject": "a 12-year-old Vietnamese girl with short black hair",
+            "style": "stylized concept art portrait",
+            "framing": "close-up face and shoulders",
+            "lighting": "soft volumetric lighting from the side"
+          },
+          "pros": "vivid colors, clean shape, friendly expression",
+          "cons": "the eyes look empty, the background is plain",
+          "best": null,
+          "worst": {
+            "reason": "extra fingers are a hallucination, AI flaw I should not ship"
+          },
+          "ts": 1785912973616
+        },
+        {
+          "prompt": "Subject: a 12-year-old Vietnamese girl with short black hair\nStyle: anime illustration with thin outlines\nFraming: close-up face and shoulders\nLighting: bright cinematic lighting from above\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-avatar.png",
+            "url": "/preview/rehearsal/assets/lumi-avatar.png"
+          },
+          "structure": {
+            "subject": "a 12-year-old Vietnamese girl with short black hair",
+            "style": "anime illustration with thin outlines",
+            "framing": "close-up face and shoulders",
+            "lighting": "bright cinematic lighting from above"
+          },
+          "pros": "I like the anime style and the eyes shine",
+          "cons": "the hair looks flat and the colors are too bright",
+          "best": {
+            "reason": "the face is clear and the colors are calm, this fits my story"
+          },
+          "worst": null,
+          "ts": 1785913005147
+        },
+        {
+          "prompt": "Subject: a 12-year-old Vietnamese girl with short black hair\nStyle: anime illustration with thin outlines\nFraming: full body standing pose with fine detail\nLighting: bright cinematic lighting from above\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-avatar.png",
+            "url": "/preview/rehearsal/assets/lumi-avatar.png"
+          },
+          "structure": {
+            "subject": "a 12-year-old Vietnamese girl with short black hair",
+            "style": "anime illustration with thin outlines",
+            "framing": "full body standing pose with fine detail",
+            "lighting": "bright cinematic lighting from above"
+          },
+          "pros": "the pose looks natural and the shoes are detailed",
+          "cons": "the hands look melted and the fingers are extra",
+          "best": null,
+          "worst": null,
+          "ts": 1785913030459
+        }
+      ],
+      "acceptedImage": "rehearsal/assets/lumi-avatar.png",
+      "value": "rehearsal/assets/lumi-avatar.png"
+    },
+    "background": {
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "prompt": "Subject: a music room background with a piano\nStyle: warm watercolor illustration\nFraming: wide room interior, piano in center\nLighting: golden afternoon light through the window",
+          "image": {
+            "path": "rehearsal/assets/lumi-background.jpg",
+            "url": "/preview/rehearsal/assets/lumi-background.jpg"
+          },
+          "structure": {
+            "subject": "a music room background with a piano",
+            "style": "warm watercolor illustration",
+            "framing": "wide room interior, piano in center",
+            "lighting": "golden afternoon light through the window"
+          },
+          "pros": "the colors are warm and the piano is clear",
+          "cons": "the picture feels too empty and nothing happens",
+          "best": null,
+          "worst": {
+            "reason": "too empty and the piano gets lost, low detail"
+          },
+          "ts": 1785913425308
+        },
+        {
+          "prompt": "Subject: a music room background with a piano\nStyle: warm watercolor illustration\nFraming: close-up of the piano keys\nLighting: blue evening light from the side\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-background.jpg",
+            "url": "/preview/rehearsal/assets/lumi-background.jpg"
+          },
+          "structure": {
+            "subject": "a music room background with a piano",
+            "style": "warm watercolor illustration",
+            "framing": "close-up of the piano keys",
+            "lighting": "blue evening light from the side"
+          },
+          "pros": "I like the close-up, the keys look real",
+          "cons": "the image is too dark and hard to see details",
+          "best": null,
+          "worst": null,
+          "ts": 1785914289744
+        },
+        {
+          "prompt": "Subject: a music room background with a piano\nStyle: hi-detail concept art of a music hall\nFraming: close-up of the piano keys\nLighting: blue evening light from the side\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-background.jpg",
+            "url": "/preview/rehearsal/assets/lumi-background.jpg"
+          },
+          "structure": {
+            "subject": "a music room background with a piano",
+            "style": "hi-detail concept art of a music hall",
+            "framing": "close-up of the piano keys",
+            "lighting": "blue evening light from the side"
+          },
+          "pros": "very detailed and moody blue lighting fits my music story",
+          "cons": "tiny watermark at the bottom looks like writing",
+          "best": {
+            "reason": "the concept art style fits my music story and the lighting is moody"
+          },
+          "worst": null,
+          "ts": 1785914457386
+        }
+      ],
+      "acceptedImage": "rehearsal/assets/lumi-background.jpg",
+      "value": "rehearsal/assets/lumi-background.jpg"
+    },
+    "hobby-image-1": {
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "version": 1,
+          "prompt": "Subject: a soccer ball on the green grass\nStyle: concept art\nFraming: close-up\nLighting: volumetric lighting\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-hobby-1.jpg",
+            "url": "/preview/rehearsal/assets/lumi-hobby-1.jpg"
+          },
+          "structure": {
+            "subject": "a soccer ball on the green grass",
+            "style": "concept art",
+            "framing": "close-up",
+            "lighting": "volumetric lighting"
+          },
+          "pros": "",
+          "cons": "",
+          "best": null,
+          "worst": null,
+          "ts": 1785980129856
+        },
+        {
+          "version": 2,
+          "prompt": "Subject: The musician playing the guitar\nStyle: concept art\nFraming: close-up\nLighting: volumetric lighting\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-hobby-1.jpg",
+            "url": "/preview/rehearsal/assets/lumi-hobby-1.jpg"
+          },
+          "structure": {
+            "subject": "The musician playing the guitar",
+            "style": "concept art",
+            "framing": "close-up",
+            "lighting": "volumetric lighting"
+          },
+          "reason": "I think it's boring.",
+          "ts": 1785980213833
+        }
+      ],
+      "acceptedImage": null,
+      "publishedVersion": 2,
+      "value": "rehearsal/assets/lumi-hobby-1.jpg"
+    },
+    "hobby-image-2": {
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "version": 1,
+          "prompt": "Subject: a soccer ball on the green grass\nStyle: concept art\nFraming: close-up\nLighting: bright daylight\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-hobby-2.jpg",
+            "url": "/preview/rehearsal/assets/lumi-hobby-2.jpg"
+          },
+          "structure": {
+            "subject": "a soccer ball on the green grass",
+            "style": "concept art",
+            "framing": "close-up",
+            "lighting": "bright daylight"
+          },
+          "pros": "",
+          "cons": "",
+          "best": null,
+          "worst": null,
+          "ts": 1785980239440
+        }
+      ],
+      "acceptedImage": null,
+      "publishedVersion": 1,
+      "value": "rehearsal/assets/lumi-hobby-2.jpg"
+    },
+    "hobby-image-3": {
+      "status": "done",
+      "nextStep": "done",
+      "iterations": [
+        {
+          "version": 1,
+          "prompt": "Subject: an open sketchbook with colorful pencils\nStyle: concept art\nFraming: close-up\nLighting: volumetric lighting\n",
+          "image": {
+            "path": "rehearsal/assets/lumi-hobby-3.jpg",
+            "url": "/preview/rehearsal/assets/lumi-hobby-3.jpg"
+          },
+          "structure": {
+            "subject": "an open sketchbook with colorful pencils",
+            "style": "concept art",
+            "framing": "close-up",
+            "lighting": "volumetric lighting"
+          },
+          "pros": "",
+          "cons": "",
+          "best": null,
+          "worst": null,
+          "ts": 1785980254102
+        }
+      ],
+      "acceptedImage": null,
+      "publishedVersion": 1,
+      "value": "rehearsal/assets/lumi-hobby-3.jpg"
+    },
+    "theme": {
+      "value": "ocean-calm",
+      "status": "done",
+      "nextStep": "done",
+      "option1": {
+        "prompt": "Role: Act as a creative web designer\nContext: My website is about energetic soccer and music\nTask: Suggest a color palette and fonts\nFormat: An energetic and bold mood with high contrast\n",
+        "moodWord": "energetic",
+        "preset": "comet-trail",
+        "presetName": "Comet Trail",
+        "palette": [
+          "#EAE7F5",
+          "#6C5CE7",
+          "#00D9C0",
+          "#2A2640"
+        ],
+        "fontHeading": "Space Grotesk",
+        "fontBody": "Inter",
+        "ts": 1785980389834
+      },
+      "option2": {
+        "prompt": "Role: Act as a creative web designer\nContext: My website is about energetic soccer and music\nTask: Suggest a color palette and fonts\nFormat: A calm and cool mood\n\n",
+        "moodWord": "calm",
+        "preset": "ocean-calm",
+        "presetName": "Ocean Calm",
+        "palette": [
+          "#EAF4F4",
+          "#3A86FF",
+          "#8ECAE6",
+          "#1D3557"
+        ],
+        "fontHeading": "Quicksand",
+        "fontBody": "Inter",
+        "ts": 1785980415240
+      },
+      "choice": 2,
+      "justification": "I chose Ocean Calm because it is calmer and softer than Comet Trail, and the soft palette matches my mood better.",
+      "ts": 1785980442403
+    }
+  },
+  "theme": "ocean-calm",
+  "built": {
+    "ts": 1785980483875,
+    "file": "dist/lumi.html",
+    "size": 341483
+  }
+}

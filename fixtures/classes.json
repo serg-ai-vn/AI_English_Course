@@ -1,0 +1,41 @@
+{
+  "classes": [
+    {
+      "code": "DEMO",
+      "name": "Demo Class",
+      "teacherPin": "0000",
+      "students": [
+        {
+          "id": "lumi",
+          "name": "Lumi",
+          "pin": "1111"
+        },
+        {
+          "id": "ziggy",
+          "name": "Ziggy",
+          "pin": "2222"
+        },
+        {
+          "id": "neo",
+          "name": "Neo",
+          "pin": "3333"
+        },
+        {
+          "id": "khoa",
+          "name": "Khoa",
+          "pin": "4444"
+        },
+        {
+          "id": "nia",
+          "name": "Nia",
+          "pin": "5555"
+        },
+        {
+          "id": "rex",
+          "name": "Rex",
+          "pin": "6666"
+        }
+      ]
+    }
+  ]
+}

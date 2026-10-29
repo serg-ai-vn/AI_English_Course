@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teacher console - Lesson 2</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="platform.css">
+</head>
+<body>
+  <div class="bg-scene" aria-hidden="true"><div class="stars"></div></div>
+  <header class="topbar">
+    <span class="lesson-tag" id="lesson-tag">Lesson 2</span>
+    <span class="who" id="who">Teacher ...</span>
+    <span class="spacer"></span>
+    <label class="auto-toggle" title="Poll every 5 seconds">
+      <input type="checkbox" id="auto-toggle"> Auto-refresh<span class="refresh-dot" id="refresh-dot"></span>
+    </label>
+    <button class="btn btn-ghost" id="refresh-btn" title="Reload the table now">Refresh</button>
+    <button class="btn btn-ghost" id="logout-btn">Log out</button>
+    <span class="ts-mono" title="Teacher Sergey">TS</span>
+  </header>
+
+  <nav class="lesson-tabs" id="console-tabs" hidden></nav>
+
+  <main class="console">
+    <h2 class="section-title" style="margin: 18px 0 14px;">Class overview</h2>
+    <div class="class-summary" id="summary"></div>
+
+    <div class="console-tools">
+      <h2 class="section-title" style="margin: 0;">Students</h2>
+      <span class="spacer"></span>
+      <span style="color: var(--ink-dim); font-size: 0.8rem;" id="last-refresh">not refreshed yet</span>
+    </div>
+
+    <p class="console-help" id="console-help" hidden></p>
+
+    <div id="table-wrap"></div>
+  </main>
+
+  <script src="teacher.js"></script>
+</body>
+</html>

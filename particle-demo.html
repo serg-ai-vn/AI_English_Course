@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="deep-focus">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Particle Assemble - isolated test</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Demo-page-only styles (not part of the template) */
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: var(--space-5);
+      padding: var(--space-6) var(--page-gutter);
+    }
+
+    .demo-title {
+      font-size: var(--text-heading-sm);
+      letter-spacing: var(--tracking-heading);
+    }
+
+    .demo-note {
+      color: var(--text-muted);
+      font-size: var(--text-label);
+      margin-top: calc(-1 * var(--space-3));
+    }
+
+    .demo-stage {
+      padding: var(--space-16);
+    }
+
+    .demo-avatar {
+      position: relative;
+      width: min(420px, 72vw);
+      aspect-ratio: 1 / 1;
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .demo-controls {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+    }
+
+    .demo-btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: var(--radius-full);
+      background: var(--accent-primary);
+      color: var(--background);
+      font-family: var(--font-body);
+      font-size: var(--text-label);
+      font-weight: var(--weight-semibold);
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .demo-btn:active {
+      transform: scale(0.97);
+    }
+
+    .demo-stat {
+      font-size: var(--text-label);
+      color: var(--text-muted);
+      min-width: 12ch;
+    }
+
+    .demo-hint {
+      font-size: var(--text-caption);
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <h1 class="demo-title">Particle Assemble</h1>
+  <p class="demo-note">
+    Canvas 2D &middot; <span id="stat-count">-</span> source points &middot;
+    device budget <span id="stat-budget">-</span>
+  </p>
+
+  <div class="demo-stage">
+    <div class="slot slot-image demo-avatar"
+         data-slot="avatar" data-slot-type="image" id="slot-avatar"
+         data-particle-src>
+      <img src="demo-assets/avatar.jpg" alt="Demo avatar">
+    </div>
+  </div>
+
+  <div class="demo-controls">
+    <button class="demo-btn" id="replay" type="button">Replay</button>
+    <span class="demo-stat" id="stat-fps">FPS: -</span>
+  </div>
+
+  <p class="demo-hint">?t=0.5 renders a frozen frame &middot; switch theme with the dots to recolor particles</p>
+
+  <script src="demo-assets/avatar-particles.js"></script>
+  <script src="particles.js"></script>
+  <script src="dev-preview.js"></script>
+  <script>
+    (function () {
+      var slot = document.getElementById('slot-avatar');
+      var data = (window.PARTICLE_DATA || {})['avatar'];
+
+      document.getElementById('stat-count').textContent =
+        data ? data.points.length : 'no data';
+      document.getElementById('stat-budget').textContent =
+        window.ParticleAssemble ? ParticleAssemble.budget() : '-';
+
+      slot.addEventListener(ParticleAssemble.DONE_EVENT, function (e) {
+        document.getElementById('stat-fps').textContent =
+          'FPS: ' + e.detail.fps + ' (' + e.detail.particles + ' particles)';
+      });
+
+      document.getElementById('replay').addEventListener('click', function () {
+        ParticleAssemble.run(slot);
+      });
+
+      /* Frozen-frame mode for visual testing: ?t=0.5 */
+      var t = parseFloat(new URLSearchParams(location.search).get('t'));
+      if (!isNaN(t)) {
+        slot.removeAttribute('data-particle-src'); /* disable auto-run */
+        window.addEventListener('load', function () {
+          ParticleAssemble.run(slot, { seek: t });
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
