@@ -6,4 +6,4 @@
 
 Реализованы локальные исправления аудита: экспорт и безопасность, гейты, точечные коррекции с журналом, schema/course/revision, Node builder, mock/live-адаптер, лимиты, backup/restore, tests/CI, Docker/VPS-runbook. Исходный прогресс владельца сохранён.
 
-Состояние приёмки PR #1 — в docs/ACCEPTANCE.md и GitHub. После принятия следующий шаг — открытые проверки из docs/IMPLEMENTATION_STATUS.md. Live API, Docker/VPS и учебный пилот не считать пройденными без фактических результатов.
+Независимая приёмка кода 7dcd350: PASS, 6/6 тестов и отдельная проверка Chrome. Протокол docs/ACCEPTANCE.md. После объединения PR #1 рабочая ветка main; следующая работа — реальные API и открытые проверки из docs/IMPLEMENTATION_STATUS.md. Live API, Docker/VPS и учебный пилот не считать пройденными без фактических результатов.
