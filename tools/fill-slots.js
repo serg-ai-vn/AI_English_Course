@@ -34,12 +34,13 @@
     if (!el) return;
     var v = slots[name];
     /* Arrays fill list-type slots (e.g. mood-tags -> <li> items) */
-    if (Object.prototype.toString.call(v) === '[object Array]') {
-      el.innerHTML = v.map(function (item) {
-        return '<li>' + item + '</li>';
-      }).join('');
+    el.textContent = '';
+    if (name === 'about-me') {
+      var p = document.createElement('p'); p.textContent = String(v || '').replace(/^<p>/i, '').replace(/<\/p>$/i, ''); el.appendChild(p);
+    } else if (Object.prototype.toString.call(v) === '[object Array]') {
+      v.forEach(function(item) { var li = document.createElement('li'); li.textContent = String(item); el.appendChild(li); });
     } else {
-      el.innerHTML = v;
+      el.textContent = String(v || '');
     }
   });
 

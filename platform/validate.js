@@ -67,23 +67,10 @@ function effectiveVocabulary(cfg, fieldDef) {
 /* Present Perfect heuristic: have/has/'ve/'s + (word ending in -ed | known V3).
    Also accepts Present Perfect Continuous: "I have been playing", "she's been drawing". */
 function hasPresentPerfect(text, v3verbs) {
-  /* Present Perfect Continuous: have/has/'ve/'s + been + V-ing */
-  if (/\b(have|has|'ve|'s)\s+been\s+[a-z]+ing\b/i.test(String(text || ''))) return true;
-  var re = /\b(have|has|'ve|'s)\s+([a-z']+)/gi;
-  var m;
-  var v3 = {};
-  (v3verbs || []).forEach(function (v) { v3[v] = true; });
-  while ((m = re.exec(String(text || ''))) !== null) {
-    var next = m[2].toLowerCase();
-    if (v3[next]) return true;
-    if (/[a-z]+ed$/.test(next) && !/^(not|never|just|already|ever)$/.test(next)) return true;
-    /* "have never played" - allow one adverb in between */
-    if (/^(not|never|just|already|ever)$/.test(next)) {
-      var rest = String(text).slice(m.index + m[0].length).trim().split(/\s+/)[0];
-      if (rest && (v3[rest.toLowerCase()] || /[a-z]+ed$/.test(rest.toLowerCase()))) return true;
-    }
-  }
-  return false;
+  const irregular = new Set((v3verbs || []).concat(['fed','led','fled','shed','bled','said','taken','given','got','gone','eaten','drunk','bought','thought','caught','told','found','kept','left','lost','sent','spent','slept','spoken','worn']));
+  const nonVerbs = new Set(['red','bed','sled','seed','weed','feed','need','speed']);
+  const re = /(?:\b(?:have|has|haven't|hasn't)|\b\w+['’](?:ve|s))\s+(?:(?:not|never|ever|just|already|always|often|also|recently|only)\s+){0,2}([a-z]+)\b/gi;
+  let m; while ((m = re.exec(String(text || '')))) { const w=m[1].toLowerCase(); if(irregular.has(w) || (w.length>=4 && /^[a-z]+ed$/.test(w) && !nonVerbs.has(w))) return true; } return false;
 }
 
 /* Check a prompt against the gating rules.
@@ -114,6 +101,8 @@ function checkPrompt(prompt, prevAcceptedPrompts, cfg, fieldDef) {
     var re = new RegExp('\\b' + w.toLowerCase() + '\\s*[:\\-]', 'i');
     if (!re.test(String(prompt || ''))) missingStruct.push(w);
   });
+  const labeled = parseLabeled(prompt, structural);
+  structural.forEach(w => { if (!String(labeled[w] || '').trim() && !missingStruct.includes(w)) missingStruct.push(w); });
   if (missingStruct.length > 0) {
     errors.push({ rule: 'structure', hint: cfg.hints.structure });
   }
@@ -385,7 +374,7 @@ function canAcceptImageField(iterations, cfg) {
   var errors = [];
   iterations = iterations || [];
 
-  if (iterations.length < (cfg.rules.minImageIterations || 3)) {
+  if (iterations.filter(it => countWords(it.pros) >= (cfg.rules.prosMinWords || 3) && countWords(it.cons) >= (cfg.rules.consMinWords || 3)).length < (cfg.rules.minImageIterations || 3)) {
     errors.push({ rule: 'iterations', hint: cfg.hints.iterations || cfg.hints.accept });
   }
 

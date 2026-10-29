@@ -211,6 +211,8 @@ function renderRow(stu) {
   if (ls['4']) meta.appendChild(lessonPill(4, ls['4'], stu));
   if (ls['5']) meta.appendChild(lessonPill(5, ls['5'], stu));
   cell.appendChild(meta);
+  var correction=el('button','btn btn-ghost mini-btn','Allow correction');
+  correction.addEventListener('click',async function(e){e.stopPropagation();var field=prompt('Field ID (about-me, hobby-text-1, avatar, background, hobby-image-1, theme, reflection-1, etc.)');if(!field)return;var reason=prompt('Reason for reopening this field');if(!reason)return;var r=await api('/api/teacher/allow-correction','POST',{studentId:stu.id,field:field,reason:reason});if(!r.ok)alert(r.error || 'Cannot allow correction');else refreshOverview();});cell.appendChild(correction);
   c1.appendChild(cell);
   tr.appendChild(c1);
 
@@ -508,6 +510,7 @@ function renderDetail(stu) {
     });
     g.appendChild(df);
   });
+  (stu.corrections || []).forEach(function(c){var note=el('p','iteration-note',c.field+': '+c.before+' → '+c.after+' ('+c.reason+')');g.appendChild(note);});
   return g;
 }
 

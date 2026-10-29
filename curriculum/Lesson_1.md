@@ -53,8 +53,8 @@
 * Good prompt: "A person with a big family who enjoys walking in the park."  
 * **Website Structure & Mind Mapping (15 min) \- Scripted:**  
 * **Teacher**: "Let's plan your website on paper. Every website starts with a main **landing page**. At the top, we have a **header** and a **navigation bar** to find different pages. At the bottom, we have a **footer**. Draw your sections now."  
-* *Needs an additional source*: A visual template/example of the website mind map for students to follow, as the methodology only mentions the conceptual activity "mind map будущего сайта" but provides no specific visual diagram content.  
-* Жёсткий визуальный шаблон mind map противоречил бы самому принципу курса — "Student Voice & Choice" из методички прямо требует, чтобы структура была личной, а не одинаковой у всех десяти детей. Правильное решение уже встроено в сценарий чуть ниже по тексту — это часть "Teacher Modeling (I do)", которая уже запланирована для блока с промптами. Добавь одну строку в сценарий этого блока: учитель рисует на доске скелет на СВОЁМ примере (не на теме ребёнка) — центральный овал "MY WEBSITE" с 3-4 ветками к пустым кружкам — и проговаривает вслух, как заполнял бы их для себя. Дети видят формат, но не копируют содержание. Отдельный файл-источник для этого не нужен.  
+* Учитель моделирует mind map на собственном примере: MY WEBSITE и 3–4 пустые ветки; дети выбирают своё содержание.
+
 * **Prompt Introduction & Teacher Modeling (15 min) \- Scripted:**  
 * **Teacher**: "To talk to AI, we use a prompt. **A prompt is a set of clear instructions you write to tell the AI exactly what to make or write for you.**"  
 * **Teacher (Thinking aloud on projector)**: "If I write a bad recipe, I get bad food. A vague recipe is: *'Write about football.'* The AI will write a boring, long essay. A perfect recipe is: *'Act as a 12-year-old sports blogger. Write a short, exciting welcome message for my website about why I love playing football. Use exactly three sentences and add one soccer emoji.'*"  
@@ -75,5 +75,5 @@ Rule / ConditionStatus (Check)**Card Sort Complete**The pair successfully placed
 * Printed "Classroom AI Use Agreement" sheets.  
 * Paper templates for Mind Maps.  
 * Structured paper blanks for the Prompt Journal.  
-* **Photo Protocol**: Because students are explicitly instructed to use their "digital mask" and sign the agreement and mind maps with their *class nicknames* (pseudonyms), the paper materials contain no real personally identifiable information (PII). At the end of the lesson, the teacher photographs the paper mind map, the "AI or Not AI" results, and the signed agreement (if using pseudonym), and manually uploads these photos to the student's digital profile in the teacher console to maintain an unbroken Prompt Journal record. If the center's administration requires the agreement to be signed with a real legal name, that specific paper is kept in a physical folder by the teacher and is NOT photographed or uploaded into the AI system.
+* **Photo Protocol:** Для pilot-1 бумагу с псевдонимами хранит преподаватель отдельно. Загрузки фото в платформу нет. Учитель вручную проверяет готовность перед выдачей доступа L2; профиль технически начинает с L2.
 

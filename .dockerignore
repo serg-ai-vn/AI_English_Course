@@ -1,0 +1,8 @@
+.git
+node_modules
+.env*
+platform/data
+platform/public/generated
+dist
+backups
+test-results

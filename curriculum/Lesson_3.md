@@ -23,9 +23,9 @@ Not specified for this lesson (не задан для этого занятия)
 
 **4. Timing (90 minutes total)**
 * **00:00 – 00:05 (5 min)**: Introduction and reading the Driving Question aloud.
-* **00:05 – 00:30 (25 min)**: Visual Styles & Image Generation.
-* **00:30 – 00:55 (25 min)**: The "Hallucination Hunt" Activity.
-* **00:55 – 01:15 (20 min)**: Deepfakes and Visual Flaws.
+* **00:05 – 00:20 (15 min)**: Visual styles and teacher modeling.
+* **00:20 – 00:35 (15 min)**: Prepared Hallucination Hunt.
+* **00:35 – 01:15 (40 min)**: Individual avatar/background generation, rating and best/worst; discuss prepared visual flaw while waiting.
 * **01:15 – 01:30 (15 min)**: Prompt Journal completion and Wrap-up.
 
 **5. Scenario**
@@ -54,7 +54,7 @@ Not specified for this lesson (не задан для этого занятия)
 **Teacher**: "When something surprises us, good fact-checkers do three things: they **Stop**, they **Investigate** where the information came from, and they **Trace** the claim back to see if it's real. Let's do that right now with this text."
 
 *Question Bank*: "Can you find three invented facts in this text?", "Why did the AI invent this story instead of saying 'I don't know'?", "How can we change the prompt to stop this hallucination?"
-*Expected Child Answers*: "Our team didn't win in 2025, that is in the future!", "There is no player named John in our school!", "Maybe the AI just wants to make us happy and give us an answer."
+*Expected Child Answers*: "Our team didn't win in 2025, that did not happen in our example!", "There is no player named John in our school!", "Maybe the AI just wants to make us happy and give us an answer."
 
 *Teacher note (not read aloud): if your school has a real team or a real 2025 result, swap the name/score/year above so nothing accidentally matches something true — the fabrication needs to be unmistakable to your specific class.*
 
@@ -66,8 +66,8 @@ Not specified for this lesson (не задан для этого занятия)
 
 **Teacher**: "Look at the fingers of the generated character — AI struggles with small details. You must act as the Operator and check every **detail** before using it."
 
-**Prompt Journal & Wrap-up (15 min) – Scripted:**
-**Teacher**: "Now, open your platform and start generating your avatar and backgrounds. Write your prompt using our formula: **Subject**, **Style**, **Framing**, **Lighting**. After each image, write two short notes in English: what you like and what you don't like. Try at least 3 iterations — each time, change at least one part of the formula, so you can see how the AI reacts."
+**Individual work starts at 00:35; Prompt Journal & Wrap-up (15 min) – Scripted:**
+**Teacher**: "Now, open your platform and start generating your avatar and backgrounds. Write your prompt using our formula: **Subject**, **Style**, **Framing**, **Lighting**. After each image, write two short notes in English: what you like and what you don't like. Try at least 3 iterations — each time, change at least one part of the formula, so you can compare results. Prefer changing one variable to understand its effect; more changes are allowed."
 
 **Teacher**: "Before we finish — make sure you've picked your **best** image and your **worst** image, each with a short English reason. The best goes on your website; the worst stays in your journal as a record of what you learned to catch. Next time, we put everything together: your text and your pictures, into your actual website!"
 
@@ -77,7 +77,7 @@ Not specified for this lesson (не задан для этого занятия)
 * **Per-iteration log (mandatory on every iteration)**: the prompt itself plus two short English notes from the student:
   * **pros** — what the student likes about this image (≥3 words);
   * **cons** — what the student does not like or wants to improve (≥3 words). Hallucinations, visual flaws, off-goal framing belong here.
-* **Iteration rule**: each new iteration must differ from the previous one in at least one of the four formula fields (`Subject` / `Style` / `Framing` / `Lighting`). Changing all four is allowed; changing none is not — the student must keep one variable under control to see how the AI reacts to it.
+* **Iteration rule**: each new iteration must differ from the previous one in at least one of the four formula fields (`Subject` / `Style` / `Framing` / `Lighting`). Changing all four is allowed; changing none is not — the student must keep at least one variable changed; changing only one at a time is recommended to see how the AI reacts to it.
 * **Minimum**: 3 rated iterations per image field (avatar, background). The student may keep generating (up to a cap) until they are ready to choose.
 * **Final pick**: after the iterations, the student selects one **best** image (→ goes on the website) and one **worst** image (stays in the journal), each with an English reason. The third (and any extra) iterations remain in the journal as a record without a best/worst mark.
 

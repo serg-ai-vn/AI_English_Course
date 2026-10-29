@@ -18,7 +18,7 @@
 9. Hobby  
 10. Experience
 
-**3\. Grammar Focus** Present Perfect (mandatory linguistic constraint for the "About Me" text to prevent language fossilization and encourage complex sentence structures).  
+**3\. Grammar Focus** Present Perfect (mandatory linguistic constraint for About Me and the three hobby texts to prevent language fossilization and encourage complex sentence structures).  
 **4\. Timing (90 minutes total)**
 
 * **00:00 – 00:05 (5 min):** Introduction and reading the Driving Question aloud.  
@@ -77,6 +77,8 @@
 * **Teacher:** "When the AI answers, do not just copy it\! Read it. Is it too **boring**? Are the words too difficult? You must edit it."  
 * **Teacher:** "Our platform has a rule to stop lazy prompting: Every next prompt must be at least 3 words longer, and you must use at least 2 target words from today's lesson."
 
+**Hobby completion:** Each of the three hobbies uses one RCTF prompt with Present Perfect, then Publish or manual Improve + reason (no second AI request). About Me requires two prompts with reviews, then Operator edit. Teacher checks meaning, not only the one-character edit.
+
 **6\. Prompt Journal**
 
 * **Format:** Digital table integrated into the platform or a structured paper blank.  
@@ -89,6 +91,6 @@ Rule / ConditionAction if Failed (System Prompt/Hint)**Minimum Iterations**"You 
 * **Assets Needed:**  
 * Access to the student digital workspace (platform wrapper over LLM API).  
 * Teacher console to monitor prompt lengths and iterations.  
-* *Нужен дополнительный источник*: Specific text examples for the "Terrible First Draft" activity. The methodology conceptually describes fixing a bad draft, but a pre-generated "bad AI text" about a pet and a "good edited text" must be provided as a concrete visual asset for the projector.  
+* The prepared bad and good text examples are included above.
 * **Photo Protocol:** Not applicable for this specific lesson as students are working directly within the digital platform, which automatically logs their prompts and iterations into the database.
 

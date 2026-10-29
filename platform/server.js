@@ -15,11 +15,20 @@ const path = require('path');
 const crypto = require('crypto');
 const { execFile } = require('child_process');
 
+require('./settings.js');
 const ROOT = __dirname;
+const storage = require('./storage.js');
+const ai = require('./ai-provider.js');
+const builder = require('../tools/site-builder.js');
 const PUBLIC = path.join(ROOT, 'public');
-const DATA = path.join(ROOT, 'data');
+const DATA = path.resolve(process.env.DATA_DIR || path.join(ROOT, 'data'));
+storage.initialize(DATA);
+ai.configure(DATA);
 const PROGRESS_DIR = path.join(DATA, 'progress');
-const PORT = 3000;
+const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || '127.0.0.1';
+const DEMO = process.env.APP_MODE !== 'pilot';
+if (!DEMO && process.env.AI_PROVIDER !== 'openai') throw new Error('Pilot requires AI_PROVIDER=openai');
 const TRACK_ROOT = path.join(ROOT, '..');   /* Kimi K3 dir (template + tools + rehearsal) */
 
 const validate = require('./validate.js');
@@ -42,26 +51,23 @@ const SESSIONS_FILE = path.join(DATA, 'sessions.json');
 
 /* ---------- tiny helpers ---------- */
 
-function readJson(file, fallback) {
-  try { return JSON.parse(fs.readFileSync(file, 'utf8')); }
-  catch (e) { return fallback; }
-}
-function writeJson(file, obj) {
-  fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file, JSON.stringify(obj, null, 2), 'utf8');
-}
+const readJson = storage.readJson;
+const writeJson = storage.writeJson;
 
-function getSessions() { return readJson(SESSIONS_FILE, {}); }
+function getSessions() { const sessions=readJson(SESSIONS_FILE, {});for(const [t,v]of Object.entries(sessions))if(Date.now()-v.created>=Number(process.env.SESSION_TTL_HOURS||24)*3600000)delete sessions[t];return sessions; }
 function saveSessions(s) { writeJson(SESSIONS_FILE, s); }
 
 function progressFile(studentId) { return path.join(PROGRESS_DIR, studentId + '.json'); }
 function getProgress(studentId) {
-  return readJson(progressFile(studentId), {
+  const p = readJson(progressFile(studentId), {
     studentId: studentId, lesson: DEFAULT_LESSON, fields: {}, complete: false,
     unlockedLessons: [DEFAULT_LESSON]
   });
+  if ((p.schemaVersion && p.schemaVersion !== 1) || (p.courseVersion && p.courseVersion !== 'pilot-1')) throw new Error('Unsupported progress schema');
+  p.schemaVersion = 1; p.courseVersion = p.courseVersion || 'pilot-1';
+  return p;
 }
-function saveProgress(p) { writeJson(progressFile(p.studentId), p); }
+function saveProgress(p) { p.schemaVersion=1; p.courseVersion=p.courseVersion || 'pilot-1'; p.revision=(p.revision||0)+1; writeJson(progressFile(p.studentId), p); }
 
 /* Look up a field definition across every loaded lesson: field IDs are
    globally unique, so the search order does not matter. Also returns
@@ -95,24 +101,6 @@ function publicConfig(lessonNum) {
    the student's job in Lesson 2 is to edit it. Deterministic,
    offline. Reuses the Context part of the prompt formula if the
    student wrote one - rewarding good prompt structure. */
-function mockGenerate(fieldId, prompt) {
-  var context = '';
-  var m = String(prompt).match(/context\s*[:\-]\s*([\s\S]*?)(?=(task|format)\s*[:\-]|$)/i);
-  if (m) context = m[1].trim().replace(/\s+/g, ' ');
-  if (context.length > 220) context = context.slice(0, 220).trim() + '...';
-
-  if (fieldId === 'about-me') {
-    var base = 'I am a student. ';
-    if (context) base += context.charAt(0).toUpperCase() + context.slice(1) + ' ';
-    base += 'I like many things and my life is interesting. This is a text about me.';
-    return base;
-  }
-  /* hobby-text-* */
-  var h = 'This is my hobby. ';
-  if (context) h += context.charAt(0).toUpperCase() + context.slice(1) + ' ';
-  h += 'It is very nice and I like it a lot.';
-  return h;
-}
 
 /* ---------- request plumbing ---------- */
 
@@ -127,10 +115,10 @@ function readBody(req) {
     let data = '';
     req.on('data', c => {
       data += c;
-      if (data.length > 1e6) { reject(new Error('body too large')); req.destroy(); }
+      if (Buffer.byteLength(data) > 65536) { data = ''; reject(new Error('body too large')); }
     });
     req.on('end', () => {
-      try { resolve(data ? JSON.parse(data) : {}); }
+      try { const body=data ? JSON.parse(data) : {}; if(!body || Array.isArray(body) || typeof body !== 'object') throw new Error('bad json'); resolve(body); }
       catch (e) { reject(new Error('bad json')); }
     });
   });
@@ -138,9 +126,11 @@ function readBody(req) {
 
 function auth(req) {
   const h = req.headers['authorization'] || '';
-  const token = h.replace(/^Bearer\s+/i, '');
+  const cookie = /(?:^|;\s*)session=([a-f0-9]{32})/.exec(req.headers.cookie || '');
+  const token = h ? h.replace(/^Bearer\s+/i, '') : (cookie ? cookie[1] : '');
   const sessions = getSessions();
-  return sessions[token] ? { token, session: sessions[token] } : null;
+  const session=sessions[token];
+  return session && Date.now()-session.created < Number(process.env.SESSION_TTL_HOURS || 24)*3600000 ? { token, session } : null;
 }
 
 /* ---------- API handlers ---------- */
@@ -153,10 +143,11 @@ function handleLogin(req, res, body) {
 
   const token = crypto.randomBytes(16).toString('hex');
   const sessions = getSessions();
+  res.setHeader('Set-Cookie', 'session='+token+'; HttpOnly; SameSite=Strict; Path=/'+(!DEMO?'; Secure':''));
 
   if (role === 'teacher') {
     const tpin = String(body.pin || '').trim();
-    if (!cls.teacherPin || String(cls.teacherPin) !== tpin) {
+    if (!(process.env['TEACHER_PIN_'+cls.code] || cls.teacherPin) || String(process.env['TEACHER_PIN_'+cls.code] || cls.teacherPin) !== tpin) {
       return sendJson(res, 401, { error: 'Wrong teacher PIN for class ' + cls.code + '.' });
     }
     sessions[token] = {
@@ -188,6 +179,8 @@ function handleMe(req, res, a) {
   const unlocked = Array.isArray(progress.unlockedLessons) && progress.unlockedLessons.length
     ? progress.unlockedLessons : [DEFAULT_LESSON];
   sendJson(res, 200, {
+    mode: DEMO?'demo':'pilot',
+    allowReset: process.env.ALLOW_RESET==='true',
     student: { id: a.session.studentId, name: a.session.name, classCode: a.session.classCode },
     lesson: cur,
     unlockedLessons: unlocked,
@@ -227,7 +220,7 @@ function emptyHobby() {
   return { value: '', status: 'open', nextStep: 'B1-prompt', iterations: [], acceptedPrompts: [], bonusClaimed: false };
 }
 
-function handlePrompt(req, res, a, body) {
+async function handlePrompt(req, res, a, body) {
   const def = fieldDef(body.field);
   if (!def) return sendJson(res, 400, { error: 'Unknown AI field.' });
   const type = def.input;
@@ -250,7 +243,7 @@ function handlePrompt(req, res, a, body) {
     const check = validate.checkPrompt(String(body.prompt || ''), prevPrompts, cfg, def);
     if (!check.ok) return sendJson(res, 200, { ok: false, errors: check.errors, words: check.words });
 
-    const draft = mockGenerate(def.id, body.prompt);
+    const draft = await ai.text({fieldId:def.id,prompt:body.prompt,stage:typeof stage==='undefined'?1:stage,cfg,def,history:f.iterations || []});
     f.iterations.push({
       stage: stage, prompt: String(body.prompt), draft: draft,
       good: null, needsChange: null, ts: Date.now()
@@ -276,7 +269,7 @@ function handlePrompt(req, res, a, body) {
     const check = validate.checkPrompt(String(body.prompt || ''), prevPrompts, cfg, def);
     if (!check.ok) return sendJson(res, 200, { ok: false, errors: check.errors, words: check.words });
 
-    const draft = mockGenerate(def.id, body.prompt);
+    const draft = await ai.text({fieldId:def.id,prompt:body.prompt,stage:typeof stage==='undefined'?1:stage,cfg,def,history:f.iterations || []});
     f.iterations = f.iterations || [];
     f.iterations.push({
       stage: 1, prompt: String(body.prompt), draft: draft, ts: Date.now()
@@ -294,7 +287,7 @@ function handlePrompt(req, res, a, body) {
   if (f.status === 'done') return sendJson(res, 400, { error: 'This field is already approved.' });
   const check = validate.checkPrompt(String(body.prompt || ''), f.acceptedPrompts, cfg, def);
   if (!check.ok) return sendJson(res, 200, { ok: false, errors: check.errors, words: check.words });
-  const draft = mockGenerate(def.id, body.prompt);
+  const draft = await ai.text({fieldId:def.id,prompt:body.prompt,stage:typeof stage==='undefined'?1:stage,cfg,def,history:f.iterations || []});
   f.iterations.push({ prompt: String(body.prompt), draft: draft, ts: Date.now() });
   f.acceptedPrompts.push(String(body.prompt));
   progress.fields[def.id] = f;
@@ -614,7 +607,7 @@ function mockGenerateImage(studentId, def, iterIdx) {
    formula, we generate the image; (2) the image appears, student writes pros
    and cons. The student rates each one (pros, cons) and eventually marks one
    best (-> goes on the site) and one worst (record only).                  */
-function handleImagePrompt(req, res, a, body) {
+async function handleImagePrompt(req, res, a, body) {
   const def = fieldDef(body.field);
   if (!def || (def.input !== 'ai-image-cycle' && def.input !== 'ai-image-rapid')) {
     return sendJson(res, 400, { error: 'Unknown image field.' });
@@ -624,6 +617,8 @@ function handleImagePrompt(req, res, a, body) {
   const cfg = lessonCfg(def.lesson);
   const f = progress.fields[def.id] || { status: 'open', nextStep: 'I1-prompt', iterations: [], acceptedImage: null };
   if (f.status === 'done') return sendJson(res, 400, { error: 'This image is already approved.' });
+  if (def.input === 'ai-image-rapid' && f.iterations.length) return sendJson(res,409,{ok:false,error:'Use regenerate with a reason.'});
+  if (def.input === 'ai-image-cycle' && !/-prompt$/.test(f.nextStep || 'I1-prompt') && f.nextStep !== 'pick') return sendJson(res,409,{ok:false,error:'Rate this image first.'});
   if (f.iterations.length >= (cfg.rules.maxImageIterations || 6)) {
     return sendJson(res, 200, { ok: false, errors: [{ rule: 'empty', hint: 'Too many iterations - accept or delete one first.' }] });
   }
@@ -636,7 +631,7 @@ function handleImagePrompt(req, res, a, body) {
   });
   if (!check.ok) return sendJson(res, 200, { ok: false, errors: check.errors });
 
-  const img = mockGenerateImage(a.session.studentId, def, f.iterations.length);
+  const img = process.env.AI_PROVIDER === 'openai' ? await ai.image({studentId:a.session.studentId,def,prompt:body.prompt,iteration:f.iterations.length+1,dataDir:DATA}) : mockGenerateImage(a.session.studentId, def, f.iterations.length);
   if (!img) return sendJson(res, 200, { ok: false, errors: [{ rule: 'empty', hint: 'No image asset ready. Ask your teacher.' }] });
 
   const n = f.iterations.length + 1;
@@ -863,7 +858,7 @@ function rapidView(f, cfg) {
   };
 }
 
-function handleImageRegenerate(req, res, a, body) {
+async function handleImageRegenerate(req, res, a, body) {
   /* V{n+1} of a rapid hobby image: the student explains WHY the image
      needs to change (>= 3 words) and edits their previous prompt (>= 1
      formula field changed, same diff mechanic as Lesson 3). */
@@ -887,7 +882,7 @@ function handleImageRegenerate(req, res, a, body) {
   const check = validate.checkImagePrompt({ prompt: body.prompt, prevStructures: prevStructs, cfg: cfg, fieldDef: def });
   if (!check.ok) return sendJson(res, 200, { ok: false, errors: check.errors });
 
-  const img = mockGenerateImage(a.session.studentId, def, f.iterations.length);
+  const img = process.env.AI_PROVIDER === 'openai' ? await ai.image({studentId:a.session.studentId,def,prompt:body.prompt,iteration:f.iterations.length+1,dataDir:DATA}) : mockGenerateImage(a.session.studentId, def, f.iterations.length);
   if (!img) return sendJson(res, 200, { ok: false, errors: [{ rule: 'empty', hint: 'No image asset ready. Ask your teacher.' }] });
 
   const n = f.iterations.length + 1;
@@ -916,7 +911,8 @@ function handleImagePublish(req, res, a, body) {
   if (!f || !f.iterations || !f.iterations.length) return sendJson(res, 400, { error: 'Generate an image first.' });
   if (f.status === 'done') return sendJson(res, 400, { error: 'This image is already published.' });
 
-  const last = f.iterations[f.iterations.length - 1];
+  const last = body.version ? f.iterations.find(it=>it.version===Number(body.version)) : f.iterations[f.iterations.length-1];
+  if(!last) return sendJson(res,400,{ok:false,error:'Unknown image version'});
   f.publishedVersion = last.version;
   f.value = last.image.path;
   f.status = 'done';
@@ -1127,17 +1123,6 @@ function handleUnlockLesson(req, res, a, body) {
    Returns the relative path (dist/<name>.html) so the teacher can
    download via /preview/dist/...                                    */
 
-function runPs(args, cwd) {
-  return new Promise(function (resolve) {
-    execFile('powershell.exe',
-      ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-File'].concat(args),
-      { cwd: cwd, windowsHide: true },
-      function (err, stdout, stderr) {
-        resolve({ err: err, stdout: String(stdout || ''), stderr: String(stderr || '') });
-      });
-  });
-}
-
 function handleBuildSite(req, res, a, body) {
   if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
   const cls = (classes.classes || []).find(c => c.code === a.session.classCode);
@@ -1151,7 +1136,7 @@ function handleBuildSite(req, res, a, body) {
   if (!isComplete(progress, lessons[3])) return sendJson(res, 200, { ok: false, error: 'Lesson 3 is not complete yet.' });
   if (!isComplete(progress, lessons[4])) return sendJson(res, 200, { ok: false, error: 'Lesson 4 is not complete yet.' });
 
-  runExport(req, res, student, 'built');
+  return runExport(req, res, student, 'built');
 }
 
 /* Lesson 5 publish: the final export/handover step. Teacher-only, gated on
@@ -1177,110 +1162,33 @@ function handleExportSite(req, res, a, body) {
     return sendJson(res, 200, { ok: false, error: lessons[5].hints.exportVocab });
   }
 
-  runExport(req, res, student, 'published');
+  return runExport(req, res, student, 'published');
 }
 
 /* Shared export pipeline (build-site + export-site): assemble the export
    config from progress, sample particles if needed, run export-site.ps1.
    mark = 'built' (teacher preview) | 'published' (Lesson 5 handover). */
-function runExport(req, res, student, mark) {
-  const studentId = student.id;
-  const progress = getProgress(studentId);
-
-  /* 1. assemble export-config */
-  const l2fields = progress.fields;
-
-  /* slots: every Lesson 2 text field. about-me wrapped in <p>...</p>.
-     author-name falls back to the student alias if the field wasn't set. */
-  var slots = {};
-  (lessons[2].fields || []).forEach(function (f) {
-    if (f.input !== 'direct' && f.input !== 'ai-cycle') return;
-    if (!l2fields[f.id] || l2fields[f.id].status !== 'done') return;
-    var v = String(l2fields[f.id].value || '');
-    if (f.id === 'about-me' && v.indexOf('<p>') !== 0) v = '<p>' + v + '</p>';
-    slots[f.id] = v;
-  });
-  if (!slots['author-name']) slots['author-name'] = student.name;
-
-  /* images: Lesson 3 accepted images (avatar/background) + Lesson 4 rapid
-     hobby images (hobby-image-1/2/3) - all relative paths under TRACK_ROOT. */
-  var images = {};
-  [3, 4].forEach(function (n) {
-    (lessons[n].fields || []).forEach(function (f) {
-      if (f.input !== 'ai-image-cycle' && f.input !== 'ai-image-rapid') return;
-      var rel = progress.fields[f.id] && progress.fields[f.id].value;
-      if (!rel) return;
-      var alt = f.alt ? String(f.alt).replace('{author-name}', student.name)
-        .replace('{hobby-title-1}', slots['hobby-title-1'] || '')
-        .replace('{hobby-title-2}', slots['hobby-title-2'] || '')
-        .replace('{hobby-title-3}', slots['hobby-title-3'] || '') : '';
-      images[f.id] = { src: rel, alt: alt };
-    });
-  });
-
-  /* theme: chosen in Lesson 4 (theme-picker). Falls back to "sunny-day"
-     for legacy progress files built before Lesson 4 existed. */
-  var theme = progress.theme || 'sunny-day';
-  var pageTitle = (slots['site-title'] || (student.name + "'s World"));
-
-  /* particle-JS for the avatar. Reuse the demo student's prebuilt file
-     when it matches (rehearsal produced *-avatar-particles.js). Otherwise
-     run the sampler now so export-site.ps1 always gets its particle data. */
-  var particlePath = 'rehearsal/assets/' + studentId + '-avatar-particles.js';
-  var particles = { avatar: particlePath };
-  if (!assetExists(path.join(TRACK_ROOT, particlePath))) {
-    var avatarsrc = l2fields['avatar'] && l2fields['avatar'].value;
-    if (avatarsrc) {
-      var absAvatar = path.join(TRACK_ROOT, avatarsrc);
-      if (assetExists(absAvatar)) {
-        var altPart = 'rehearsal/assets/' + studentId + '-avatar-particles.js';
-        var altAbs = path.join(TRACK_ROOT, altPart);
-        return runPs(['tools\\sample-particles.ps1', '-Source', absAvatar,
-          '-Out', altAbs, '-SlotName', 'avatar', '-Step', '4'], TRACK_ROOT)
-          .then(function (out) {
-            proceedExport(req, res, studentId, pageTitle, theme, slots, images, particles, out, mark);
-          });
-      }
-    }
-  }
-  proceedExport(req, res, studentId, pageTitle, theme, slots, images, particles, null, mark);
-}
-
-function proceedExport(req, res, studentId, pageTitle, theme, slots, images, particles, sampleOut, mark) {
-  if (sampleOut && sampleOut.err) {
-    return sendJson(res, 200, { ok: false,
-      error: 'Particle sampler failed: ' + (sampleOut.stderr || sampleOut.err.message) });
-  }
-
-  var exportCfg = {
-    name: studentId,
-    pageTitle: pageTitle,
-    theme: theme,
-    slots: slots,
-    images: images,
-    particles: particles
-  };
-  var cfgPath = path.join(DATA, studentId + '-export.json');
-  writeJson(cfgPath, exportCfg);
-
-  var outHtml = 'dist/' + studentId + '.html';
-  runPs(['tools\\export-site.ps1', '-Config', path.relative(TRACK_ROOT, cfgPath), '-Out', outHtml], TRACK_ROOT)
-    .then(function (out) {
-      if (out.err) return sendJson(res, 200, { ok: false,
-        error: 'Export failed: ' + (out.stderr || out.err.message) });
-      var abs = path.join(TRACK_ROOT, outHtml);
-      var size = assetExists(abs) ? fs.statSync(abs).size : 0;
-      /* record a build stamp on the student's progress so the teacher
-         console can show "site built" with a timestamp. */
-      var p = getProgress(studentId);
-      p.built = { ts: Date.now(), file: outHtml, size: size };
-      if (mark === 'published') {
-        p.published = { ts: Date.now(), file: outHtml, size: size, url: '/preview/' + outHtml };
-      }
-      saveProgress(p);
-      sendJson(res, 200, { ok: true, file: outHtml, size: size, url: '/preview/' + outHtml,
-        published: !!p.published });
-    });
+async function runExport(req,res,student,mark) {
+ const p=getProgress(student.id),slots={},images={};
+ for(const f of lessons[2].fields) { if(!['direct','ai-cycle','ai-text-3step','ai-cycle-bonus'].includes(f.input)) continue;
+ const state=p.fields[f.id]; if(f.required && (!state || state.status!=='done')) throw new Error('Missing required slot: '+f.id);
+ if(state && state.status==='done') slots[f.id]=String(state.value||'').replace(/^<p>/i,'').replace(/<\/p>$/i,''); }
+ slots['author-name']=student.name;
+ for(const n of [3,4]) for(const f of lessons[n].fields) if(f.input.startsWith('ai-image-')) {
+ const state=p.fields[f.id]; if(!state || !state.value) throw new Error('Missing image: '+f.id);
+ images[f.id]={src:state.value,alt:(f.alt || '').replace('{author-name}',student.name).replace(/\{(hobby-title-\d)\}/g,(_,key)=>slots[key]||'')}; }
+ const cfg={name:student.id,pageTitle:slots['site-title'],theme:p.theme||'sunny-day',slots,images,particles:{}};
+ const avatar=builder.resolveAsset(TRACK_ROOT,DATA,images.avatar.src);
+ const hash=crypto.createHash('sha256').update(fs.readFileSync(avatar)).update('256-step4-v1').digest('hex');
+ const part=path.join(DATA,'particles',hash+'.js');
+ if(!fs.existsSync(part)) await builder.sampleParticles({sourcePath:avatar,outPath:part});
+ cfg.particles.avatar='runtime/particles/'+hash+'.js';
+ writeJson(path.join(DATA,student.id+'-export.json'),cfg);
+ const file=path.join(DATA,'sites',student.id+'.html');
+ await builder.exportSite({rootDir:TRACK_ROOT,dataDir:DATA,config:cfg,outPath:file});
+ p.built={ts:Date.now(),file:'dist/'+student.id+'.html',size:fs.statSync(file).size};
+ if(mark==='published') { const token=crypto.randomBytes(24).toString('hex'); const pub=path.join(DATA,'published',token+'.html'); fs.mkdirSync(path.dirname(pub),{recursive:true});fs.copyFileSync(file,pub);p.published={ts:Date.now(),file:token+'.html',url:'/published/'+token+'.html',size:p.built.size}; }
+ saveProgress(p);sendJson(res,200,{ok:true,file:p.built.file,size:p.built.size,url:mark==='published'?p.published.url:'/preview/dist/'+student.id+'.html',published:!!p.published});
 }
 
 /* ---------- teacher console (Pieces 2 + 3) ----------
@@ -1483,6 +1391,7 @@ function buildStudentView(student, selLesson) {
       lastTs: f.lastTs
     })),
     lastActivity: lastField ? { label: lastField, prompt: lastPrompt, ts: lastTs } : null,
+    corrections: Object.entries(p.fields).flatMap(([id,f])=>(f.corrections||[]).map(c=>({field:id,...c}))),
     journal: journal
   };
 }
@@ -1527,125 +1436,374 @@ function handleTeacherOverview(req, res, a) {
   sendJson(res, 200, resp);
 }
 
-/* ---------- static files ---------- */
-
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
-               '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8',
-               '.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
-               '.svg': 'image/svg+xml', '.webp': 'image/webp', '.gif': 'image/gif' };
-
-function serveStatic(req, res, urlPath) {
-  let rel = decodeURIComponent(urlPath.split('?')[0]);
-  if (rel === '/') rel = '/login.html';
-  const file = path.normalize(path.join(PUBLIC, rel));
-  if (file.indexOf(PUBLIC) !== 0) { res.writeHead(403); return res.end('forbidden'); }
-  fs.readFile(file, (err, content) => {
-    if (err) { res.writeHead(404); return res.end('not found'); }
-    res.writeHead(200, { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream' });
-    res.end(content);
-  });
+/* All state mutations for the same student share one queue (single-process MVP). */
+const queues = new Map(),
+  rates = new Map();
+setInterval(() => {
+  const now = Date.now();
+  for (const [k, v] of rates) if (now - v.start > 60000) rates.delete(k);
+}, 60000).unref();
+async function serial(key, fn) {
+  const before = queues.get(key) || Promise.resolve();
+  let release;
+  const gate = new Promise((r) => (release = r));
+  const tail = before.catch(() => {}).then(() => gate);
+  queues.set(key, tail);
+  await before.catch(() => {});
+  try {
+    return await fn();
+  } finally {
+    release();
+    if (queues.get(key) === tail) queues.delete(key);
+  }
 }
-
-/* Preview / download route: serves files from the track root (rehearsal
-   images, dist exports, demo-assets) so the platform UI and the teacher's
-   "download site" link work without bundling everything into /public.
-   The path is locked to TRACK_ROOT - nothing escapes the project. */
-function servePreview(req, res, urlPath) {
-  let rel = decodeURIComponent(urlPath.split('?')[0]);
-  if (rel.indexOf('/') === 0) rel = rel.slice(1);
-  const file = path.normalize(path.join(TRACK_ROOT, rel));
-  if (file.indexOf(TRACK_ROOT) !== 0) { res.writeHead(403); return res.end('forbidden'); }
-  fs.readFile(file, (err, content) => {
-    if (err) { res.writeHead(404); return res.end('not found'); }
-    /* ?download=1 -> attachment so the teacher can hand the single-file
-       site to the family as a file (Lesson 5 export). */
-    const isDownload = new URL(req.url, 'http://localhost').searchParams.get('download') === '1';
-    const headers = { 'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream' };
-    if (isDownload) {
-      headers['Content-Disposition'] = 'attachment; filename="' + path.basename(file) + '"';
-    }
-    res.writeHead(200, headers);
-    res.end(content);
-  });
+function throttle(req, key, max = 120) {
+  const id = (req.socket.remoteAddress || '') + key,
+    now = Date.now();
+  const entry = rates.get(id);
+  if (!entry || now - entry.start > 60000) {
+    rates.set(id, { start: now, n: 1 });
+    return true;
+  }
+  return ++entry.n <= max;
 }
-
-/* ---------- main ---------- */
-
+function classStudent(a, id) {
+  const cls = classes.classes.find((c) => c.code === a.session.classCode);
+  return cls && cls.students.find((s) => s.id === id);
+}
+function owns(a, id) {
+  return a && (a.session.role === 'student' ? a.session.studentId === id : !!classStudent(a, id));
+}
+function invalidate(p, field) {
+  delete p.built;
+  delete p.published;
+  if (!field.startsWith('reflection-') && field !== 'audit') delete p.fields.audit;
+  p.complete = isComplete(p, lessonCfg(p.lesson));
+}
+function correction(a, body) {
+  const def = fieldDef(body.field),
+    p = getProgress(a.session.studentId);
+  if (!def || !p.fields[def.id] || p.fields[def.id].status !== 'done')
+    return { ok: false, error: 'Choose a completed field.' };
+  if (!def.id.startsWith('reflection-') && !(p.editGrants || {})[def.id])
+    return { ok: false, error: 'Ask your teacher to allow correction.' };
+  const reason = String(body.reason || '').trim();
+  if (!reason) return { ok: false, error: 'Give a correction reason.' };
+  let value = String(body.text || '').trim();
+  const f = p.fields[def.id];
+  let check;
+  if (['ai-text-3step', 'ai-cycle-bonus', 'ai-cycle'].includes(def.input))
+    check = validate.checkText(def, value, lessonCfg(def.lesson));
+  else if (def.input === 'direct') check = validate.checkDirect(def, value, lessonCfg(def.lesson));
+  else if (def.input.startsWith('ai-image-')) {
+    const it = (f.iterations || []).find((x) => x.version === Number(value));
+    if (!it) return { ok: false, error: 'Choose an existing version.' };
+    value = it.image.path;
+    check = { ok: true };
+  } else if (def.input === 'theme-picker') {
+    const option = Number(value) === 1 ? f.option1 : Number(value) === 2 ? f.option2 : null;
+    if (!option) return { ok: false, error: 'Choose option 1 or 2.' };
+    value = option.preset;
+    check = { ok: true };
+  } else return { ok: false, error: 'This field cannot be corrected this way.' };
+  if (!check.ok) return check;
+  f.corrections = f.corrections || [];
+  f.corrections.push({
+    before: f.value,
+    after: value,
+    reason,
+    ts: Date.now(),
+    teacherGrant: (p.editGrants || {})[def.id] || null,
+  });
+  f.value = value;
+  f.ts = Date.now();
+  if (def.input === 'theme-picker') p.theme = value;
+  if (def.input === 'ai-image-cycle') f.acceptedImage = value;
+  if (def.input === 'ai-image-rapid') f.publishedVersion = Number(body.text);
+  if (p.editGrants) delete p.editGrants[def.id];
+  invalidate(p, def.id);
+  saveProgress(p);
+  return { ok: true };
+}
+const studentHandlers = {
+  '/api/me': handleMe,
+  '/api/prompt': handlePrompt,
+  '/api/submit-text': handleSubmitText,
+  '/api/save-edit': handleSaveEdit,
+  '/api/save-eval': handleSaveEval,
+  '/api/save-direct': handleSaveDirect,
+  '/api/reset': handleReset,
+  '/api/reset-all': handleResetAll,
+  '/api/lesson-switch': handleLessonSwitch,
+  '/api/image-prompt': handleImagePrompt,
+  '/api/image-eval': handleImageEval,
+  '/api/image-best': handleImageBest,
+  '/api/image-worst': handleImageWorst,
+  '/api/image-unmark': handleImageUnmark,
+  '/api/image-accept': handleImageAccept,
+  '/api/image-regenerate': handleImageRegenerate,
+  '/api/image-publish': handleImagePublish,
+  '/api/theme-prompt': handleThemePrompt,
+  '/api/theme-second': handleThemeSecond,
+  '/api/theme-choose': handleThemeChoose,
+  '/api/theme-justify': handleThemeJustify,
+};
+const teacherHandlers = {
+  '/api/teacher/overview': handleTeacherOverview,
+  '/api/teacher/unlock-lesson': handleUnlockLesson,
+  '/api/teacher/build-site': handleBuildSite,
+  '/api/teacher/export-site': handleExportSite,
+};
+const MIME = {
+  '.html': 'text/html; charset=utf-8',
+  '.js': 'text/javascript; charset=utf-8',
+  '.css': 'text/css; charset=utf-8',
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.svg': 'image/svg+xml',
+};
+function sendFile(res, file, download) {
+  const bytes = fs.readFileSync(file);
+  res.writeHead(200, {
+    'Content-Type': MIME[path.extname(file)] || 'application/octet-stream',
+    'Cache-Control': 'no-store',
+    'X-Content-Type-Options': 'nosniff',
+    ...(download ? { 'Content-Disposition': 'attachment; filename="website.html"' } : {}),
+  });
+  res.end(bytes);
+}
 const server = http.createServer(async (req, res) => {
-  const u = req.url.split('?')[0];
-
-  if (u === '/api/login' && req.method === 'POST') {
-    return handleLogin(req, res, await readBody(req));
-  }
-  if (u.indexOf('/api/') === 0) {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('Cache-Control', 'no-store');
+  try {
+    const url = new URL(req.url, 'http://localhost'),
+      u = decodeURIComponent(req.url.split('?')[0]);
+    if (u.includes('\\') || u.includes('\0') || u.split('/').some((x) => x === '..' || x === '.'))
+      return sendJson(res, 403, { ok: false, error: 'Forbidden path' });
+    if (u === '/api/health')
+      return sendJson(res, 200, {
+        ok: true,
+        version: require('../package.json').version,
+        aiProvider: process.env.AI_PROVIDER || 'mock',
+        mode: DEMO ? 'demo' : 'pilot',
+        uptime: process.uptime(),
+      });
     const a = auth(req);
-    if (!a) return sendJson(res, 401, { error: 'Not logged in.' });
-    const body = req.method === 'POST' ? await readBody(req) : {};
-
-    /* teacher-only endpoints */
-    if (u === '/api/teacher/overview' && req.method === 'GET') {
-      if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
-      return handleTeacherOverview(req, res, a);
+    if (u.startsWith('/api/')) {
+      if (req.method !== 'GET' && req.method !== 'POST')
+        return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+      if (
+        req.method === 'POST' &&
+        req.headers.origin &&
+        req.headers.origin !== (!DEMO ? 'https://' : 'http://') + req.headers.host
+      )
+        return sendJson(res, 403, { ok: false, error: 'Origin mismatch' });
+      if (!throttle(req, u, u === '/api/login' ? 20 : 120))
+        return sendJson(res, 429, { ok: false, error: 'Too many requests. Wait a minute.' });
+      const body = req.method === 'POST' ? await readBody(req) : {};
+      if (u === '/api/login' && req.method === 'POST') return handleLogin(req, res, body);
+      if (!a) return sendJson(res, 401, { ok: false, error: 'Not logged in' });
+      if (u === '/api/logout' && req.method === 'POST') {
+        res.setHeader('Set-Cookie', 'session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
+        return handleLogout(req, res, a);
+      }
+      if (u.startsWith('/api/teacher/')) {
+        if (a.session.role !== 'teacher')
+          return sendJson(res, 403, { ok: false, error: 'Teachers only' });
+        if (u === '/api/teacher/allow-correction' && req.method === 'POST')
+          return await serial(body.studentId, () => {
+            if (
+              !classStudent(a, body.studentId) ||
+              !fieldDef(body.field) ||
+              !String(body.reason || '').trim()
+            )
+              return sendJson(res, 400, { ok: false, error: 'Student, field and reason required' });
+            const p = getProgress(body.studentId);
+            p.editGrants = p.editGrants || {};
+            p.editGrants[body.field] = { reason: String(body.reason), ts: Date.now() };
+            saveProgress(p);
+            sendJson(res, 200, { ok: true });
+          });
+        const fn = teacherHandlers[u];
+        if (!fn) return sendJson(res, 404, { ok: false, error: 'Unknown teacher API' });
+        if (req.method !== (u.endsWith('overview') ? 'GET' : 'POST'))
+          return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+        return await serial(body.studentId || a.session.classCode, () => fn(req, res, a, body));
+      }
+      if (a.session.role !== 'student')
+        return sendJson(res, 403, { ok: false, error: 'Students only' });
+      if ((u === '/api/reset' || u === '/api/reset-all') && process.env.ALLOW_RESET !== 'true')
+        return sendJson(res, 403, {
+          ok: false,
+          error: 'Reset disabled. Ask your teacher for a correction.',
+        });
+      const fn = studentHandlers[u];
+      if (!fn && u !== '/api/correct-field')
+        return sendJson(res, 404, { ok: false, error: 'Unknown API' });
+      if (req.method !== (u === '/api/me' ? 'GET' : 'POST'))
+        return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+      return await serial(a.session.studentId, async () => {
+        const p = getProgress(a.session.studentId),
+          def = body.field ? fieldDef(body.field) : null;
+        if (body.field && (!def || !(p.unlockedLessons || [2]).includes(def.lesson)))
+          return sendJson(res, 403, {
+            ok: false,
+            error: 'This lesson is locked by your teacher.',
+            errors: [{ rule: 'lesson-locked', hint: 'This lesson is locked by your teacher.' }],
+          });
+        if (def && p.fields[def.id]?.status === 'done' && u !== '/api/correct-field')
+          return sendJson(res, 409, {
+            ok: false,
+            error: 'Use correction to preserve your journal.',
+          });
+        if (u === '/api/correct-field') return sendJson(res, 200, correction(a, body));
+        if (def) {
+          const types = {
+            '/api/prompt': ['ai-cycle', 'ai-text-3step', 'ai-cycle-bonus'],
+            '/api/submit-text': ['ai-cycle', 'ai-text-3step', 'ai-cycle-bonus'],
+            '/api/save-eval': ['ai-text-3step'],
+            '/api/save-direct': ['direct', 'checklist'],
+            '/api/image-prompt': ['ai-image-cycle', 'ai-image-rapid'],
+            '/api/image-eval': ['ai-image-cycle'],
+            '/api/image-best': ['ai-image-cycle'],
+            '/api/image-worst': ['ai-image-cycle'],
+            '/api/image-unmark': ['ai-image-cycle'],
+            '/api/image-accept': ['ai-image-cycle'],
+            '/api/image-regenerate': ['ai-image-rapid'],
+            '/api/image-publish': ['ai-image-rapid'],
+            '/api/theme-prompt': ['theme-picker'],
+            '/api/theme-second': ['theme-picker'],
+            '/api/theme-choose': ['theme-picker'],
+            '/api/theme-justify': ['theme-picker'],
+          };
+          if (types[u] && !types[u].includes(def.input))
+            return sendJson(res, 400, { ok: false, error: 'Wrong field type' });
+          const state = p.fields[def.id];
+          if (
+            ['/api/image-best', '/api/image-worst', '/api/image-unmark'].includes(u) &&
+            !['pick', 'accept'].includes(state?.nextStep)
+          )
+            return sendJson(res, 409, { ok: false, error: 'Rate required images first' });
+          if (
+            u === '/api/image-eval' &&
+            state?.nextStep !== 'I' + state?.iterations?.length + '-eval'
+          )
+            return sendJson(res, 409, { ok: false, error: 'Generate an image before rating' });
+        }
+        const before = JSON.stringify(p.fields);
+        await fn(req, res, a, body);
+        if (req.method === 'POST' && def) {
+          const after = getProgress(a.session.studentId);
+          if (JSON.stringify(after.fields) !== before && (after.built || after.published)) {
+            invalidate(after, def.id);
+            saveProgress(after);
+          }
+        }
+      });
     }
-    if (u === '/api/teacher/unlock-lesson' && req.method === 'POST') {
-      if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
-      return handleUnlockLesson(req, res, a, body);
+    if (req.method !== 'GET') return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
+    if (/^\/published\/[a-f0-9]{48}\.html$/.test(u)) {
+      const file = u.split('/').pop();
+      const active = (classes.classes || []).some((c) =>
+        c.students.some((s) => getProgress(s.id).published?.file === file),
+      );
+      if (!active) return sendJson(res, 404, { error: 'Publication unavailable' });
+      return sendFile(
+        res,
+        path.join(DATA, 'published', file),
+        url.searchParams.get('download') === '1',
+      );
     }
-    if (u === '/api/teacher/build-site' && req.method === 'POST') {
-      if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
-      return handleBuildSite(req, res, a, body);
+    if (u.startsWith('/preview/')) {
+      const rel = u.slice(9);
+      if (rel.startsWith('dist/')) {
+        const id = /^dist\/([a-z0-9_-]+)\.html$/.exec(rel)?.[1];
+        if (!id || !owns(a, id) || !getProgress(id).built)
+          return sendJson(res, 403, { error: 'Private preview' });
+        return sendFile(
+          res,
+          path.join(DATA, 'sites', id + '.html'),
+          url.searchParams.get('download') === '1',
+        );
+      }
+      if (rel.startsWith('runtime/generated/')) {
+        if (!a) return sendJson(res, 401, { error: 'Private image' });
+        const ids =
+          a.session.role === 'student'
+            ? [a.session.studentId]
+            : (classes.classes.find((c) => c.code === a.session.classCode)?.students || []).map(
+                (s) => s.id,
+              );
+        const used = ids.some((id) =>
+          Object.values(getProgress(id).fields).some(
+            (f) => f.value === rel || (f.iterations || []).some((it) => it.image?.path === rel),
+          ),
+        );
+        if (!used) return sendJson(res, 403, { error: 'Private image' });
+        return sendFile(res, builder.resolveAsset(TRACK_ROOT, DATA, rel));
+      }
+      if (/^(demo-assets|rehearsal\/assets)\/[a-zA-Z0-9_-]+\.(png|jpg|js)$/.test(rel))
+        return sendFile(res, path.join(TRACK_ROOT, rel));
+      if (
+        DEMO &&
+        [
+          'index.html',
+          'particle-demo.html',
+          'styles.css',
+          'motion.js',
+          'particles.js',
+          'flight.js',
+          'carousel.js',
+          'dev-preview.js',
+        ].includes(rel)
+      )
+        return sendFile(res, path.join(TRACK_ROOT, rel));
+      return sendJson(res, 403, { error: 'Forbidden' });
     }
-    if (u === '/api/teacher/export-site' && req.method === 'POST') {
-      if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
-      return handleExportSite(req, res, a, body);
-    }
-
-    /* student-only endpoints: a teacher session must not touch them */
-    const studentOnly = ['/api/me', '/api/prompt', '/api/submit-text',
-      '/api/save-edit', '/api/save-eval', '/api/save-direct', '/api/reset', '/api/reset-all', '/api/lesson-switch',
-      '/api/image-prompt', '/api/image-eval', '/api/image-best', '/api/image-worst', '/api/image-unmark', '/api/image-accept',
-      '/api/image-regenerate', '/api/image-publish',
-      '/api/theme-prompt', '/api/theme-second', '/api/theme-choose', '/api/theme-justify'];
-    if (studentOnly.indexOf(u) !== -1 && a.session.role !== 'student') {
-      return sendJson(res, 403, { error: 'Students only.' });
-    }
-
-    if (u === '/api/me' && req.method === 'GET') return handleMe(req, res, a);
-    if (u === '/api/prompt' && req.method === 'POST') return handlePrompt(req, res, a, body);
-    if (u === '/api/submit-text' && req.method === 'POST') return handleSubmitText(req, res, a, body);
-    if (u === '/api/save-edit' && req.method === 'POST') return handleSaveEdit(req, res, a, body);
-    if (u === '/api/save-eval' && req.method === 'POST') return handleSaveEval(req, res, a, body);
-    if (u === '/api/save-direct' && req.method === 'POST') return handleSaveDirect(req, res, a, body);
-    if (u === '/api/lesson-switch' && req.method === 'POST') return handleLessonSwitch(req, res, a, body);
-    if (u === '/api/image-prompt' && req.method === 'POST') return handleImagePrompt(req, res, a, body);
-    if (u === '/api/image-eval' && req.method === 'POST') return handleImageEval(req, res, a, body);
-    if (u === '/api/image-best' && req.method === 'POST') return handleImageBest(req, res, a, body);
-    if (u === '/api/image-worst' && req.method === 'POST') return handleImageWorst(req, res, a, body);
-    if (u === '/api/image-unmark' && req.method === 'POST') return handleImageUnmark(req, res, a, body);
-    if (u === '/api/image-accept' && req.method === 'POST') return handleImageAccept(req, res, a, body);
-    if (u === '/api/image-regenerate' && req.method === 'POST') return handleImageRegenerate(req, res, a, body);
-    if (u === '/api/image-publish' && req.method === 'POST') return handleImagePublish(req, res, a, body);
-    if (u === '/api/theme-prompt' && req.method === 'POST') return handleThemePrompt(req, res, a, body);
-    if (u === '/api/theme-second' && req.method === 'POST') return handleThemeSecond(req, res, a, body);
-    if (u === '/api/theme-choose' && req.method === 'POST') return handleThemeChoose(req, res, a, body);
-    if (u === '/api/theme-justify' && req.method === 'POST') return handleThemeJustify(req, res, a, body);
-    if (u === '/api/reset' && req.method === 'POST') return handleReset(req, res, a);
-    if (u === '/api/reset-all' && req.method === 'POST') return handleResetAll(req, res, a);
-    if (u === '/api/logout' && req.method === 'POST') return handleLogout(req, res, a);
-    return sendJson(res, 404, { error: 'Unknown API call.' });
+    const rel = u === '/' ? 'login.html' : u.slice(1);
+    if (
+      ![
+        'login.html',
+        'workspace.html',
+        'teacher.html',
+        'app.js',
+        'teacher.js',
+        'platform.css',
+      ].includes(rel)
+    )
+      return sendJson(res, 404, { error: 'Not found' });
+    return sendFile(res, path.join(PUBLIC, rel));
+  } catch (err) {
+    const code =
+      err.message === 'bad json'
+        ? 400
+        : err.message === 'body too large'
+          ? 413
+          : err.code === 'ENOENT'
+            ? 404
+            : err instanceof URIError
+              ? 400
+              : 500;
+    if (!res.headersSent)
+      sendJson(res, code, {
+        ok: false,
+        error:
+          code === 500
+            ? 'Operation failed. Your saved work is unchanged; ask your teacher.'
+            : code === 404
+              ? 'Not found'
+              : 'Invalid request',
+        errors: [
+          {
+            hint:
+              code === 500
+                ? 'Could not complete this operation. Retry or ask your teacher.'
+                : 'Check this request and try again.',
+          },
+        ],
+      });
+    else if (!res.writableEnded) res.end();
+    console.error('Request failure:', code, err.message.replace(/sk-[\w-]+/g, '[redacted]'));
   }
-
-  /* files outside /public (rehearsal images, dist exports) */
-  if (u.indexOf('/preview/') === 0 && req.method === 'GET') {
-    return servePreview(req, res, u.slice('/preview'.length));
-  }
-
-  if (req.method === 'GET') return serveStatic(req, res, req.url);
-  res.writeHead(405); res.end('method not allowed');
 });
-
-server.listen(PORT, () => {
-  console.log('Platform running:  http://localhost:' + PORT);
-  console.log('Students: code DEMO, Lumi/1111, Ziggy/2222, Neo/3333');
-  console.log('Teacher:  code DEMO, PIN 0000  ->  /teacher.html');
-});
+server.listen(PORT, HOST, () => console.log('Platform ready on http://' + HOST + ':' + PORT));

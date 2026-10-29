@@ -3,25 +3,155 @@
   "title": "Site: theme & hobby images",
   "source": "Product spec L4 (Scaffolding Removal + R.C.T.F. theme comparison)",
   "drivingQuestion": "How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?",
-  "targetVocabulary": ["concept art", "close-up", "volumetric lighting", "background", "section", "layout", "portrait", "soft light", "bold colors"],
+  "targetVocabulary": [
+    "concept art",
+    "close-up",
+    "volumetric lighting",
+    "background",
+    "section",
+    "layout",
+    "portrait",
+    "soft light",
+    "bold colors"
+  ],
   "vocabByField": {
-    "hobby-image": { "new": ["background", "section", "layout"], "review": ["concept art", "close-up", "volumetric lighting", "avatar"] },
-    "theme": { "new": ["theme", "palette", "mood", "contrast", "font", "bold", "soft", "match"] }
+    "hobby-image": {
+      "new": [
+        "background",
+        "section",
+        "layout"
+      ],
+      "review": [
+        "concept art",
+        "close-up",
+        "volumetric lighting",
+        "avatar"
+      ]
+    },
+    "theme": {
+      "new": [
+        "theme",
+        "palette",
+        "mood",
+        "contrast",
+        "font",
+        "bold",
+        "soft",
+        "match"
+      ]
+    }
   },
   "rules": {
     "maxImageIterations": 6,
     "promptMinTargetWords": 1,
-    "imageStructureFields": ["subject", "style", "framing", "lighting"],
-    "structuralWords": ["role", "context", "task", "format"],
+    "imageStructureFields": [
+      "subject",
+      "style",
+      "framing",
+      "lighting"
+    ],
+    "structuralWords": [
+      "role",
+      "context",
+      "task",
+      "format"
+    ],
     "minStructureChanged": 1,
     "changeReasonMinWords": 3,
     "themeContextMinWords": 3,
-    "themeMoodWords": ["bold", "soft", "contrast", "energetic", "calm", "playful", "warm", "cool"],
+    "themeMoodWords": [
+      "happy",
+      "warm",
+      "playful",
+      "friendly",
+      "calm",
+      "peaceful",
+      "cool",
+      "gentle",
+      "soft",
+      "natural",
+      "adventurous",
+      "earthy",
+      "grounded",
+      "bold",
+      "fun",
+      "loud",
+      "exciting",
+      "contrast",
+      "energetic",
+      "techy",
+      "futuristic",
+      "mysterious",
+      "dramatic",
+      "focused",
+      "intense"
+    ],
     "themeDiffMinWords": 1,
     "journalMinChars": 10,
     "journalMinWords": 3,
-    "designWords": ["theme", "palette", "contrast", "font", "bold", "soft"],
-    "comparativeWords": ["brighter", "lighter", "darker", "warmer", "cooler", "softer", "bolder", "calmer", "simpler", "easier", "nicer", "louder", "cleaner", "smarter", "faster", "slower", "taller", "shorter", "better", "bigger", "smaller", "stronger", "quieter", "friendlier", "cozier", "brighter", "brightest", "lightest", "darkest", "warmest", "coolest", "softest", "boldest", "calmest", "simplest", "easiest", "nicest", "loudest", "cleanest", "smartest", "fastest", "slowest", "tallest", "shortest", "best", "biggest", "smallest", "strongest", "quietest", "friendliest", "coziest", "most", "more"]
+    "designWords": [
+      "theme",
+      "palette",
+      "contrast",
+      "font",
+      "bold",
+      "soft"
+    ],
+    "comparativeWords": [
+      "brighter",
+      "lighter",
+      "darker",
+      "warmer",
+      "cooler",
+      "softer",
+      "bolder",
+      "calmer",
+      "simpler",
+      "easier",
+      "nicer",
+      "louder",
+      "cleaner",
+      "smarter",
+      "faster",
+      "slower",
+      "taller",
+      "shorter",
+      "better",
+      "bigger",
+      "smaller",
+      "stronger",
+      "quieter",
+      "friendlier",
+      "cozier",
+      "brighter",
+      "brightest",
+      "lightest",
+      "darkest",
+      "warmest",
+      "coolest",
+      "softest",
+      "boldest",
+      "calmest",
+      "simplest",
+      "easiest",
+      "nicest",
+      "loudest",
+      "cleanest",
+      "smartest",
+      "fastest",
+      "slowest",
+      "tallest",
+      "shortest",
+      "best",
+      "biggest",
+      "smallest",
+      "strongest",
+      "quietest",
+      "friendliest",
+      "coziest",
+      "most",
+      "more"
+    ]
   },
   "hints": {
     "structure": "Use the formula: Subject:, Style:, Framing:, Lighting:.",
@@ -31,10 +161,10 @@
     "reasonRequired": "Please explain in English why you want to change this image before generating a new one.",
     "reasonShort": "Your reason needs at least 3 words. Tell the AI what is wrong with the image.",
     "publish": "This image will go on your website. You can publish it now or keep improving it - you have up to 6 attempts total.",
-    "noMore": "You have used all co-pilot attempts. Act as the Operator: choose the best result from your history or publish this final image!",
+    "noMore": "No attempts left. Publish a version from your history.",
     "themeStructure": "Use the formula with all four labels: Role: ... Context: ... Task: ... Format: ...",
     "themeContext": "Describe what your website is about in the Context line (at least 3 words).",
-    "themeMood": "Use a mood word in your Format line: bold, soft, contrast, energetic, calm, playful, warm, or cool.",
+    "themeMood": "Use a mood word in Format, for example warm, calm, natural, bold, energetic or mysterious.",
     "themeDiff": "Change your prompt - try a different mood in the Format line to get a second option.",
     "themeSame": "Try a different mood - you got the same theme twice. Change the Format line.",
     "chooseNeeded": "Choose Theme 1 or Theme 2 to compare before publishing.",
@@ -43,47 +173,176 @@
     "justifyVocab": "Great grammar! Now, connect it to your website design. Use at least one design word from today's bank: theme, palette, contrast, font, bold, or soft."
   },
   "fields": [
-    { "id": "hobby-image-1", "label": "Hobby 1 - image", "input": "ai-image-rapid", "required": true,
-      "group": "hobby-1", "maxAttempts": 6,
-      "spec": { "width": 640, "height": 480, "format": "jpg" },
+    {
+      "id": "hobby-image-1",
+      "label": "Hobby 1 - image",
+      "input": "ai-image-rapid",
+      "required": true,
+      "group": "hobby-1",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
       "alt": "{hobby-title-1}",
       "brief": "Picture for your first hobby. You can publish the first image or keep improving it - up to 6 attempts."
     },
-    { "id": "hobby-image-2", "label": "Hobby 2 - image", "input": "ai-image-rapid", "required": true,
-      "group": "hobby-2", "maxAttempts": 6,
-      "spec": { "width": 640, "height": 480, "format": "jpg" },
+    {
+      "id": "hobby-image-2",
+      "label": "Hobby 2 - image",
+      "input": "ai-image-rapid",
+      "required": true,
+      "group": "hobby-2",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
       "alt": "{hobby-title-2}",
       "brief": "Picture for your second hobby. You can publish the first image or keep improving it - up to 6 attempts."
     },
-    { "id": "hobby-image-3", "label": "Hobby 3 - image", "input": "ai-image-rapid", "required": true,
-      "group": "hobby-3", "maxAttempts": 6,
-      "spec": { "width": 640, "height": 480, "format": "jpg" },
+    {
+      "id": "hobby-image-3",
+      "label": "Hobby 3 - image",
+      "input": "ai-image-rapid",
+      "required": true,
+      "group": "hobby-3",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
       "alt": "{hobby-title-3}",
       "brief": "Picture for your third hobby. You can publish the first image or keep improving it - up to 6 attempts."
     },
-    { "id": "theme", "label": "Website Theme", "input": "theme-picker", "required": true,
+    {
+      "id": "theme",
+      "label": "Website Theme",
+      "input": "theme-picker",
+      "required": true,
       "brief": "Design your site's theme with the R.C.T.F. formula: generate two options, compare them, and justify your choice."
     }
   ],
   "presets": [
-    { "id": "sunny-day", "name": "Sunny Day", "moodWords": ["happy", "warm", "playful", "friendly"],
-      "palette": ["#FFF8E7", "#FF9F1C", "#2EC4B6", "#2B2B2B"], "fontHeading": "Fredoka", "fontBody": "Inter",
-      "particle": "#FF9F1C" },
-    { "id": "ocean-calm", "name": "Ocean Calm", "moodWords": ["calm", "peaceful", "cool", "gentle", "soft"],
-      "palette": ["#EAF4F4", "#3A86FF", "#8ECAE6", "#1D3557"], "fontHeading": "Quicksand", "fontBody": "Inter",
-      "particle": "#3A86FF" },
-    { "id": "forest-explorer", "name": "Forest Explorer", "moodWords": ["natural", "adventurous", "earthy", "grounded"],
-      "palette": ["#F2ECE4", "#4C7A5D", "#C97C4E", "#2E2A24"], "fontHeading": "Merriweather", "fontBody": "Lato",
-      "particle": "#4C7A5D" },
-    { "id": "comic-pop", "name": "Comic Pop", "moodWords": ["bold", "fun", "loud", "exciting", "contrast"],
-      "palette": ["#FFFFFF", "#E63946", "#FFD60A", "#000000"], "fontHeading": "Bangers", "fontBody": "Inter",
-      "particle": "#E63946" },
-    { "id": "comet-trail", "name": "Comet Trail", "moodWords": ["energetic", "techy", "futuristic", "exciting"],
-      "palette": ["#EAE7F5", "#6C5CE7", "#00D9C0", "#2A2640"], "fontHeading": "Space Grotesk", "fontBody": "Inter",
-      "particle": "#6C5CE7" },
-    { "id": "deep-focus", "name": "Deep Focus", "moodWords": ["mysterious", "dramatic", "focused", "intense"],
-      "palette": ["#000000", "#8052FF", "#FFB829", "#FFFFFF"], "fontHeading": "Space Grotesk", "fontBody": "Inter",
-      "particle": "#8052FF" }
+    {
+      "id": "sunny-day",
+      "name": "Sunny Day",
+      "moodWords": [
+        "happy",
+        "warm",
+        "playful",
+        "friendly"
+      ],
+      "palette": [
+        "#FFF8E7",
+        "#FF9F1C",
+        "#2EC4B6",
+        "#2B2B2B"
+      ],
+      "fontHeading": "Fredoka",
+      "fontBody": "Inter",
+      "particle": "#FF9F1C"
+    },
+    {
+      "id": "ocean-calm",
+      "name": "Ocean Calm",
+      "moodWords": [
+        "calm",
+        "peaceful",
+        "cool",
+        "gentle",
+        "soft"
+      ],
+      "palette": [
+        "#EAF4F4",
+        "#3A86FF",
+        "#8ECAE6",
+        "#1D3557"
+      ],
+      "fontHeading": "Quicksand",
+      "fontBody": "Inter",
+      "particle": "#3A86FF"
+    },
+    {
+      "id": "forest-explorer",
+      "name": "Forest Explorer",
+      "moodWords": [
+        "natural",
+        "adventurous",
+        "earthy",
+        "grounded"
+      ],
+      "palette": [
+        "#F2ECE4",
+        "#4C7A5D",
+        "#C97C4E",
+        "#2E2A24"
+      ],
+      "fontHeading": "Merriweather",
+      "fontBody": "Lato",
+      "particle": "#4C7A5D"
+    },
+    {
+      "id": "comic-pop",
+      "name": "Comic Pop",
+      "moodWords": [
+        "bold",
+        "fun",
+        "loud",
+        "exciting",
+        "contrast"
+      ],
+      "palette": [
+        "#FFFFFF",
+        "#E63946",
+        "#FFD60A",
+        "#000000"
+      ],
+      "fontHeading": "Bangers",
+      "fontBody": "Inter",
+      "particle": "#E63946"
+    },
+    {
+      "id": "comet-trail",
+      "name": "Comet Trail",
+      "moodWords": [
+        "energetic",
+        "techy",
+        "futuristic",
+        "exciting"
+      ],
+      "palette": [
+        "#EAE7F5",
+        "#6C5CE7",
+        "#00D9C0",
+        "#2A2640"
+      ],
+      "fontHeading": "Space Grotesk",
+      "fontBody": "Inter",
+      "particle": "#6C5CE7"
+    },
+    {
+      "id": "deep-focus",
+      "name": "Deep Focus",
+      "moodWords": [
+        "mysterious",
+        "dramatic",
+        "focused",
+        "intense"
+      ],
+      "palette": [
+        "#000000",
+        "#8052FF",
+        "#FFB829",
+        "#FFFFFF"
+      ],
+      "fontHeading": "Space Grotesk",
+      "fontBody": "Inter",
+      "particle": "#8052FF"
+    }
   ],
   "order": 4,
   "requiresLesson": 3
