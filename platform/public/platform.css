@@ -1365,3 +1365,6 @@ tr.detail-row td { background: rgba(8, 6, 20, 0.4); padding: 16px 16px 20px; bor
   .last-prompt { max-width: 100%; }
   .mini-bar { width: 120px; }
 }
+
+/* Respect hidden even on flex/grid components. */
+[hidden] { display: none !important; }
