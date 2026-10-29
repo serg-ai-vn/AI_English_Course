@@ -22,18 +22,7 @@ var state = { me: null, saving: {} };
 
 function token() { return localStorage.getItem('token') || ''; }
 
-async function api(path, method, body) {
-  var res = await fetch(path, {
-    method: method,
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token()
-    },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if (res.status === 401 || res.status === 403) { location.href = '/login.html'; throw new Error('unauthorized'); }
-  return res.json();
-}
+async function api(path,method,body){try{var res=await fetch(path,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},body:body?JSON.stringify(body):undefined});if(res.status===401){location.href='/login.html';return {ok:false,errors:[{hint:'Please log in again.'}]};}var payload=await res.json();if(!res.ok&&!payload.errors)payload.errors=[{hint:payload.error||'Please retry.'}];return payload;}catch(e){return {ok:false,errors:[{hint:'Connection failed. Your input is still here. Retry when connected.'}]};}}
 
 function el(tag, className, text) {
   var e = document.createElement(tag);
@@ -65,6 +54,9 @@ async function switchLesson(n) {
 function render() {
   var me = state.me;
   var cfg = me.config;
+  ['reset-btn','reset-all-btn'].forEach(function(id){var b=document.getElementById(id);if(b)b.hidden=!me.allowReset;});
+  var notice=document.getElementById('simulation-notice');if(!notice){notice=el('p','iteration-note','');notice.id='simulation-notice';document.body.insertBefore(notice,document.body.firstChild);}notice.textContent=me.mode==='demo'?'Demo: prepared sample images. Prompts do not change these pictures.':'';
+
 
   document.getElementById('lesson-tag').textContent = 'Lesson ' + cfg.lesson + ' - ' + cfg.title;
   document.getElementById('who').textContent = me.student.name + ' (' + me.student.classCode + ')';
@@ -215,10 +207,10 @@ function renderRules(cfg) {
       'About Me runs in <b>three stages</b>: Step 1 (write your first prompt), Step 2 (improve the prompt), Step 3 (you are the Operator - polish & publish).',
       'Every prompt uses the formula: <b>Role: ... Context: ... Task: ... Format: ...</b>',
       'First prompt: at least <b>' + r.promptMinWordsFirst + ' words</b>. Step 2 prompt: at least <b>' +
-        r.promptGrowthWords + ' words longer</b> than Step 1. Today\'s lesson words: at least <b>' + r.promptMinTargetWords + '</b>.',
+        r.promptGrowthWords + ' words longer</b> than Step 1. About Me lesson words: at least <b>' + r.promptMinTargetWords + '</b>.',
       '<b>Present Perfect</b> is required in the Context line ("I have played...", "I have been playing...").',
       'Hobbies: one prompt in the same formula. You can <b>Publish</b> straight away or choose <b>Improve this text (bonus)</b> and edit the AI draft by hand + write why you changed it.',
-      'After every AI draft, write your <b>critical review</b>: what is good and what needs to change. This is your analytical feedback - it stays in the journal.'
+      'After each About Me draft, write your <b>critical review</b>: what is good and what needs to change. This is your analytical feedback - it stays in the journal.'
     ];
   } else if (cfg.lesson === 3) {
     items = [
@@ -233,7 +225,7 @@ function renderRules(cfg) {
     items = [
       'Hobby images: keep the formula <b>Subject:, Style:, Framing:, Lighting:</b>. You can <b>publish the first image</b> or improve it - up to <b>' + (r.maxImageIterations || 6) + ' attempts</b>.',
       'Each regeneration needs: a <b>reason</b> why the image must change (at least ' + (r.changeReasonMinWords || 3) + ' words) and <b>at least one formula field changed</b> in your new prompt.',
-      'Website theme: use the text formula <b>Role:, Context:, Task:, Format:</b> and a <b>mood word</b> in Format (bold, soft, contrast, energetic, calm, playful, warm, cool).',
+      'Website theme: use the text formula <b>Role:, Context:, Task:, Format:</b> and a <b>mood word</b> in Format (warm, calm, natural, bold, energetic, mysterious (and their related mood words)).',
       'Generate <b>two theme options</b> and compare them. Pick your favorite and <b>justify the choice</b> using comparative words: brighter, calmer, bolder, the boldest...',
       'Your justification also needs a <b>design word</b>: theme, palette, contrast, font, bold, or soft.'
     ];
@@ -276,7 +268,7 @@ function renderCompleteBanner(me, cfg) {
     };
   } else if (cfg.lesson === 3) {
     title.textContent = 'Lesson 3 complete!';
-    body.textContent = 'Your avatar and background are ready. Your teacher can now build your site.';
+    body.textContent = 'Your avatar and background are ready. Complete Lesson 4 next; your teacher can build the site after that.';
     proceedBtn.hidden = true;
   } else if (cfg.lesson === 4) {
     title.textContent = 'Lesson 4 complete!';
@@ -322,6 +314,16 @@ function renderField(def) {
 
   if (isDone) {
     card.appendChild(renderDoneStripe(def, fstate));
+    var grants=me.progress.editGrants || {};
+    if(grants[def.id] || def.id.indexOf('reflection-')===0) {
+      var correct=el('button','btn btn-ghost','Correct this field');card.appendChild(correct);
+      correct.addEventListener('click',async function(){
+        var reason=prompt('Why are you correcting this field?');if(!reason)return;
+        var text=prompt(def.input.indexOf('image')>=0?'Image version number':(def.id==='theme'?'Theme option number (1 or 2)':'Corrected text'),fstate.value || '');if(text===null)return;
+        try {var r=await api('/api/correct-field','POST',{field:def.id,text:text,reason:reason});if(!r.ok){showErrors(card,r.errors);return;}refresh();}catch(e){showErrors(card,[{hint:'Could not save. Please try again.'}]);}
+      });
+    } else card.appendChild(el('small','iteration-note','Ask your teacher to allow a correction.'));
+
     return card;
   }
 
@@ -1315,6 +1317,7 @@ function renderHobbyImageRapid(card, def, fstate) {
     img.alt = 'version ' + v;
     card.appendChild(img);
 
+    var versionSelect=document.createElement('select');fstate.iterations.forEach(function(it){var o=document.createElement('option');o.value=it.version;o.textContent='Version '+it.version;versionSelect.appendChild(o);});versionSelect.value=lastIter.version;card.appendChild(versionSelect);
     var act = el('div', 'field-actions fork-actions');
     var pubBtn = el('button', 'btn btn-publish', 'Publish to Website \u{1F680}');
     act.appendChild(pubBtn);
@@ -1332,7 +1335,7 @@ function renderHobbyImageRapid(card, def, fstate) {
       clearErrors(card);
       pubBtn.disabled = true;
       try {
-        var res = await api('/api/image-publish', 'POST', { field: def.id });
+        var res = await api('/api/image-publish', 'POST', { field: def.id,version:Number(versionSelect.value) });
         pubBtn.disabled = false;
         if (!res.ok) { showErrors(card, res.errors); return; }
         refresh();
@@ -1794,7 +1797,7 @@ function showErrors(card, errors) {
   clearErrors(card);
   var box = el('div', 'error-box');
   var ul = document.createElement('ul');
-  (errors || []).forEach(function (e) {
+  (errors && errors.length ? errors : [{hint:'The request failed. Please try again.'}]).forEach(function (e) {
     var li = document.createElement('li');
     li.textContent = e.hint || e.rule;
     ul.appendChild(li);

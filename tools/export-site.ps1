@@ -70,7 +70,7 @@ $html = $html.Replace(
   '<html lang="en" data-theme="sunny-day">',
   '<html lang="en" data-theme="' + [string]$cfg.theme + '">'
 )
-$html = $html.Replace('<title>My AI Site</title>', '<title>' + [string]$cfg.pageTitle + '</title>')
+$html = $html.Replace('<title>My AI Site</title>', '<title>' + [System.Net.WebUtility]::HtmlEncode([string]$cfg.pageTitle) + '</title>')
 $html = $html.Replace(
   '  <link rel="stylesheet" href="styles.css">',
   "  <style>`n" + $css + "`n  </style>"

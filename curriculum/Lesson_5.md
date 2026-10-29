@@ -38,6 +38,8 @@ Not specified for this lesson (не задан для этого занятия)
 **Teacher**: "As a quick reminder, a **prompt** is a set of clear instructions you write to tell the AI exactly what to make or write for you."
 
 **Publishing, Exporting & Reflection (15 min) – Scripted:**
+
+Teacher first checks saved reflections and authorizes any field correction. Published links are issued only after completion. If six answers do not fit the time, record the observation for D08; do not silently bypass the configured rule.
 **Teacher**: "Now that your **audit** is complete, it is time to **export** your website. We will create a real **link** for you to share with your family and friends."
 
 **Teacher**: "Open your journals for the last time. Answer these questions before we present:"
@@ -57,7 +59,7 @@ Not specified for this lesson (не задан для этого занятия)
 **Teacher**: "It is time for your **presentation**. Show us your website, tell us how you made it, and show us one example of how you had to **change** an AI text or picture."
 
 *Question Bank (spontaneous, from teacher/peers)*: "Why did you choose this visual style for your avatar?", "Why did you choose this theme and these colors for your site?", "What was the biggest mistake the AI made in your first draft?", "How did you fix the hallucination on your 'About Me' page?", "What does this specific English word on your website mean?"
-*Expected Child Answers*: "I chose this style because I love concept art and lighting", "The AI wrote that I have three brothers, but I only have one, so I changed the prompt", "I added a rule to my system prompt to stop the chatbot from answering math questions", "This word means 'energetic' because I like playing active sports."
+*Expected Child Answers*: "I chose this style because I love concept art and lighting", "The AI wrote that I have three brothers, but I only have one, so I changed the prompt", "This word means 'energetic' because I like playing active sports."
 
 **Wrap-up (5 min) – Scripted:**
 **Teacher**: "You all did an amazing job today. You are no longer just users; you are operators!"
@@ -76,7 +78,7 @@ Not specified for this lesson (не задан для этого занятия)
 | **Target Vocabulary Check (Journal, cumulative)** — ≥1 of publish/export/change/presentation across all six answers | "Use one of today's words in your reflection: publish, export, change, or presentation." (мягкое предупреждение в UI ученика; жёсткий блок у учителя при публикации) |
 | **Publish Gate** — export is a teacher-only action, requires L2-L5 complete | (hint in the teacher console) |
 
-*Export note: `Build site` (preview) remains available to the teacher from L3; the final `Publish` (`/api/teacher/export-site`) is the Lesson 5 handover — it re-runs the export, stamps `published` and gives the family a link + downloadable single-file HTML.*
+*Export note: `Build site` (preview) is available to the teacher after L2–L4 are complete; the final `Publish` (`/api/teacher/export-site`) is the Lesson 5 handover — it re-runs the export, stamps `published` and gives the family a link + downloadable single-file HTML.*
 
 **8. Materials / Assets**
 * Access to the student digital workspace for the final audit + reflection.
@@ -84,4 +86,4 @@ Not specified for this lesson (не задан для этого занятия)
 * Projector/screen for students to display their websites during the Public Defense.
 * Analytical rubric for the Public Defense (Prompt Engineering, Language Application, Final Website, Public Defense — see course guide).
 * The reflection questions are already written into the script above — nothing further to prepare.
-* **Photo Protocol**: During the course, no real photos of children's faces were uploaded — only AI-generated stylized avatars. Publishing at the end of this lesson is literally the export/handover step. The full export (files or a link to a personal hosting site) is transferred to the family. Once handed over, the family takes full responsibility and decides whether to add real names or photos. The school's AI-facing system retains only pseudonyms and the digital mask.
+* **Photo Protocol**: During the course, no real photos of children's faces were uploaded — only AI-generated stylized avatars. Publishing at the end of this lesson is literally the export/handover step. The full export (files or a link to a personal hosting site) is transferred to the family. The family chooses further use; transfer does not automatically end the platform’s retention and access obligations. The school's AI-facing system retains only pseudonyms and the digital mask.

@@ -47,8 +47,6 @@
     });
     el.appendChild(frag);
   });
-    el.appendChild(frag);
-  });
 
   /* --- Arm + observe everything marked data-reveal --- */
   var io = new IntersectionObserver(function (entries) {

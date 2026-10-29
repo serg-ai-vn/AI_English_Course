@@ -1,6 +1,6 @@
 # Source: Site Theme Presets (v2 — enriched with motion)
 
-*Five bounded style presets, each a coordinated package: palette + font pairing + avatar particle color. Three additional motion behaviors apply uniformly to every site (not a per-student choice). Informed by two reference files: DESIGN.md (token-naming approach, warm/light palette sensibility) and Build_a_3D_Creator (motion vocabulary, renamed in plain language) — neither copied wholesale, both used as inspiration.*
+*Six bounded style presets, each a coordinated package: palette + font pairing + avatar particle color. Three additional motion behaviors apply uniformly to every site (not a per-student choice). Informed by two reference files: DESIGN.md (token-naming approach, warm/light palette sensibility) and Build_a_3D_Creator (motion vocabulary, renamed in plain language) — neither copied wholesale, both used as inspiration.*
 
 ## Uniform motion — same for every site, not a choice
 
@@ -18,7 +18,7 @@ The avatar image (generated in Lesson 3) dissolves into particles and reassemble
 
 *Build note: this is the one genuinely novel, higher-effort piece — a canvas-based particle technique, not lifted from either reference file. Build and test this in isolation before wiring it into the full template.*
 
-## The five presets
+## The six presets
 
 Each includes: mood words (what a student would say to get this), palette, fonts, and the Particle Assemble accent color.
 
@@ -66,4 +66,4 @@ Each includes: mood words (what a student would say to get this), palette, fonts
 
 ## Token naming principle (from DESIGN.md)
 
-Every color has a named role, not just a hex value — this is what DESIGN.md does well and what the build should copy as a *practice*, not its specific colors: `--accent-primary` always means "the color a visitor notices first," `--background` always means "the calm base everything sits on." Keeping roles consistent across all five presets is what makes swapping between them safe and predictable in code.
+Every color has a named role, not just a hex value — this is what DESIGN.md does well and what the build should copy as a *practice*, not its specific colors: `--accent-primary` always means "the color a visitor notices first," `--background` always means "the calm base everything sits on." Keeping roles consistent across all six presets is what makes swapping between them safe and predictable in code.

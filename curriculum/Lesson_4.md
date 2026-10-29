@@ -46,7 +46,7 @@ Comparative and superlative adjectives (e.g., "This palette is brighter than tha
 *Example 2*: Mood word `contrast` or `bold` → Theme: Comic Pop — bright colors, bold contrast, comic font.
 *Example 3*: Mood word `energetic` → Theme: Comet Trail — light background, bold violet contrast, purple particles.
 
-**Teacher**: "One rule: your mood word goes into the **Format** line. You can use one of these eight: **bold, soft, contrast, energetic, calm, playful, warm, cool**."
+**Teacher**: "One rule: your mood word goes into the **Format** line. You can use one of these mood words: **warm, calm, natural, bold, energetic, mysterious (plus related mood words in the config)**."
 
 **Comparing & Refining Themes (20 min) – Scripted intro, then Open Discussion:**
 **Teacher**: "Don't just accept the first theme! Ask for a second option — change the mood word in your Format line. Compare. Which one is **bolder**? Which one is **softer**? Which one **matches** you **better**?"
@@ -86,12 +86,12 @@ Comparative and superlative adjectives (e.g., "This palette is brighter than tha
 |---|---|
 | **R.C.T.F. Structure Check** — all four labels present | "Use the formula with all four labels: Role: ... Context: ... Task: ... Format: ..." |
 | **Context Check** — Context line describes the site in ≥3 words | "Describe what your website is about in the Context line (at least 3 words)." |
-| **Mood Check** — one of 8 mood words (bold/soft/contrast/energetic/calm/playful/warm/cool) in the Format line | "Use a mood word in your Format line: bold, soft, contrast, energetic, calm, playful, warm, or cool." |
+| **Mood Check** — a supported mood word (bold/soft/contrast/energetic/calm/playful/warm/cool) in the Format line | "Use a mood word in your Format line: bold, soft, contrast, energetic, calm, playful, warm, or cool." |
 | **Minimum Comparison Check** — a second prompt is required; if it maps to the same theme, a soft warning (not a block) | "Try a different mood - you got the same theme twice. Change the Format line." |
 | **Choice Check** — student must choose Theme 1 or Theme 2 | "Choose Theme 1 or Theme 2 to compare before publishing." |
 | **Theme Justification Log Check** — ≥10 chars/3 words + comparative/superlative ("brighter", "the boldest", "than") + ≥1 design word (theme/palette/contrast/font/bold/soft) | "Please write a full, meaningful sentence in English to justify your design choice as an Operator." |
 
-*Build note: the Comparative/Superlative check is a lightweight pattern match (whitelist of -er/-est forms, "more"/"most", or "than"), not full grammar parsing — same category as the Present Perfect rule in Lesson 2. The mood word maps to one of 6 presets (soft→Ocean Calm, contrast→Comic Pop, etc.).*
+*Build note: the Comparative/Superlative check is a lightweight pattern match (whitelist of -er/-est forms, "more"/"most", or "than"), not full grammar parsing — same category as the Present Perfect rule in Lesson 2. The mood word maps to one of 6 presets (natural→Forest Explorer, mysterious→Deep Focus, soft→Ocean Calm, contrast→Comic Pop, etc.).*
 
 **8. Materials / Assets**
 * Access to the student digital workspace (the custom HTML/CSS template with pre-defined slots, built on CSS custom properties for theming).

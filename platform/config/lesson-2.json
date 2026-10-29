@@ -3,19 +3,109 @@
   "title": "Text: the prompt formula",
   "source": "Lesson_2.md (sections 2, 6, 7) + Interaction Spec (Aug 2026)",
   "drivingQuestion": "How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?",
-  "targetVocabulary": ["role", "context", "task", "format", "energetic", "boring", "creative", "paragraph", "hobby", "experience"],
+  "targetVocabulary": [
+    "role",
+    "context",
+    "task",
+    "format",
+    "energetic",
+    "boring",
+    "creative",
+    "paragraph",
+    "hobby",
+    "experience"
+  ],
   "vocabByField": {
-    "about-me": ["energetic", "boring", "creative", "paragraph", "experience", "interesting"],
-    "hobby-text": ["hobby", "training", "match", "game", "team", "energetic"]
+    "about-me": [
+      "energetic",
+      "boring",
+      "creative",
+      "paragraph",
+      "experience",
+      "interesting"
+    ],
+    "hobby-text": [
+      "hobby",
+      "training",
+      "match",
+      "game",
+      "team",
+      "energetic"
+    ]
   },
   "rules": {
     "promptMinWordsFirst": 5,
     "promptGrowthWords": 3,
     "promptMinTargetWords": 2,
-    "structuralWords": ["role", "context", "task", "format"],
-    "presentPerfectFields": ["about-me", "hobby-text-1", "hobby-text-2", "hobby-text-3"],
-    "textMinWords": { "about-me": 40, "hobby-text": 15 },
-    "v3verbs": ["been", "had", "done", "made", "seen", "built", "read", "won", "drawn", "written", "learned", "learnt", "lived", "tried", "played", "visited", "started", "finished", "loved", "liked", "watched", "collected", "practiced", "practised", "trained", "competed", "created", "designed", "cooked", "baked", "swum", "run", "ridden", "climbed", "travelled", "traveled", "met", "taught", "learned", "sung", "danced", "painted", "skated", "scored", "landed", "performed", "joined", "won"]
+    "structuralWords": [
+      "role",
+      "context",
+      "task",
+      "format"
+    ],
+    "presentPerfectFields": [
+      "about-me",
+      "hobby-text-1",
+      "hobby-text-2",
+      "hobby-text-3"
+    ],
+    "textMinWords": {
+      "about-me": 40,
+      "hobby-text": 15
+    },
+    "v3verbs": [
+      "been",
+      "had",
+      "done",
+      "made",
+      "seen",
+      "built",
+      "read",
+      "won",
+      "drawn",
+      "written",
+      "learned",
+      "learnt",
+      "lived",
+      "tried",
+      "played",
+      "visited",
+      "started",
+      "finished",
+      "loved",
+      "liked",
+      "watched",
+      "collected",
+      "practiced",
+      "practised",
+      "trained",
+      "competed",
+      "created",
+      "designed",
+      "cooked",
+      "baked",
+      "swum",
+      "run",
+      "ridden",
+      "climbed",
+      "travelled",
+      "traveled",
+      "met",
+      "taught",
+      "sung",
+      "danced",
+      "painted",
+      "skated",
+      "scored",
+      "landed",
+      "performed",
+      "joined",
+      "fed",
+      "led",
+      "fled",
+      "shed",
+      "bled"
+    ]
   },
   "hints": {
     "firstLength": "Your first prompt is too short. Use the formula with labels: Role: ... Context: ... Task: ... Format: ...",
@@ -30,11 +120,30 @@
     "empty": "This field is still empty. Write something - even a simple sentence is fine."
   },
   "fields": [
-    { "id": "hero-kicker",   "label": "Greeting line",     "input": "direct",   "required": true,  "maxLength": 60,  "placeholder": "Hi, my name is ..." },
-    { "id": "site-title",    "label": "Site title",        "input": "direct",   "required": true,  "maxLength": 80 },
-    { "id": "hero-subtitle", "label": "Welcome sentence",  "input": "direct",   "required": true,  "maxLength": 140 },
-
-    { "id": "about-me",
+    {
+      "id": "hero-kicker",
+      "label": "Greeting line",
+      "input": "direct",
+      "required": true,
+      "maxLength": 60,
+      "placeholder": "Hi, my name is ..."
+    },
+    {
+      "id": "site-title",
+      "label": "Site title",
+      "input": "direct",
+      "required": true,
+      "maxLength": 80
+    },
+    {
+      "id": "hero-subtitle",
+      "label": "Welcome sentence",
+      "input": "direct",
+      "required": true,
+      "maxLength": 140
+    },
+    {
+      "id": "about-me",
       "label": "About Me",
       "input": "ai-text-3step",
       "required": true,
@@ -42,24 +151,76 @@
       "grammar": "present-perfect",
       "brief": "Three stages: V1 draft (prompt formula) -> V2 calibration (longer prompt) -> A3 Operator edit & publish."
     },
-
-    { "id": "hobby-title-1", "label": "Hobby 1 - name",    "input": "direct",   "required": true,  "maxLength": 40, "group": "hobby-1" },
-    { "id": "hobby-text-1",  "label": "Hobby 1 - about it","input": "ai-cycle-bonus", "required": true,  "maxLength": 200, "group": "hobby-1",
-      "grammar": "present-perfect", "minIterations": 1, "vocabRequired": false,
-      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby." },
-
-    { "id": "hobby-title-2", "label": "Hobby 2 - name",    "input": "direct",   "required": true,  "maxLength": 40, "group": "hobby-2" },
-    { "id": "hobby-text-2",  "label": "Hobby 2 - about it","input": "ai-cycle-bonus", "required": true,  "maxLength": 200, "group": "hobby-2",
-      "grammar": "present-perfect", "minIterations": 1, "vocabRequired": false,
-      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby." },
-
-    { "id": "hobby-title-3", "label": "Hobby 3 - name",    "input": "direct",   "required": true,  "maxLength": 40, "group": "hobby-3" },
-    { "id": "hobby-text-3",  "label": "Hobby 3 - about it","input": "ai-cycle-bonus", "required": true,  "maxLength": 200, "group": "hobby-3",
-      "grammar": "present-perfect", "minIterations": 1, "vocabRequired": false,
-      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby." },
-
-    { "id": "footer-text", "label": "Footer line (optional)", "input": "direct", "required": false, "maxLength": 80,
-      "default": "Made with AI as my co-pilot. I am the Operator." }
+    {
+      "id": "hobby-title-1",
+      "label": "Hobby 1 - name",
+      "input": "direct",
+      "required": true,
+      "maxLength": 40,
+      "group": "hobby-1"
+    },
+    {
+      "id": "hobby-text-1",
+      "label": "Hobby 1 - about it",
+      "input": "ai-cycle-bonus",
+      "required": true,
+      "maxLength": 200,
+      "group": "hobby-1",
+      "grammar": "present-perfect",
+      "minIterations": 1,
+      "vocabRequired": false,
+      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby."
+    },
+    {
+      "id": "hobby-title-2",
+      "label": "Hobby 2 - name",
+      "input": "direct",
+      "required": true,
+      "maxLength": 40,
+      "group": "hobby-2"
+    },
+    {
+      "id": "hobby-text-2",
+      "label": "Hobby 2 - about it",
+      "input": "ai-cycle-bonus",
+      "required": true,
+      "maxLength": 200,
+      "group": "hobby-2",
+      "grammar": "present-perfect",
+      "minIterations": 1,
+      "vocabRequired": false,
+      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby."
+    },
+    {
+      "id": "hobby-title-3",
+      "label": "Hobby 3 - name",
+      "input": "direct",
+      "required": true,
+      "maxLength": 40,
+      "group": "hobby-3"
+    },
+    {
+      "id": "hobby-text-3",
+      "label": "Hobby 3 - about it",
+      "input": "ai-cycle-bonus",
+      "required": true,
+      "maxLength": 200,
+      "group": "hobby-3",
+      "grammar": "present-perfect",
+      "minIterations": 1,
+      "vocabRequired": false,
+      "brief": "Write a prompt in the Role/Context/Task/Format formula. Include Present Perfect for how long you have done this hobby."
+    },
+    {
+      "id": "footer-text",
+      "label": "Footer line (optional)",
+      "input": "direct",
+      "required": false,
+      "maxLength": 80,
+      "default": "Made with AI as my co-pilot. I am the Operator."
+    }
   ],
-  "autoFields": { "author-name": "account.name" }
+  "autoFields": {
+    "author-name": "account.name"
+  }
 }

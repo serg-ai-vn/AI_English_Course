@@ -1,0 +1,16 @@
+name: Pilot observation
+description: A technical issue or learning observation without personal data
+body:
+  - type: textarea
+    attributes:
+      label: Version, lesson, field and step
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Expected, observed, reproduction and time spent
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Teacher help, attempt count, next action and priority
