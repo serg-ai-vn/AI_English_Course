@@ -157,6 +157,33 @@ async function request(endpoint, body) {
     );
   }
 }
+function responseContents(r) {
+  const invalid = () => {
+    record('text', null, 'provider_invalid_response');
+    throw new ProviderError(
+      'provider_invalid_response',
+      502,
+      'AI returned an unreadable answer. Retry or ask your teacher.',
+    );
+  };
+  if (!r || !Array.isArray(r.output)) invalid();
+  const contents = [];
+  for (const item of r.output) {
+    if (!item || typeof item !== 'object') invalid();
+    if (item.content === undefined) continue;
+    if (!Array.isArray(item.content)) invalid();
+    for (const c of item.content) {
+      if (
+        !c ||
+        typeof c.type !== 'string' ||
+        (c.type === 'output_text' && typeof c.text !== 'string')
+      )
+        invalid();
+      contents.push(c);
+    }
+  }
+  return contents;
+}
 async function text({ fieldId, prompt, stage, cfg, def, history = [] }) {
   if (process.env.AI_PROVIDER !== 'openai') {
     const draft = mock(fieldId, prompt);
@@ -190,7 +217,7 @@ async function text({ fieldId, prompt, stage, cfg, def, history = [] }) {
       }),
       max_output_tokens: 350,
     });
-    const contents = (r.output || []).flatMap((o) => o.content || []);
+    const contents = responseContents(r);
     if (contents.some((c) => c.type === 'refusal')) {
       record('text', null, 'provider_refusal');
       throw new ProviderError(

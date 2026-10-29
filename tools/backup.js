@@ -5,7 +5,6 @@ function main() {
     crypto = require('crypto');
 
   const { readJson } = require('../platform/storage');
-  const data = path.resolve(process.env.DATA_DIR || path.join(__dirname, '../platform/data'));
   const mode = process.argv[2],
     target = process.argv[3] && path.resolve(process.argv[3]);
   if (!target || !['backup', 'restore'].includes(mode)) {
@@ -16,6 +15,7 @@ function main() {
     return;
   }
   require('../platform/settings');
+  const data = path.resolve(process.env.DATA_DIR || path.join(__dirname, '../platform/data'));
   if (target === data || target.startsWith(data + path.sep) || data.startsWith(target + path.sep))
     throw new Error('Snapshot and DATA_DIR must be separate');
   function files(d) {

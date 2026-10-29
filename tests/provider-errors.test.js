@@ -68,6 +68,24 @@ test('live errors classified and redacted; invalid text bounded to two requests;
         return true;
       });
     }
+    for (const malformed of [
+      { output: {} },
+      { output: [null] },
+      { output: [{ content: {} }] },
+      { output: [{ content: [null] }] },
+      { output: [{ content: [{ type: 'output_text', text: {} }] }] },
+    ]) {
+      let attempts = 0;
+      global.fetch = async () => {
+        attempts++;
+        return { ok: true, json: async () => malformed };
+      };
+      await assert.rejects(
+        ai.text(input),
+        (e) => e.status === 502 && e.code === 'provider_invalid_response',
+      );
+      assert.equal(attempts, 1);
+    }
     let calls = 0;
     global.fetch = async () => {
       calls++;

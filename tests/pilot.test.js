@@ -197,3 +197,47 @@ test('HTTP provider failure preserves progress and provides an actionable 503; L
     await server.stop();
   }
 });
+
+test('backup/restore resolves DATA_DIR from .env before choosing data, never the default decoy', () => {
+  const root = path.resolve(__dirname, '..'),
+    project = fs.mkdtempSync(path.join(os.tmpdir(), 'course-env-cli-')),
+    actual = path.join(project, 'actual data'),
+    restored = path.join(project, 'restored data'),
+    snapshot = path.join(project, 'snapshot');
+  for (const folder of ['tools', 'platform', 'platform/data', 'actual data'])
+    fs.mkdirSync(path.join(project, folder), { recursive: true });
+  for (const file of ['tools/backup.js', 'platform/settings.js', 'platform/storage.js'])
+    fs.copyFileSync(path.join(root, file), path.join(project, file));
+  fs.writeFileSync(path.join(project, 'package.json'), JSON.stringify({ version: 'test' }));
+  fs.writeFileSync(path.join(actual, 'marker.json'), JSON.stringify({ source: 'CORRECT-env' }));
+  fs.writeFileSync(
+    path.join(project, 'platform/data/marker.json'),
+    JSON.stringify({ source: 'WRONG-default' }),
+  );
+  const env = { ...process.env, APP_MODE: 'demo', AI_PROVIDER: 'mock' };
+  delete env.DATA_DIR;
+  const run = (mode) =>
+    cp.spawnSync(process.execPath, ['tools/backup.js', mode, snapshot], {
+      cwd: project,
+      env,
+      encoding: 'utf8',
+    });
+  fs.writeFileSync(path.join(project, '.env'), 'DATA_DIR="' + actual + '"');
+  let p = run('backup');
+  assert.equal(p.status, 0, p.stderr);
+  assert.equal(
+    JSON.parse(fs.readFileSync(path.join(snapshot, 'marker.json'))).source,
+    'CORRECT-env',
+  );
+  fs.writeFileSync(path.join(project, '.env'), 'DATA_DIR="' + restored + '"');
+  p = run('restore');
+  assert.equal(p.status, 0, p.stderr);
+  assert.equal(
+    JSON.parse(fs.readFileSync(path.join(restored, 'marker.json'))).source,
+    'CORRECT-env',
+  );
+  assert.equal(
+    JSON.parse(fs.readFileSync(path.join(project, 'platform/data/marker.json'))).source,
+    'WRONG-default',
+  );
+});
