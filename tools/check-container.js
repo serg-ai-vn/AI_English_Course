@@ -68,9 +68,11 @@ async function launch() {
         Origin: base,
         Authorization: 'Bearer ' + token,
       },
-      body: JSON.stringify({ field: 'site-title', text: 'Container persistence' }),
+      body: JSON.stringify({ field: 'site-title', value: 'Container persistence' }),
     });
-    assert.equal((await r.json()).ok, true);
+    const saved = await r.json();
+    assert.equal(r.status, 200, JSON.stringify(saved));
+    assert.equal(saved.ok, true, JSON.stringify(saved));
     docker(['rm', '-f', container]);
     base = await launch();
     const me = await (
