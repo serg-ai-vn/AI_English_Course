@@ -315,14 +315,8 @@ function renderField(def) {
   if (isDone) {
     card.appendChild(renderDoneStripe(def, fstate));
     var grants=me.progress.editGrants || {};
-    if(grants[def.id] || def.id.indexOf('reflection-')===0) {
-      var correct=el('button','btn btn-ghost','Correct this field');card.appendChild(correct);
-      correct.addEventListener('click',async function(){
-        var reason=prompt('Why are you correcting this field?');if(!reason)return;
-        var text=prompt(def.input.indexOf('image')>=0?'Image version number':(def.id==='theme'?'Theme option number (1 or 2)':'Corrected text'),fstate.value || '');if(text===null)return;
-        try {var r=await api('/api/correct-field','POST',{field:def.id,text:text,reason:reason});if(!r.ok){showErrors(card,r.errors);return;}refresh();}catch(e){showErrors(card,[{hint:'Could not save. Please try again.'}]);}
-      });
-    } else card.appendChild(el('small','iteration-note','Ask your teacher to allow a correction.'));
+    if(def.input!=='checklist'&&(grants[def.id]||def.id.indexOf('reflection-')===0))addCorrectionForm(card,def,fstate);
+    else if(def.input!=='checklist')card.appendChild(el('small','iteration-note','Ask your teacher to allow a correction.'));
 
     return card;
   }
@@ -336,6 +330,140 @@ function renderField(def) {
   else if (def.input === 'theme-picker') renderThemePicker(card, def, fstate);
   else if (def.input === 'ai-cycle') renderAiCycleLegacy(card, def, fstate);
   return card;
+}
+
+var correctionDrafts = {};
+function addCorrectionForm(card, def, fstate) {
+  var draft =
+    correctionDrafts[def.id] ||
+    (correctionDrafts[def.id] = { reason: '', text: String(fstate.value || '') });
+  var toggle = el('button', 'btn btn-ghost', 'Correct this field');
+  toggle.type = 'button';
+  card.appendChild(toggle);
+  var form = el('form', 'correction-form');
+  form.setAttribute('aria-label', 'Correct ' + def.label);
+  form.hidden = true;
+  var id = 'correction-value-' + def.id,
+    label = el('label', '', 'Corrected ' + def.label),
+    input;
+  label.htmlFor = id;
+  form.appendChild(label);
+  if (def.input.indexOf('image') >= 0 || def.input === 'theme-picker') {
+    input = document.createElement('select');
+    var options =
+      def.input === 'theme-picker'
+        ? [fstate.option1, fstate.option2].map(function (o, i) {
+            return {
+              value: String(i + 1),
+              label: 'Option ' + (i + 1) + ' — ' + ((o && o.presetName) || (o && o.preset) || ''),
+              path: o && o.preset,
+            };
+          })
+        : (fstate.iterations || []).map(function (it, i) {
+            return {
+              value: String(it.version || i + 1),
+              label: 'Version ' + (it.version || i + 1),
+              path: it.image && it.image.path,
+              url: it.image && it.image.url,
+            };
+          });
+    options.forEach(function (o) {
+      var option = document.createElement('option');
+      option.value = o.value;
+      option.textContent = o.label;
+      input.appendChild(option);
+    });
+    var matched = options.find(function (o) {
+      return o.path === draft.text;
+    });
+    input.value = matched ? matched.value : draft.text;
+    if (!input.value && options.length) input.value = options[0].value;
+    draft.text = input.value;
+    if (def.input.indexOf('image') >= 0) {
+      var image = document.createElement('img');
+      image.className = 'img-preview-big';
+      image.alt = 'Selected correction version';
+      var preview = function () {
+        var selected = options.find(function (o) {
+          return o.value === input.value;
+        });
+        image.src = (selected && selected.url) || '';
+      };
+      input.addEventListener('change', preview);
+      preview();
+      form.appendChild(image);
+    }
+  } else {
+    input = document.createElement('textarea');
+    input.rows = 5;
+    input.value = draft.text;
+  }
+  input.id = id;
+  input.addEventListener('input', function () {
+    draft.text = input.value;
+  });
+  input.addEventListener('change', function () {
+    draft.text = input.value;
+  });
+  form.appendChild(input);
+  var reasonLabel = el('label', '', 'Reason for correction'),
+    reason = document.createElement('textarea');
+  reason.id = 'correction-reason-' + def.id;
+  reasonLabel.htmlFor = reason.id;
+  reason.rows = 2;
+  reason.value = draft.reason;
+  reason.required = true;
+  reason.addEventListener('input', function () {
+    draft.reason = reason.value;
+  });
+  form.appendChild(reasonLabel);
+  form.appendChild(reason);
+  if (def.input === 'theme-picker')
+    form.appendChild(
+      el(
+        'small',
+        'iteration-note',
+        'Compare themes using a design word, for example: This theme is calmer than the first theme.',
+      ),
+    );
+  var save = el('button', 'btn btn-primary', 'Save correction');
+  save.type = 'submit';
+  var cancel = el('button', 'btn btn-ghost', 'Cancel');
+  cancel.type = 'button';
+  form.appendChild(save);
+  form.appendChild(cancel);
+  card.appendChild(form);
+  toggle.addEventListener('click', function () {
+    form.hidden = false;
+    toggle.hidden = true;
+    input.focus();
+  });
+  cancel.addEventListener('click', function () {
+    form.hidden = true;
+    toggle.hidden = false;
+  });
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    clearErrors(form);
+    save.disabled = true;
+    var r = await api('/api/correct-field', 'POST', {
+      field: def.id,
+      text: input.value,
+      reason: reason.value,
+    });
+    save.disabled = false;
+    if (!r.ok) {
+      showErrors(
+        form,
+        r.errors && r.errors.length
+          ? r.errors
+          : [{ hint: r.error || 'Could not save. Please try again.' }],
+      );
+      return;
+    }
+    delete correctionDrafts[def.id];
+    refresh();
+  });
 }
 
 function emptyFstate(def) {

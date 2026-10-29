@@ -1,9 +1,9 @@
 /* ============================================================
-   Platform server (MVP, zero dependencies).
+   Platform server (single-process MVP, Node 24 + sharp).
    Serves the student workspace + login, keeps progress in
    JSON files, runs the gating engine (validate.js) on every
-   prompt and text. LLM is a local mock for now: swap
-   mockGenerate() for a real API call later - nothing else changes.
+   prompt and text. ai-provider.js selects deterministic mock or
+   the configured live provider; there is no silent live-to-mock fallback.
 
    Run:  node server.js     ->  http://localhost:3000
    ============================================================ */
@@ -13,7 +13,6 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
-const { execFile } = require('child_process');
 
 require('./settings.js');
 const ROOT = __dirname;
@@ -32,6 +31,8 @@ if (!DEMO && process.env.AI_PROVIDER !== 'openai') throw new Error('Pilot requir
 const TRACK_ROOT = path.join(ROOT, '..');   /* Kimi K3 dir (template + tools + rehearsal) */
 
 const validate = require('./validate.js');
+const network = require('./network-policy');
+const limiter = require('./rate-limit').createLimiter();
 const classes = JSON.parse(fs.readFileSync(path.join(DATA, 'classes.json'), 'utf8'));
 
 /* Multi-lesson configs: lesson N -> its config object. Each lesson's fields
@@ -96,11 +97,7 @@ function publicConfig(lessonNum) {
   };
 }
 
-/* ---------- mock AI (placeholder for a real LLM call) ----------
-   Deliberately produces a FLAT first draft (like a lazy model):
-   the student's job in Lesson 2 is to edit it. Deterministic,
-   offline. Reuses the Context part of the prompt formula if the
-   student wrote one - rewarding good prompt structure. */
+/* Text generation is implemented by ai-provider.js. */
 
 /* ---------- request plumbing ---------- */
 
@@ -143,11 +140,12 @@ function handleLogin(req, res, body) {
 
   const token = crypto.randomBytes(16).toString('hex');
   const sessions = getSessions();
-  res.setHeader('Set-Cookie', 'session='+token+'; HttpOnly; SameSite=Strict; Path=/'+(!DEMO?'; Secure':''));
+  res.setHeader('Set-Cookie', 'session='+token+'; HttpOnly; SameSite=Strict; Path=/'+(network.secure(req)?'; Secure':''));
 
   if (role === 'teacher') {
     const tpin = String(body.pin || '').trim();
-    if (!(process.env['TEACHER_PIN_'+cls.code] || cls.teacherPin) || String(process.env['TEACHER_PIN_'+cls.code] || cls.teacherPin) !== tpin) {
+    const configuredTeacherPin=process.env['TEACHER_PIN_'+cls.code.toUpperCase().replace(/-/g,'_')] || process.env['TEACHER_PIN_'+cls.code] || cls.teacherPin;
+    if (!configuredTeacherPin || String(configuredTeacherPin) !== tpin) {
       return sendJson(res, 401, { error: 'Wrong teacher PIN for class ' + cls.code + '.' });
     }
     sessions[token] = {
@@ -435,25 +433,6 @@ function handleSubmitText(req, res, a, body) {
 /* Save the student's edit + notes for the current (last) iteration without
    closing the field. Used for mid-flow iterations on multi-iteration fields
    (e.g. About Me iter 1) before writing the next prompt. */
-function handleSaveEdit(req, res, a, body) {
-  const def = fieldDef(body.field);
-  if (!def || def.input !== 'ai-cycle') return sendJson(res, 400, { error: 'Unknown AI field.' });
-
-  const progress = getProgress(a.session.studentId);
-  const f = progress.fields[def.id];
-  if (!f || !f.iterations || !f.iterations.length) {
-    return sendJson(res, 400, { error: 'Generate a draft first.' });
-  }
-  if (f.status === 'done') return sendJson(res, 400, { error: 'This field is already approved.' });
-
-  var last = f.iterations[f.iterations.length - 1];
-  last.edited = String(body.text || '').trim();
-  last.notes = String(body.notes || '').trim() || null;
-  saveProgress(progress);
-
-  sendJson(res, 200, { ok: true });
-}
-
 function handleSaveDirect(req, res, a, body) {
   const def = fieldDef(body.field);
   if (!def || (def.input !== 'direct' && def.input !== 'checklist')) {
@@ -548,7 +527,7 @@ function handleResetAll(req, res, a) {
 /* ============================================================
    Lesson 3 - image generation (mock) + image-cycle gating.
    mockGenerateImage returns a path under rehearsal/assets/ that
-   export-site.ps1 can later resolve. A real text-to-image API
+   site-builder.js can later resolve. A real text-to-image API
    replaces this function and writes the same file paths - nothing
    else changes (same swap-one-function contract as mockGenerate).
    ============================================================ */
@@ -565,7 +544,7 @@ function mockGenerateImage(studentId, def, iterIdx) {
      one avatar PNG, one background JPG and three hobby JPGs per pilot
      student). Fallback to the shared demo-assets/ so brand-new students
      are never stuck. The returned "paths" are TRACK_ROOT-relative so
-     export-site.ps1 (which also resolves from TRACK_ROOT) can embed them
+     site-builder.js (which also resolves from TRACK_ROOT) can embed them
      as base64. */
   var ext;
   if (def.id === 'avatar') ext = '.png';
@@ -1106,19 +1085,19 @@ function handleUnlockLesson(req, res, a, body) {
   progress.complete = isComplete(progress, lessonCfg(target));
   saveProgress(progress);
 
-  sendJson(res, 200, { ok: true, lesson: target, unlockedLessons: unlocked });
+  sendJson(res, 200, { ok: true, lesson: target, unlockedLessons: unlocked, ...(target===2&&!progress.l1Ready?{warning:'Please check L1 paper work before starting L2.'}:{}) });
 }
 
 /* ============================================================
    Build the student's site as a single self-contained HTML file.
    Server assembles the export-config from the student's progress
    (Lesson 2 texts -> slots, Lesson 3 images -> images), then runs
-   the two PowerShell tools used by the rehearsal pipeline:
-     1) sample-particles.ps1   - only if the avatar PNG changed since
+   the shared Node builder used by both live and demo exports:
+     1) site-builder.js#sampleParticles   - only if the avatar PNG changed since
                                  the last build (rehearsal already
                                  produced an avatar-particles.js for the
                                  demo students - we reuse it when we can)
-     2) export-site.ps1       - inlines template + CSS + JS + images
+     2) site-builder.js       - inlines template + CSS + JS + images
                                  + particle-JS into one .html
    Returns the relative path (dist/<name>.html) so the teacher can
    download via /preview/dist/...                                    */
@@ -1166,7 +1145,7 @@ function handleExportSite(req, res, a, body) {
 }
 
 /* Shared export pipeline (build-site + export-site): assemble the export
-   config from progress, sample particles if needed, run export-site.ps1.
+   config from progress, sample particles if needed, run site-builder.js.
    mark = 'built' (teacher preview) | 'published' (Lesson 5 handover). */
 async function runExport(req,res,student,mark) {
  const p=getProgress(student.id),slots={},images={};
@@ -1392,6 +1371,8 @@ function buildStudentView(student, selLesson) {
     })),
     lastActivity: lastField ? { label: lastField, prompt: lastPrompt, ts: lastTs } : null,
     corrections: Object.entries(p.fields).flatMap(([id,f])=>(f.corrections||[]).map(c=>({field:id,...c}))),
+    completedFields: Object.values(lessons).flatMap(c=>c.fields.filter(f=>f.input!=='checklist'&&p.fields[f.id]?.status==='done').map(f=>({id:f.id,label:f.label,input:f.input,lesson:c.lesson,grant:p.editGrants?.[f.id]||null}))),
+    l1Ready: p.l1Ready || null,
     journal: journal
   };
 }
@@ -1437,12 +1418,7 @@ function handleTeacherOverview(req, res, a) {
 }
 
 /* All state mutations for the same student share one queue (single-process MVP). */
-const queues = new Map(),
-  rates = new Map();
-setInterval(() => {
-  const now = Date.now();
-  for (const [k, v] of rates) if (now - v.start > 60000) rates.delete(k);
-}, 60000).unref();
+const queues = new Map();
 async function serial(key, fn) {
   const before = queues.get(key) || Promise.resolve();
   let release;
@@ -1456,16 +1432,6 @@ async function serial(key, fn) {
     release();
     if (queues.get(key) === tail) queues.delete(key);
   }
-}
-function throttle(req, key, max = 120) {
-  const id = (req.socket.remoteAddress || '') + key,
-    now = Date.now();
-  const entry = rates.get(id);
-  if (!entry || now - entry.start > 60000) {
-    rates.set(id, { start: now, n: 1 });
-    return true;
-  }
-  return ++entry.n <= max;
 }
 function classStudent(a, id) {
   const cls = classes.classes.find((c) => c.code === a.session.classCode);
@@ -1496,7 +1462,7 @@ function correction(a, body) {
     check = validate.checkText(def, value, lessonCfg(def.lesson));
   else if (def.input === 'direct') check = validate.checkDirect(def, value, lessonCfg(def.lesson));
   else if (def.input.startsWith('ai-image-')) {
-    const it = (f.iterations || []).find((x) => x.version === Number(value));
+    const it = (f.iterations || []).find((x,i) => (x.version||i+1) === Number(value));
     if (!it) return { ok: false, error: 'Choose an existing version.' };
     value = it.image.path;
     check = { ok: true };
@@ -1536,7 +1502,6 @@ const studentHandlers = {
   '/api/me': handleMe,
   '/api/prompt': handlePrompt,
   '/api/submit-text': handleSubmitText,
-  '/api/save-edit': handleSaveEdit,
   '/api/save-eval': handleSaveEval,
   '/api/save-direct': handleSaveDirect,
   '/api/reset': handleReset,
@@ -1594,21 +1559,19 @@ const server = http.createServer(async (req, res) => {
         aiProvider: process.env.AI_PROVIDER || 'mock',
         mode: DEMO ? 'demo' : 'pilot',
         uptime: process.uptime(),
+        ...ai.status(),
       });
     const a = auth(req);
     if (u.startsWith('/api/')) {
       if (req.method !== 'GET' && req.method !== 'POST')
         return sendJson(res, 405, { ok: false, error: 'Method not allowed' });
-      if (
-        req.method === 'POST' &&
-        req.headers.origin &&
-        req.headers.origin !== (!DEMO ? 'https://' : 'http://') + req.headers.host
-      )
-        return sendJson(res, 403, { ok: false, error: 'Origin mismatch' });
-      if (!throttle(req, u, u === '/api/login' ? 20 : 120))
-        return sendJson(res, 429, { ok: false, error: 'Too many requests. Wait a minute.' });
+      if(req.method==='POST'&&!network.originAllowed(req))return sendJson(res,403,{ok:false,error:'This page address does not match the server. Open the configured course address.',errors:[{rule:'origin',hint:'Open the course at its configured address.'}]});
+      if(!limiter.allow(req,u,a))return sendJson(res,429,{ok:false,error:'Too many requests. Wait a minute.'});
       const body = req.method === 'POST' ? await readBody(req) : {};
-      if (u === '/api/login' && req.method === 'POST') return handleLogin(req, res, body);
+      if(u==='/api/login'&&req.method==='POST'){
+        if(!limiter.loginAllowed(req,body))return sendJson(res,429,{ok:false,error:'Too many incorrect PIN attempts. Wait a minute.'});
+        handleLogin(req,res,body);if(res.statusCode===401)limiter.failure(req,body);else if(res.statusCode===200)limiter.success(req,body);return;
+      }
       if (!a) return sendJson(res, 401, { ok: false, error: 'Not logged in' });
       if (u === '/api/logout' && req.method === 'POST') {
         res.setHeader('Set-Cookie', 'session=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
@@ -1617,6 +1580,7 @@ const server = http.createServer(async (req, res) => {
       if (u.startsWith('/api/teacher/')) {
         if (a.session.role !== 'teacher')
           return sendJson(res, 403, { ok: false, error: 'Teachers only' });
+        if(u==='/api/teacher/l1-ready'&&req.method==='POST')return await serial(body.studentId,()=>{if(!classStudent(a,body.studentId))return sendJson(res,400,{ok:false,error:'Unknown student in your class.'});if(typeof body.ready!=='boolean')return sendJson(res,400,{ok:false,error:'Readiness must be true or false.'});const p=getProgress(body.studentId);p.l1Checks=p.l1Checks||[];p.l1Checks.push({ready:body.ready,ts:Date.now()});p.l1Ready=body.ready?{ts:Date.now()}:null;saveProgress(p);return sendJson(res,200,{ok:true});});
         if (u === '/api/teacher/allow-correction' && req.method === 'POST')
           return await serial(body.studentId, () => {
             if (
@@ -1626,6 +1590,8 @@ const server = http.createServer(async (req, res) => {
             )
               return sendJson(res, 400, { ok: false, error: 'Student, field and reason required' });
             const p = getProgress(body.studentId);
+            if(fieldDef(body.field).input==='checklist')return sendJson(res,400,{ok:false,error:'Checklist is rechecked after a content correction.'});
+            if(p.fields[body.field]?.status!=='done')return sendJson(res,400,{ok:false,error:'Choose a completed field.'});
             p.editGrants = p.editGrants || {};
             p.editGrants[body.field] = { reason: String(body.reason), ts: Date.now() };
             saveProgress(p);
@@ -1781,6 +1747,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 404, { error: 'Not found' });
     return sendFile(res, path.join(PUBLIC, rel));
   } catch (err) {
+    if(err.status && err.code && !res.headersSent)return sendJson(res,err.status,{ok:false,error:err.publicMessage || err.message,code:err.code,errors:[{rule:err.code,hint:err.publicMessage || err.message}]});
     const code =
       err.message === 'bad json'
         ? 400
@@ -1813,4 +1780,4 @@ const server = http.createServer(async (req, res) => {
     console.error('Request failure:', code, err.message.replace(/sk-[\w-]+/g, '[redacted]'));
   }
 });
-server.listen(PORT, HOST, () => console.log('Platform ready on http://' + HOST + ':' + PORT));
+server.listen(PORT, HOST, () => console.log('Platform ready on http://' + HOST + ':' + server.address().port));

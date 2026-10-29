@@ -1368,3 +1368,13 @@ tr.detail-row td { background: rgba(8, 6, 20, 0.4); padding: 16px 16px 20px; bor
 
 /* Respect hidden even on flex/grid components. */
 [hidden] { display: none !important; }
+
+.correction-form { display:grid; gap:10px; margin-top:12px; padding:12px; border:1px solid var(--line); border-radius:12px; }
+.correction-form textarea,.correction-form select { width:100%; min-height:44px; font:inherit; padding:10px; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:8px; }
+.correction-form label {font-weight:600;}
+
+.correction-form[hidden] {display:none;}
+
+.student-correction-controls {display:grid;gap:8px;min-width:220px;margin-top:12px;}
+.student-correction-controls > label {display:flex;gap:8px;align-items:center;}
+.correction-form select,.correction-form textarea {min-width:0;max-width:100%;}

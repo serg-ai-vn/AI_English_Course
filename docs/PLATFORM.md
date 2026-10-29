@@ -1,9 +1,32 @@
-# Фактическая реализация 0.6.0
+# Архитектура и состояние 0.6.1
 
-Node 24, sharp; JSON-хранилище одного процесса. settings.js читает .env до запуска; storage.js создаёт только отсутствующие demo-данные, пишет атомарно и не скрывает повреждение. server.js содержит существующие стейт-машины и общий router с проверкой доступа/состояния/очередью. ai-provider.js разделяет mock/live без скрытой подмены.
+Node 24 + sharp, один процесс, JSON DATA_DIR. settings читает .env, storage пишет атомарно и не перезаписывает повреждение. AI_PROVIDER=mock/openai выбирается явно; live не подменяется demo при сбое.
 
-Основные API: login/logout/me; save-direct, prompt/save-eval/submit-text; image-prompt/eval/best/worst/accept/regenerate/publish; theme-prompt/second/choose/justify; teacher overview/unlock-lesson/build-site/export-site. POST /api/teacher/allow-correction {studentId,field,reason} даёт одно разрешение; POST /api/correct-field {field,text,reason} сохраняет прежний результат в corrections и отзывает старые сборки. reflection-* можно корректировать без повторного разрешения.
+| Слой | Источник истины и связь |
+|---|---|
+| Методика / зачем | curriculum/DECISIONS, SOURCES и Lesson_N. Причины, гипотезы, допустимость изменения правил. |
+| Исполняемый урок | platform/config/lesson-N.json. Типы полей, рубежи, банк слов, число итераций; согласовать со Spec. |
+| Решения сервера | validate + server: проверка правил, доступа, состояния и очередь записи ученика. UI не может обойти гейт. |
+| Действия пользователя | public/app, teacher, login и CSS: один активный этап, явная ошибка, сохранение черновика формы, названия полей/версий. |
+| Долговременная работа | storage и DATA_DIR: schema/course/revision, прежние итерации, corrections, одноразовые grants, l1Checks. |
+| Результат | site-builder/fill-slots/template: один самостоятельный HTML. Коррекция отзывает built/published/audit до повторной проверки и сборки. |
 
-GET /api/health сообщает версию, mode и aiProvider. Pilot запрещает DEMO и mock; production credentials создаются вне репозитория. Сессии имеют TTL; cookie HttpOnly/SameSite=Strict, в pilot Secure. Bearer поддерживается для тестов/API. Учитель ограничен своим классом. Reset сервером отключён по умолчанию.
+Тесты, CONTRACT и эксплуатация проходят через все слои. При смене количества попыток прочитать методику и проверить все затронутые слои. Для цвета кнопки достаточно UI/стилей и её пользовательского пути; расширить контекст, если обнаружилась межурочная зависимость.
 
-Нет загрузки фото L1, Supabase, универсального редактора уроков и ИИ-тьютора. Mock не оценивает методику и не отражает изменения промпта визуально. Реальные API и Docker/VPS требуют отдельной приёмки, указанной в IMPLEMENTATION_STATUS.md.
+| Машина состояния | Маршрут |
+|---|---|
+| L2 About Me | A1 prompt → draft/evaluation → A2 improved prompt → draft/evaluation → A3 manual edit/publish → done |
+| L2 hobby | B1 prompt/draft → publish либо manual edit + reason/bonus → done |
+| L3 avatar/background | prompt → image → pros/cons → повтор в рамках config → разные best/worst + причины → accept → done |
+| L4 hobby images | prompt → image → publish либо изменённая структура + причина → новая версия в пределах config → publish |
+| L4 theme | option1 → option2 → choose → comparative design justification → done |
+| L5 | checklist + 6 reflections + общий словарный гейт → teacher export |
+| Коррекция | done → одноразовое разрешение учителя → валидная новая версия и причина → done с corrections; reflection-* без разрешения |
+
+Старые изображения без version выбираются по прежнему порядку итераций (1-based); сохранённая история не переписывается. Старый ai-cycle читается/показывается; неиспользуемая запись /api/save-edit удалена. Checklist не корректируется этим маршрутом, он перепроверяется после изменения контента.
+
+Teacher overview возвращает completedFields всех уроков, включая обычные direct-поля и активные editGrants. POST /api/teacher/allow-correction {studentId,field,reason}; POST /api/correct-field {field,text,reason}. Учитель ограничен своим классом. POST /api/teacher/l1-ready {studentId,ready:boolean} сохраняет мягкую отметку бумажной работы; она не блокирует L2 и не требует миграции старых профилей.
+
+GET /api/health: ok — процесс отвечает; liveChecked/readiness — успешные text/image проверки текущего ключа/моделей за 24 часа без последующего сбоя соответствующего типа. Это кэш, не вызов API и не гарантия урока. Ошибки 401/403/404/429 провайдера, таймаут, отказ и невалидный результат имеют понятные коды. Учебная попытка сохраняется только при успешном ответе; бюджет учитывает и неуспешные обращения.
+
+Cookie HttpOnly/SameSite=Strict, Secure по HTTPS-транспорту/явному PUBLIC_ORIGIN; HTTP локально работает и в pilot. Forwarded-заголовок принимается только от явно доверенного адреса. Прокси и Origin: DEPLOY_RUNBOOK. Ограничения запросов: на учётную запись/маршрут 120 в минуту, login IP 60, общий IP 600, неверные попытки 10 на аккаунт/IP в минуту; это настройки малого пилота, не нагрузочная гарантия.

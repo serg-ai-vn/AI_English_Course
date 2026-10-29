@@ -2,7 +2,7 @@
    Slot filler (production pipeline)
    Reads window.SITE_DATA and fills every matching [data-slot]
    element. Inlined into exported single-file sites by
-   tools/export-site.ps1; the backend can reuse the same contract
+   tools/site-builder.js; the backend can reuse the same contract
    when rendering a student's live page.
 
    SITE_DATA shape:

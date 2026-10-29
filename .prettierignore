@@ -1,0 +1,5 @@
+platform/data/
+platform/public/generated/
+node_modules/
+docs/history/
+dist/

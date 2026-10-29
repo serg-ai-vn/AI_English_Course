@@ -8,18 +8,11 @@
 'use strict';
 
 var state = { overview: null, openId: null, timer: null, lesson: null };
+var teacherDrafts={},activeCorrection=null;
 
 function token() { return localStorage.getItem('token') || ''; }
 
-async function api(path, method, body) {
-  var res = await fetch(path, {
-    method: method,
-    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token() },
-    body: body ? JSON.stringify(body) : undefined
-  });
-  if (res.status === 401 || res.status === 403) { location.href = '/login.html'; throw new Error('unauthorized'); }
-  return res.json();
-}
+async function api(path,method,body){try{var res=await fetch(path,{method:method,headers:{'Content-Type':'application/json','Authorization':'Bearer '+token()},body:body?JSON.stringify(body):undefined});if(res.status===401){location.href='/login.html';return {ok:false,error:'Please log in again.'};}return await res.json();}catch(e){return {ok:false,error:'Connection failed. Your input is still here.'};}}
 
 function el(tag, className, text) {
   var e = document.createElement(tag);
@@ -65,7 +58,7 @@ async function refreshOverview() {
   try {
     var q = state.lesson ? '?lesson=' + state.lesson : '';
     state.overview = await api('/api/teacher/overview' + q, 'GET');
-    render();
+    if(!activeCorrection || !document.body.contains(activeCorrection))render();
   } catch (e) { /* redirected to login by api() */ }
 }
 
@@ -188,6 +181,112 @@ function lessonPill(n, ls, stu) {
   return pill;
 }
 
+function addTeacherCorrection(cell, stu) {
+  var fields = (stu.completedFields || []).filter(function (f) {
+    return f.input !== 'checklist';
+  });
+  var draft = teacherDrafts[stu.id] || (teacherDrafts[stu.id] = { field: '', reason: '' });
+  var button = el('button', 'btn btn-ghost mini-btn', 'Allow correction');
+  button.type = 'button';
+  button.disabled = !fields.length;
+  cell.appendChild(button);
+  var form = el('form', 'correction-form');
+  form.setAttribute('aria-label', 'Allow correction for ' + stu.name);
+  form.hidden = true;
+  form.addEventListener('click', function (e) {
+    e.stopPropagation();
+  });
+  var select = document.createElement('select');
+  select.id = 'grant-field-' + stu.id;
+  var label = el('label', '', 'Completed field');
+  label.htmlFor = select.id;
+  fields.forEach(function (f) {
+    var o = document.createElement('option');
+    o.value = f.id;
+    o.textContent =
+      'Lesson ' + f.lesson + ' — ' + f.label + (f.grant ? ' (correction allowed)' : '');
+    select.appendChild(o);
+  });
+  select.value = draft.field;
+  if (!select.value && fields.length)
+    select.value = (
+      fields.find(function (f) {
+        return f.grant;
+      }) || fields[0]
+    ).id;
+  draft.field = select.value;
+  form.appendChild(label);
+  form.appendChild(select);
+  var reason = document.createElement('textarea');
+  reason.id = 'grant-reason-' + stu.id;
+  reason.rows = 2;
+  reason.value = draft.reason;
+  reason.required = true;
+  var reasonLabel = el('label', '', 'Reason for reopening');
+  reasonLabel.htmlFor = reason.id;
+  form.appendChild(reasonLabel);
+  form.appendChild(reason);
+  var granted = el('p', 'iteration-note', '');
+  form.appendChild(granted);
+  var displayGrant = function () {
+    var f = fields.find(function (f) {
+      return f.id === select.value;
+    });
+    granted.textContent =
+      f && f.grant
+        ? 'Granted ' + new Date(f.grant.ts).toLocaleString() + ': ' + f.grant.reason
+        : '';
+  };
+  displayGrant();
+  select.addEventListener('change', function () {
+    draft.field = select.value;
+    displayGrant();
+  });
+  reason.addEventListener('input', function () {
+    draft.reason = reason.value;
+  });
+  var save = el('button', 'btn btn-primary mini-btn', 'Grant correction');
+  save.type = 'submit';
+  var cancel = el('button', 'btn btn-ghost mini-btn', 'Cancel');
+  cancel.type = 'button';
+  var message = el('p', 'error-box', '');
+  message.setAttribute('role', 'status');
+  form.appendChild(message);
+  form.appendChild(save);
+  form.appendChild(cancel);
+  cell.appendChild(form);
+  button.addEventListener('click', function (e) {
+    e.stopPropagation();
+    form.hidden = false;
+    button.hidden = true;
+    activeCorrection = form;
+    select.focus();
+  });
+  cancel.addEventListener('click', function () {
+    form.hidden = true;
+    button.hidden = false;
+    activeCorrection = null;
+  });
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    save.disabled = true;
+    message.textContent = '';
+    var r = await api('/api/teacher/allow-correction', 'POST', {
+      studentId: stu.id,
+      field: select.value,
+      reason: reason.value,
+    });
+    save.disabled = false;
+    if (!r.ok) {
+      message.textContent = r.error || 'Could not grant correction';
+      return;
+    }
+    delete teacherDrafts[stu.id];
+    activeCorrection = null;
+    await refreshOverview();
+  });
+}
+
 function renderRow(stu) {
   var tr = el('tr');
   if (stu.state === 'complete') tr.className = 'row-complete';
@@ -211,9 +310,9 @@ function renderRow(stu) {
   if (ls['4']) meta.appendChild(lessonPill(4, ls['4'], stu));
   if (ls['5']) meta.appendChild(lessonPill(5, ls['5'], stu));
   cell.appendChild(meta);
-  var correction=el('button','btn btn-ghost mini-btn','Allow correction');
-  correction.addEventListener('click',async function(e){e.stopPropagation();var field=prompt('Field ID (about-me, hobby-text-1, avatar, background, hobby-image-1, theme, reflection-1, etc.)');if(!field)return;var reason=prompt('Reason for reopening this field');if(!reason)return;var r=await api('/api/teacher/allow-correction','POST',{studentId:stu.id,field:field,reason:reason});if(!r.ok)alert(r.error || 'Cannot allow correction');else refreshOverview();});cell.appendChild(correction);
-  c1.appendChild(cell);
+  var controls=el('div','student-correction-controls');addTeacherCorrection(controls,stu);
+  var l1Label=el('label','iteration-note','L1 paper work checked'),l1=document.createElement('input');l1.type='checkbox';l1.checked=!!stu.l1Ready;l1.setAttribute('aria-label','L1 paper work checked for '+stu.name);l1Label.prepend(l1);l1Label.addEventListener('click',function(e){e.stopPropagation();});l1.addEventListener('change',async function(){l1.disabled=true;var result=await api('/api/teacher/l1-ready','POST',{studentId:stu.id,ready:l1.checked});if(!result.ok){l1.checked=!l1.checked;alert(result.error||'Could not save L1 check');}l1.disabled=false;});controls.appendChild(l1Label);
+  c1.appendChild(cell);c1.appendChild(controls);
   tr.appendChild(c1);
 
   /* 2 - progress */

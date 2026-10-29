@@ -19,7 +19,7 @@ test('live adapter: valid text, refusal, timeout, budget and image bytes without
   assert(v.checkText(def, draft, cfg).ok);
   try {
     process.env.AI_PROVIDER = 'openai';
-    process.env.AI_TEXT_REQUEST_LIMIT = '5';
+    process.env.AI_TEXT_REQUEST_LIMIT = '4';
     process.env.AI_IMAGE_REQUEST_LIMIT = '1';
     ai.configure(dir);
     global.fetch = async () => {
@@ -35,7 +35,7 @@ test('live adapter: valid text, refusal, timeout, budget and image bytes without
       ok: true,
       json: async () => ({ output: [{ content: [{ type: 'refusal', refusal: 'no' }] }] }),
     });
-    await assert.rejects(ai.text({ fieldId: 'about-me', prompt, cfg, def }), /did not meet/);
+    await assert.rejects(ai.text({ fieldId: 'about-me', prompt, cfg, def }), /provider_refusal/);
     global.fetch = async () => {
       throw new Error('timeout');
     };

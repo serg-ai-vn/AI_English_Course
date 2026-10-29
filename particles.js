@@ -5,7 +5,7 @@
    fades in and the animation loop stops completely.
 
    - Canvas 2D, no WebGL, no libraries
-   - Particle data is PRECOMPUTED server-side (tools/sample-particles.ps1)
+   - Particle data is PRECOMPUTED server-side (tools/site-builder.js#sampleParticles)
      and arrives as window.PARTICLE_DATA[slotName]. The device never
      samples pixels: no CORS issues, no CPU cost.
    - Particle color comes from the active preset (--particle-color),
