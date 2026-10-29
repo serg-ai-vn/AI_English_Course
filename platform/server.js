@@ -1504,7 +1504,7 @@ function correction(a, body) {
     const option = Number(value) === 1 ? f.option1 : Number(value) === 2 ? f.option2 : null;
     if (!option) return { ok: false, error: 'Choose option 1 or 2.' };
     value = option.preset;
-    check = { ok: true };
+    check = validate.checkThemeJournal(reason, lessonCfg(def.lesson));
   } else return { ok: false, error: 'This field cannot be corrected this way.' };
   if (!check.ok) return check;
   f.corrections = f.corrections || [];
@@ -1514,10 +1514,17 @@ function correction(a, body) {
     reason,
     ts: Date.now(),
     teacherGrant: (p.editGrants || {})[def.id] || null,
+    ...(def.input === 'theme-picker'
+      ? { beforeChoice: f.choice, beforeJustification: f.justification }
+      : {}),
   });
   f.value = value;
   f.ts = Date.now();
-  if (def.input === 'theme-picker') p.theme = value;
+  if (def.input === 'theme-picker') {
+    p.theme = value;
+    f.choice = Number(body.text);
+    f.justification = reason;
+  }
   if (def.input === 'ai-image-cycle') f.acceptedImage = value;
   if (def.input === 'ai-image-rapid') f.publishedVersion = Number(body.text);
   if (p.editGrants) delete p.editGrants[def.id];

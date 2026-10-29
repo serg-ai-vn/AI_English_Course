@@ -187,7 +187,7 @@ function checkDirect(fieldDef, value, cfg) {
 function checkChecklist(fieldDef, value, cfg) {
   var errors = [];
   var v = value || {};
-  var unchecked = (fieldDef.items || []).filter(function (it) { return !v[it.id]; });
+  var unchecked = (fieldDef.items || []).filter(function (it) { return v[it.id] !== true; });
   if (unchecked.length > 0) {
     errors.push({ rule: 'audit', hint: (cfg && cfg.hints && cfg.hints.auditRequired) || 'Confirm all items before continuing.' });
   }

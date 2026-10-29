@@ -17,4 +17,4 @@
 
 Следующая приёмка: независимый свежий clone, CI Linux, целевое устройство, live API, один VPS и тест восстановления на нём, затем небольшая группа. DONE локального кода не равно готовому внешнему пилоту.
 
-GitHub: публичная загрузка разрешена владельцем, draft PR #1: https://github.com/serg-ai-vn/AI_English_Course/pull/1 . Main — архивный снимок; текущая локальная ветка audit/mvp-readiness-2026-10-29. Merge ждёт независимой приёмки.
+GitHub: по последнему запросу владельца репозиторий приватный. PR #1: https://github.com/serg-ai-vn/AI_English_Course/pull/1 . До merge main хранит архивный снимок, после merge — исправленную версию. Состояние приёмки: ACCEPTANCE.md и GitHub.

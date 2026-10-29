@@ -82,6 +82,7 @@ test('grammar, label contents and image acceptance', () => {
     assert.equal(v.matchThemePreset(w, cfg(4)).id, p.id);
   }
 });
+test('audit requires actual boolean confirmations',()=>{const c=cfg(5),f=c.fields.find(x=>x.id==='audit');for(const value of [false,'false','true',1,{},[],null])assert.equal(v.checkChecklist(f,{data:value,hallucination:value},c).ok,false);assert.equal(v.checkChecklist(f,{data:true,hallucination:true},c).ok,true);});
 test('corrupt storage is preserved and backup restores bytes', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'course-storage-')),
     data = path.join(dir, 'data'),
@@ -263,13 +264,35 @@ test('complete L2-L5 flow, permissions, corrections, export and restart', async 
       { field: 'theme', text: 'This theme is calmer than the other theme.' },
       student,
     );
+    await ok(
+      '/api/teacher/allow-correction',
+      { studentId: 'ziggy', field: 'theme', reason: 'Compare theme choices' },
+      teacher,
+    );
+    const badTheme = await call(
+      '/api/correct-field',
+      { field: 'theme', text: '2', reason: 'better' },
+      student,
+    );
+    assert.equal(badTheme.data.ok, false);
+    const themeReason = 'This theme is bolder than the first theme.';
+    await ok('/api/correct-field', { field: 'theme', text: '2', reason: themeReason }, student);
+    const themeProgress = JSON.parse(fs.readFileSync(path.join(data, 'progress/ziggy.json')));
+    assert.equal(themeProgress.theme, 'deep-focus');
+    assert.equal(themeProgress.fields.theme.choice, 2);
+    assert.equal(themeProgress.fields.theme.justification, themeReason);
+    assert.equal(themeProgress.fields.theme.corrections[0].beforeChoice, 1);
+    assert.equal(
+      themeProgress.fields.theme.corrections[0].beforeJustification,
+      'This theme is calmer than the other theme.',
+    );
     const built = await ok('/api/teacher/build-site', { studentId: 'ziggy' }, teacher);
     assert.equal((await call('/preview/dist/ziggy.html')).status, 403);
     assert.equal((await call('/preview/dist/ziggy.html', undefined, teacher)).status, 200);
     const exported = JSON.parse(fs.readFileSync(path.join(data, 'ziggy-export.json')));
     for (const key of ['about-me', 'hobby-text-1', 'hobby-text-2', 'hobby-text-3'])
       assert(exported.slots[key]);
-    assert.equal(exported.theme, 'forest-explorer');
+    assert.equal(exported.theme, 'deep-focus');
     await ok('/api/teacher/unlock-lesson', { studentId: 'ziggy', lesson: 5 }, teacher);
     await ok(
       '/api/save-direct',
