@@ -40,7 +40,7 @@
         <input id="student-name" type="text" autocomplete="off" placeholder="Lumi" required>
       </label>
       <label id="pin-label">PIN
-        <input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="4 digits" required>
+        <input id="pin" type="password" inputmode="numeric" maxlength="12" placeholder="PIN from your teacher" required>
       </label>
       <button type="submit" class="btn btn-primary btn-block" id="enter-btn">Enter</button>
       <p id="login-error" class="error-box" hidden></p>
@@ -69,7 +69,7 @@
       nameWrap.classList.toggle('collapsed', isT);
       nameInput.required = !isT;
       pinLabel.firstChild.textContent = isT ? 'Teacher PIN' : 'PIN';
-      pinInput.placeholder = isT ? '0000' : '4 digits';
+      pinInput.placeholder = isT ? '0000' : 'PIN from your teacher';
       document.getElementById('login-error').hidden = true;
     }
     btnS.addEventListener('click', function () { setRole('student'); });

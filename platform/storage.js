@@ -44,9 +44,13 @@ function initialize(data) {
     });
   }
   const classes = readJson(path.join(data, 'classes.json'));
-  const ids = new Set();
+  const ids = new Set(), codes = new Set(), pinKeys = new Set();
   for (const c of classes.classes || []) {
     if (!/^[A-Za-z0-9_-]+$/.test(c.code)) throw new Error('Invalid class code');
+    const code=c.code.toUpperCase(),pinKey='TEACHER_PIN_'+code.replace(/-/g,'_');
+    if(codes.has(code))throw new Error('Class codes must be unique ignoring case');
+    if(pinKeys.has(pinKey)&&process.env[pinKey])throw new Error('Ambiguous teacher PIN override; use distinct normalized class codes');
+    codes.add(code);pinKeys.add(pinKey);
     if (
       process.env.APP_MODE === 'pilot' &&
       (c.code.toUpperCase() === 'DEMO' || String(c.teacherPin) === '0000')

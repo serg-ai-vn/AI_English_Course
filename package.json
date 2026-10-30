@@ -1,6 +1,6 @@
 {
   "name": "ai-english-course-platform",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "Interactive Web Creation & AI Literacy Platform for Kids (English + AI Course, Lessons 2-5)",
   "main": "platform/server.js",
   "scripts": {
@@ -12,10 +12,14 @@
     "seed": "node tools/seed.js",
     "build": "node tools/site-builder.js --config demo-export.json",
     "backup": "node tools/backup.js backup",
-    "restore": "node tools/backup.js restore"
+    "restore": "node tools/backup.js restore",
+    "test:ui": "playwright test",
+    "smoke:isolated": "node tools/ci-smoke.js",
+    "check:live": "node tools/check-live.js",
+    "format": "prettier --write \"platform/**/*.js\" \"tools/**/*.js\" \"tests/**/*.js\" playwright.config.js"
   },
   "engines": {
-    "node": ">=24 <27"
+    "node": ">=24 <25"
   },
   "keywords": [
     "edtech",
@@ -32,6 +36,7 @@
     "sharp": "0.35.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.64.1",
     "prettier": "3.9.10"
   }
 }

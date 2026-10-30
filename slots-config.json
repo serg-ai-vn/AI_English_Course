@@ -105,7 +105,7 @@
     "slot": "avatar",
     "slotMarker": "data-particle-src",
     "global": "window.PARTICLE_DATA",
-    "sampler": "tools/sample-particles.ps1",
+    "sampler": "tools/site-builder.js#sampleParticles",
     "format": {
       "w": "source image width (256)",
       "h": "source image height (256)",
