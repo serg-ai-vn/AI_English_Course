@@ -1632,3 +1632,66 @@ html[data-ui-theme="classroom-light"] .field-card .vocab-bank-field .chip.word-u
 @media (prefers-reduced-motion: reduce) {
   html[data-ui-theme="classroom-light"] :is(.btn, .lesson-tab, .mini-bar > span, .lesson-pill) { transition: none; }
 }
+
+/* Owner's visual review: yellow landmarks, one completion signal per block. */
+.helper-bar { display: flex; flex-wrap: wrap; }
+.helper-panel { flex: 1 1 auto; max-width: 100%; }
+.helper-panel[open] { flex-basis: 100%; }
+.helper-panel > summary { white-space: nowrap; overflow-wrap: normal; font-size: 14px; padding: 12px; }
+.goal-card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 18px; background: var(--card); }
+.goal-number { display: inline-block; padding: 4px 10px; border-radius: 8px; font-size: 13px; font-weight: 700; }
+.goal-title { font-family: var(--font-head); font-size: 20px; line-height: 1.3; margin: 12px 0 8px; }
+.goal-card .goal-copy { border: 0; padding: 0; margin: 0; font-size: 17px; line-height: 1.55; }
+.requirement-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 0; list-style: none; }
+.helper-panel .requirement-grid > li { min-width: 0; margin: 0; padding: 16px; border: 1px solid var(--line); border-radius: 16px; }
+.requirement-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.requirement-head h3 { font-size: 18px; line-height: 1.35; margin: 0; }
+.requirement-copy { font-size: 17px; line-height: 1.6; }
+.all-requirements > summary { font-weight: 600; padding: 12px 0; cursor: pointer; }
+.workspace .field-head { width: fit-content; max-width: 100%; padding: 10px 16px; border: 1px solid var(--line); border-radius: 14px; align-items: center; }
+.workspace .field-head .status { padding: 0; border: 0; background: none; text-transform: lowercase; font-size: 14px; letter-spacing: 0; }
+.completion-check { font-size: 26px; line-height: 1; font-weight: 700; color: var(--ok); }
+.workspace .done-detail { padding: 0; border: 0; background: none; }
+.gate-heading { text-align: center; font-size: 16px; font-weight: 600; margin: 22px 0 8px; }
+.live-gates { justify-content: center; padding: 14px; border: 1px solid var(--line); border-radius: 16px; }
+.gate-chip { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; cursor: default; }
+.gate-state { font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+.gate-note { text-align: center; }
+.hobby-group { background: var(--card); border: 1px solid var(--card-border); border-radius: var(--radius); padding: 20px; margin-bottom: 20px; }
+.hobby-group > .field-card { border: 0; border-radius: 0; padding: 0; margin: 0; background: none; box-shadow: none; backdrop-filter: none; }
+.hobby-group .hobby-name-field { border-bottom: 1px solid var(--line); padding-bottom: 18px; margin-bottom: 20px; }
+.hobby-name-label { display: block; font-size: 16px; font-weight: 600; margin: 8px 0; }
+.iteration-panel .img-thumb { width: min(100%, 320px); height: 180px; object-fit: contain; }
+html[data-ui-theme="classroom-light"] .workspace .field-head {
+  background: var(--grad); border: 2px solid #141414; box-shadow: 0 3px 0 #141414; margin-bottom: 20px;
+}
+html[data-ui-theme="classroom-light"] .workspace .field-head :is(.completion-check, .status.done) { color: #12502c; background: none; border: 0; }
+html[data-ui-theme="classroom-light"] .workspace .field-card .struct-label {
+  background: #ffe47a; border: 1px solid #141414; border-radius: 8px; padding: 5px 9px; color: #141414; width: fit-content;
+}
+html[data-ui-theme="classroom-light"] .workspace .prompt-builder-row > .struct-label { padding: 9px; margin-top: 4px; }
+html[data-ui-theme="classroom-light"] .iteration-panel > .iteration-summary {
+  background: var(--grad); color: #141414; border-radius: 14px; border: 1px solid #141414;
+}
+html[data-ui-theme="classroom-light"] .iteration-panel[open] > .iteration-summary { border-radius: 14px 14px 0 0; }
+html[data-ui-theme="classroom-light"] .iteration-summary::marker { color: #141414; }
+html[data-ui-theme="classroom-light"] .iteration-summary::after { color: #2b2b2b; }
+html[data-ui-theme="classroom-light"] .goal-card { background: #fff9e6; border: 2px solid #141414; border-top: 6px solid #ffb703; box-shadow: 0 4px 0 #e6d8b5; }
+html[data-ui-theme="classroom-light"] .goal-card:nth-child(2) { background: #eef9fc; border-top-color: #219ebc; }
+html[data-ui-theme="classroom-light"] .goal-card:nth-child(3) { border-top-color: #fb8500; }
+html[data-ui-theme="classroom-light"] .goal-number { background: #141414; color: #ffb703; }
+html[data-ui-theme="classroom-light"] .helper-panel .requirement-grid > li { background: #fff9e6; border: 1px solid #e6d8b5; border-left: 5px solid #fb8500; }
+html[data-ui-theme="classroom-light"] .helper-panel .requirement-grid > li:nth-child(even) { background: #eef9fc; border-left-color: #219ebc; }
+html[data-ui-theme="classroom-light"] .requirement-head h3 { color: #141414; background: #ffe47a; border-radius: 7px; padding: 5px 8px; }
+html[data-ui-theme="classroom-light"] .live-gates { background: #fff9e6; border-color: #e6d8b5; }
+html[data-ui-theme="classroom-light"] .gate-chip:not(.met) { background: #fff; color: #555; }
+html[data-ui-theme="classroom-light"] .hobby-group { background: #fff; box-shadow: var(--shadow-card); }
+html[data-ui-theme="classroom-light"] .hobby-group.done { border-color: var(--ok); }
+html[data-ui-theme="classroom-light"] .hobby-group > .field-card { background: none; border: 0; box-shadow: none; }
+@media (max-width: 700px) {
+  .requirement-grid { grid-template-columns: 1fr; }
+  .helper-panel { flex-basis: 100%; }
+  .hobby-group { padding: 16px; }
+  .live-gates { padding: 10px; }
+  .gate-chip { flex: 1 1 100px; text-align: center; }
+}

@@ -116,9 +116,11 @@ function renderL5VocabWarning(me, cfg) {
 function renderDrivingQuestion(cfg) {
   var b = document.getElementById('driving-question');
   if (!b) return;
-  if (cfg.drivingQuestion) {
+  // Older long-running pilot-1 servers may still serve the previous L3 config.
+  var question = cfg.drivingQuestion || (cfg.lesson === 3 ? 'How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?' : '');
+  if (question) {
     b.hidden = false;
-    b.textContent = cfg.drivingQuestion;
+    b.textContent = question;
   } else {
     b.hidden = true;
   }
@@ -306,15 +308,16 @@ function renderField(def) {
   card.id = 'card-' + def.id;
 
   var head = el('div', 'field-head');
-  var status = isDone ? 'done' : 'open';
+  if (isDone) {
+    var check = el('span', 'completion-check', '✓');
+    check.setAttribute('aria-hidden', 'true');
+    head.appendChild(check);
+  }
   head.appendChild(el('span', 'field-label', def.label));
-  if (def.brief && !(me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input))) head.appendChild(el('span', 'field-brief', def.brief));
-  head.appendChild(el('span', 'spacer'));
-  var statusNode = el('span', 'status ' + status, isDone ? 'Done' : 'Open');
-  statusNode.hidden = !isDone && me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input);
-  head.appendChild(statusNode);
+  if (isDone) head.appendChild(el('span', 'status done', completionLabel(def)));
   card.appendChild(head);
-  if (me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input)) card.appendChild(renderStepper(def, fstate));
+  if (!isDone && def.brief && !(me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input))) card.appendChild(el('p', 'field-brief', def.brief));
+  if (!isDone && me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input)) card.appendChild(renderStepper(def, fstate));
 
   if (isDone) {
     card.appendChild(renderDoneStripe(def, fstate));
@@ -484,42 +487,8 @@ function emptyFstate(def) {
 
 function renderDoneStripe(def, fstate) {
   var wrap = el('div', 'done-stripe-wrap');
-  var stripe = el('div', 'step-stripe done');
-  var label;
-  if (def.input === 'ai-text-3step') label = '\u2713 About Me published';
-  else if (def.input === 'ai-cycle-bonus') {
-    label = '\u2713 ' + def.label + ' published' + (fstate.bonusClaimed ? ' (bonus claimed)' : '');
-  } else if (def.input === 'direct') {
-    var dv = String(fstate.value || '');
-    label = '\u2713 ' + def.label + ': ' + (dv.length > 70 ? dv.slice(0, 70) + '\u2026' : dv);
-  } else if (def.input === 'checklist') {
-    label = '\u2713 Final Operator Audit completed';
-  } else if (def.input === 'ai-image-cycle') {
-    label = '\u2713 ' + def.label + ' accepted';
-  } else if (def.input === 'ai-image-rapid') {
-    label = '\u2713 ' + def.label + ' published (V' + (fstate.publishedVersion || '') + ')';
-  } else if (def.input === 'theme-picker') {
-    var pName = presetName(fstate);
-    label = '\u2713 Website theme selected' + (pName ? ': ' + pName : '');
-  } else {
-    label = '\u2713 ' + def.label;
-  }
-  stripe.appendChild(el('span', 'stripe-text', label));
-  var viewBtn = el('button', 'btn btn-ghost mini-btn view-log-btn', 'View log');
-  viewBtn.addEventListener('click', function () {
-    wrap.classList.toggle('expanded');
-    viewBtn.textContent = wrap.classList.contains('expanded') ? 'Hide log' : 'View log';
-  });
-  stripe.appendChild(viewBtn);
-  wrap.appendChild(stripe);
-
   var detail = el('div', 'done-detail');
-  detail.hidden = true;
-  /* keep detail in sync with the wrap.expanded class via a MutationObserver
-     is overkill - simpler: toggle the hidden attr right here. */
-  viewBtn.addEventListener('click', function () {
-    detail.hidden = !wrap.classList.contains('expanded');
-  });
+  detail.hidden = false;
 
   /* read-only detail content per input type */
   if (def.input === 'direct') {
@@ -555,15 +524,11 @@ function renderDoneStripe(def, fstate) {
   } else if (def.input === 'theme-picker') {
     detail.appendChild(renderThemeDetail(fstate));
   }
-  wrap.appendChild(detail);
-  if ((fstate.iterations || []).length) {
-    viewBtn.remove();
-    detail.hidden = false;
-  }
+  if (detail.childNodes.length) wrap.appendChild(detail);
   return wrap;
 }
 
-/* read-only summary of a finalized theme-picker field (View log). */
+/* Read-only summary of a finalized theme-picker field. */
 function renderThemeDetail(fstate) {
   var box = el('div', 'iter-entry read-only');
   var pName = presetName(fstate);

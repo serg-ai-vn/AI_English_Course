@@ -119,7 +119,7 @@ test('teacher/student UI: login, L1 mark, named fields, retained drafts, invalid
     await page.request.post('/api/lesson-switch', { data: { lesson: 4 } });
     await page.reload();
     const themeCard = page.locator('#card-theme');
-    await themeCard.getByRole('button', { name: 'View log', exact: true }).click();
+    await expect(themeCard.locator('.done-detail')).toBeVisible();
     await themeCard.getByRole('button', { name: 'Correct this field', exact: true }).click();
     const themeForm = themeCard.getByRole('form');
     await themeForm.locator('select').selectOption('1');

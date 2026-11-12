@@ -78,7 +78,8 @@ test('L2 browser workflow: validation, provider failure, loading, generation, re
   await expect(card.getByRole('button', { name: /Publish to Website/ })).toBeDisabled();
   await card.locator('.operator-edit').fill(await card.locator('.operator-edit').inputValue() + ' Hello!');
   await card.getByRole('button', { name: /Publish to Website/ }).click();
-  await expect(card.locator('.status')).toHaveText('Done');
+  await expect(card.locator('.status')).toHaveText('Published');
+  await expect(card.locator('.step-stripe, .published-label, .task-stepper')).toHaveCount(0);
   await expect(card.locator('.published-text')).toBeVisible();
   await expect(card.locator('.iteration-panel')).toHaveCount(2);
   const panels = card.locator('.iteration-panel');

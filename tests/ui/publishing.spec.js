@@ -42,7 +42,7 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
       await card.getByPlaceholder('This one is weak because...').fill('less suitable light');
       await card.getByRole('button', { name: /Confirm worst/ }).click();
       await card.getByRole('button', { name: /Accept this image/ }).click();
-      await expect(card.locator('.status')).toHaveText('Done');
+      await expect(card.locator('.status')).toHaveText('Accepted');
     }
     await teacher.getByRole('button', { name: 'Refresh', exact: true }).click();
     await row.getByRole('button', { name: 'Unlock Lesson 4', exact: true }).click();
@@ -59,7 +59,7 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
       await expect(card.locator('.step-badge').last()).toContainText('Version V2');
       await card.locator('select').selectOption('1');
       await card.getByRole('button', { name: /Publish to Website/ }).click();
-      await expect(card.locator('.status')).toHaveText('Done');
+      await expect(card.locator('.status')).toHaveText('Published');
     }
     const themeCard = page.locator('#card-theme');
     const prompt = word => `Role: designer Context: My site shows hobbies Task: suggest theme Format: ${word}`;
@@ -73,7 +73,7 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
     await themeCard.getByRole('button', { name: /^Choose Theme 1/ }).click();
     await themeCard.locator('.prompt-area').fill('This theme is calmer than the other theme.');
     await themeCard.getByRole('button', { name: /^Publish my theme/ }).click();
-    await expect(themeCard.locator('.status')).toHaveText('Done');
+    await expect(themeCard.locator('.status')).toHaveText('Selected');
     await teacher.getByRole('button', { name: 'Refresh', exact: true }).click();
     await row.getByRole('button', { name: 'Build site', exact: true }).click();
     const preview = row.getByRole('link', { name: /^open dist/ });
@@ -91,12 +91,12 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
     await audit.getByRole('checkbox').nth(0).check();
     await audit.getByRole('checkbox').nth(1).check();
     await audit.getByRole('button', { name: 'Confirm audit', exact: true }).click();
-    await expect(audit.locator('.status')).toHaveText('Done');
+    await expect(audit.locator('.status')).toHaveText('Complete');
     for (const i of [1, 2, 3, 4, 5, 6]) {
       const card = page.locator('#card-reflection-' + i);
       await card.locator('textarea').fill('I will publish my creative website after I check every detail and explain the changes to my friends.');
       await card.getByRole('button', { name: 'Save', exact: true }).click();
-      await expect(card.locator('.status')).toHaveText('Done');
+      await expect(card.locator('.status')).toHaveText('Saved');
     }
     await expect(page.locator('#complete-banner')).toBeVisible();
     await teacher.getByRole('button', { name: 'Refresh', exact: true }).click();
