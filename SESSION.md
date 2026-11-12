@@ -4,6 +4,8 @@
 
 2026-11-12: TASK-06 реализована в ветке feat/platform-ui-themes, статус IN_REVIEW. Classroom Light по умолчанию, Night Lab через window.PlatformTheme.setTheme('night-lab'). Дизайн/API: docs/UI_THEMES.md; доказательства и границы: docs/history/2026-11-12-platform-ui-theme-implementation.md. Независимая приёмка финального SHA и выпуск ожидаются; main не изменён. Темы L4 и учебные данные не менялись. Образцы в соседней с Main папке «Создание презы первого урока» не публиковать.
 
+Продолжение в том же PR #3: TASK-07-guided-workspace.md, новый пакет владельца. Индивидуальные аккордеоны итераций (D13), четыре поля L2, общие с сервером live checks, шпаргалки, увеличенный текст. Предыдущая контрольная точка 1fb8b2f сохранена. Отчёт: docs/history/2026-11-12-guided-workspace.md. main не сливать до независимой приёмки нового финального SHA.
+
 Прочитать AGENTS → tasks/00-BACKLOG → docs/SYSTEM_INVARIANTS → docs/CONTEXT_MAP. Последняя карта исправлений: docs/AUDIT_DISPOSITION_2026-10-29.md. Research — curriculum/SOURCES и DECISIONS; не превращать настройки пилота в научные нормативы.
 
 PR #1 объединил первую подготовку MVP. Отдельная arena/0f062cc8-ai-english-course первоначально содержала только два отчёта. Их выводы перепроверены, подтверждённые проблемы исправлены в этой итерации; детали и доказательства слияния — в соответствующем PR. В docs/history хранится исторический материал, не новая очередь задач.

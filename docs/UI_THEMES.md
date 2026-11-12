@@ -87,3 +87,38 @@ Keep `[hidden] { display: none !important; }`. Never use descendant-wide color,
 background or font overrides. Any new asset needs an exact server allowlist entry.
 
 Evidence and verification boundaries: [implementation report](history/2026-11-12-platform-ui-theme-implementation.md).
+
+## Guided workspace follow-up (TASK-07, owner decision D13)
+
+The owner authorized a second UI iteration in the same branch/PR. The earlier
+theme-only checkpoint `1fb8b2f` is retained. [Follow-up report](history/2026-11-12-guided-workspace.md)
+and [task](../tasks/TASK-07-guided-workspace.md) describe the current behavior.
+
+Each historical iteration has its own native `details`/`summary`, initially
+collapsed; opening one never closes siblings. Its chevron and Show/Hide label
+make the state visible. Current inputs/current AI result remain outside the
+disclosures, and published text stays visible. There is no whole-history toggle
+for fields with iterations. Open states are held in memory, per pupil/lesson/
+field/iteration, across UI refreshes; they never enter progress or localStorage.
+Night Lab supports the same controls with its original palette and fonts.
+
+Three independent helper drawers show goals/steps, words and lesson-appropriate
+language tips. Complete original requirements remain in a nested disclosure.
+Present Perfect guidance and six A2/Vietnamese glosses are specific to L2;
+image lessons do not display irrelevant grammar requirements.
+
+L2's four labeled prompt fields serialize to the existing labeled string API.
+Prefilled accepted prompts retain their original string until the learner edits
+a field. Live chips invoke the exact server `checkPrompt` from `validate.js`,
+served only at `/prompt-validation.js`; no duplicate grammar heuristic. They
+do not block submission or promise a complete grammar assessment. Hobbies do
+not inherit About Me's two-word gate or extra AI generation. Existing counts
+and server stage transitions remain authoritative.
+
+Light teaching text (prompts, AI drafts, final text) is now 18–20px / 1.55 / 500;
+card/step headings 22px; word chips 16px; helper content 18px. This supersedes
+the earlier 16px input/20px heading values for the student working area only.
+Published text is black on pale green; AI drafts warm yellow with orange edge;
+review cards form two columns (one on narrow screens). The published badge uses
+the existing darker success token for white-text contrast. These changes do not
+recolor L4's preset swatches/sample fonts or student exports.
