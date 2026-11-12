@@ -122,3 +122,29 @@ Published text is black on pale green; AI drafts warm yellow with orange edge;
 review cards form two columns (one on narrow screens). The published badge uses
 the existing darker success token for white-text contrast. These changes do not
 recolor L4's preset swatches/sample fonts or student exports.
+
+## Owner visual review (TASK-08)
+
+Yellow is also used for instructional landmarks: field headings, iteration
+summary bars and formula badges. A completed field shows a green check and one
+small status beside its yellow heading. Repeated completion strips, publication
+labels and fully completed steppers are removed; the result remains visible.
+Direct fields show their saved value, and each historical iteration still has
+its own native disclosure. Small green text on yellow uses `#12502c` (5.44:1 on
+`#ffb703`). This replaces the earlier all-green completion hierarchy.
+
+Goal cards use numbered badges, yellow/orange accents and a blue supporting
+surface. Every lesson has three goal cards. Requirements retain their complete
+original text but appear in numbered, titled cards (two columns, one on mobile).
+Helper summaries remain one line at 320px and wider; the label is 14px, distinct
+from the larger teaching content inside. Live checks are centered, noninteractive
+To do / Ready hints; their note refers to the teacher only.
+
+Each L2 hobby is one visual card containing its existing name and description
+fields. Separate save/correction endpoints and progress keys remain unchanged.
+In-memory field drafts preserve an unsaved prompt while saving its name, and an
+unsaved name while the other field refreshes. The L3 course question is restored
+in its config from the lesson plan; a frontend fallback supports older running
+pilot-1 servers whose cached L3 config omits that display property.
+
+Current evidence and checks: [visual review report](history/2026-11-12-visual-review.md).
