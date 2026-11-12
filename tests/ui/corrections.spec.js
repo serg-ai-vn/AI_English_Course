@@ -24,9 +24,12 @@ test('teacher/student UI: login, L1 mark, named fields, retained drafts, invalid
   browser,
 }, testInfo) => {
   const errors = [];
+  const theme = testInfo.project.metadata.theme;
+  await page.addInitScript(t => localStorage.setItem('aiEnglishCourse.uiTheme.v1', t), theme);
   page.on('pageerror', (e) => errors.push(e.message));
   await login(page);
   const tctx = await browser.newContext({ baseURL: testInfo.project.use.baseURL });
+  await tctx.addInitScript(t => localStorage.setItem('aiEnglishCourse.uiTheme.v1', t), theme);
   const teacher = await tctx.newPage();
   teacher.on('pageerror', (e) => errors.push(e.message));
   try {
@@ -75,6 +78,22 @@ test('teacher/student UI: login, L1 mark, named fields, retained drafts, invalid
     await expect(text).toHaveValue('x'.repeat(100));
     await expect(reason).toHaveValue('Keep this correction draft');
     await text.fill('Lumi Creative Space');
+    const before = await (await page.request.get('/api/me')).json();
+    const writes = [];
+    const trackWrites = r => { if (r.method() !== 'GET') writes.push(r.url()); };
+    page.on('request', trackWrites);
+    await text.focus();
+    await page.evaluate(() => {
+      window.PlatformTheme.setTheme('night-lab');
+      window.PlatformTheme.setTheme('classroom-light');
+    });
+    await expect(text).toBeFocused();
+    await expect(text).toHaveValue('Lumi Creative Space');
+    await expect(reason).toHaveValue('Keep this correction draft');
+    expect(await (await page.request.get('/api/me')).json()).toEqual(before);
+    expect(writes).toEqual([]);
+    page.off('request', trackWrites);
+    await page.evaluate(t => window.PlatformTheme.setTheme(t), theme);
     await page.screenshot({ path: testInfo.outputPath('student-correction.png') });
     await form.getByRole('button', { name: 'Save correction', exact: true }).click();
     await expect(card.getByRole('form')).toBeHidden();
@@ -99,15 +118,16 @@ test('teacher/student UI: login, L1 mark, named fields, retained drafts, invalid
     await grant(teacher, 'theme');
     await page.request.post('/api/lesson-switch', { data: { lesson: 4 } });
     await page.reload();
-    const theme = page.locator('#card-theme');
-    await theme.getByRole('button', { name: 'Correct this field', exact: true }).click();
-    const themeForm = theme.getByRole('form');
+    const themeCard = page.locator('#card-theme');
+    await themeCard.getByRole('button', { name: 'View log', exact: true }).click();
+    await themeCard.getByRole('button', { name: 'Correct this field', exact: true }).click();
+    const themeForm = themeCard.getByRole('form');
     await themeForm.locator('select').selectOption('1');
     await themeForm
       .getByLabel('Reason for correction')
       .fill('This theme is calmer and softer than the second theme.');
     await themeForm.getByRole('button', { name: 'Save correction', exact: true }).click();
-    await expect(theme.getByRole('form')).toBeHidden();
+    await expect(themeCard.getByRole('form')).toBeHidden();
     const updated = await (await page.request.get('/api/me')).json();
     expect(updated.progress.fields.theme.choice).toBe(1);
     expect(updated.progress.theme).toBe(updated.progress.fields.theme.option1.preset);

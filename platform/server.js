@@ -1742,6 +1742,7 @@ const server = http.createServer(async (req, res) => {
         'app.js',
         'teacher.js',
         'platform.css',
+        'ui-theme.js',
       ].includes(rel)
     )
       return sendJson(res, 404, { error: 'Not found' });

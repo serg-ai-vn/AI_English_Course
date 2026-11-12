@@ -1378,3 +1378,182 @@ tr.detail-row td { background: rgba(8, 6, 20, 0.4); padding: 16px 16px 20px; bor
 .student-correction-controls {display:grid;gap:8px;min-width:220px;margin-top:12px;}
 .student-correction-controls > label {display:flex;gap:8px;align-items:center;}
 .correction-form select,.correction-form textarea {min-width:0;max-width:100%;}
+
+/* Classroom Light. Night Lab above is the unchanged fallback and explicit
+   night-lab skin. These selectors style the shell, never L4 preset values. */
+html[data-ui-theme="classroom-light"] {
+  color-scheme: light;
+  --bg: #fefcf7;
+  --card: #ffffff;
+  --card-border: #e6d8b5;
+  --ink: #141414;
+  --ink-soft: #2b2b2b;
+  --ink-dim: #555555;
+  --line: #82765e;
+  --iris: #795000;
+  --violet: #07677d;
+  --teal: #07677d;
+  --amber: #795000;
+  --ok: #176438;
+  --ok-bg: #eafaf0;
+  --err: #a32020;
+  --err-bg: #fff2f2;
+  --grad: linear-gradient(135deg, #ffe47a, #ffb703);
+  --font-head: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-body: var(--font-head);
+  --surface-info: #eef9fc;
+  --surface-warm: #fff9e6;
+  --surface-muted: #f5f1e8;
+  --focus: #07677d;
+  --shadow-card: 0 5px 0 #ede0c0;
+  --shadow-action: 0 4px 0 #141414;
+  --radius: 20px;
+}
+html[data-ui-theme="classroom-light"] ::selection { background: #ffe47a; color: #141414; }
+html[data-ui-theme="classroom-light"] .bg-scene {
+  background: radial-gradient(circle at 8% 12%, #ffe7a840, transparent 32%),
+    radial-gradient(circle at 92% 85%, #8ecae630, transparent 32%);
+}
+html[data-ui-theme="classroom-light"] .stars { display: none; }
+html[data-ui-theme="classroom-light"] :is(.login-card, .field-card, .sum-card, .student-table) {
+  background: var(--card);
+  box-shadow: var(--shadow-card);
+  backdrop-filter: none;
+}
+html[data-ui-theme="classroom-light"] .login-card { max-width: 440px; border-radius: 28px; }
+html[data-ui-theme="classroom-light"] .wordmark { font-size: clamp(26px, 3.4vw, 36px); }
+html[data-ui-theme="classroom-light"] .login-card label { font-size: 0.9rem; }
+html[data-ui-theme="classroom-light"] .brand-rings { filter: none; }
+html[data-ui-theme="classroom-light"] .brand-rings stop:first-child { stop-color: #fb8500; }
+html[data-ui-theme="classroom-light"] .brand-rings stop:last-child { stop-color: #07677d; }
+html[data-ui-theme="classroom-light"] :is(.sign-name, .progress-pill b, .section-index, .sum-num.grad) {
+  background: none; color: var(--ink);
+}
+html[data-ui-theme="classroom-light"] :is(.topbar, .lesson-tabs) {
+  background: var(--bg); border-bottom-color: var(--card-border); backdrop-filter: none;
+}
+html[data-ui-theme="classroom-light"] :is(.lesson-tag, .ts-mono, .stu-avatar, .lesson-tab.active, .role-toggle button.active) {
+  color: var(--ink); box-shadow: none; border-color: var(--ink);
+}
+html[data-ui-theme="classroom-light"] :is(.btn-primary, .btn-improve, .btn-publish) {
+  background: var(--grad); color: var(--ink); border: 2px solid var(--ink);
+  box-shadow: var(--shadow-action);
+}
+html[data-ui-theme="classroom-light"] :is(.btn-primary, .btn-improve, .btn-publish):hover:enabled {
+  background: #ffe47a; filter: none; box-shadow: var(--shadow-action);
+}
+html[data-ui-theme="classroom-light"] :is(.btn-primary, .btn-improve, .btn-publish):active:enabled {
+  transform: translateY(2px); box-shadow: 0 2px 0 #141414;
+}
+html[data-ui-theme="classroom-light"] :is(.btn-ghost, .btn-light, .lesson-tab) {
+  background: var(--card); border: 1px solid var(--line); color: var(--ink-soft);
+}
+html[data-ui-theme="classroom-light"] :is(.btn-ghost, .btn-light, .lesson-tab):hover:enabled {
+  background: var(--surface-warm); border-color: var(--ink);
+}
+html[data-ui-theme="classroom-light"] .lesson-tab.active { background: var(--grad); color: var(--ink); }
+html[data-ui-theme="classroom-light"] .mini-btn.ok { background: var(--ok-bg); color: var(--ok); border: 1px solid var(--ok); box-shadow: none; }
+html[data-ui-theme="classroom-light"] :is(.btn, .lesson-tab):disabled {
+  background: #e9e5dc; color: #686158; border: 1px solid #a59c8c;
+  box-shadow: none; opacity: 1; transform: none; cursor: not-allowed;
+}
+html[data-ui-theme="classroom-light"] :is(button, input, textarea, select, a):focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 3px;
+}
+html[data-ui-theme="classroom-light"] :is(.login-card input, .field-card input[type="text"], .field-card textarea,
+  .field-card textarea.operator-edit, .pick-reason-block input.eval-input, .img-rating,
+  .correction-form textarea, .correction-form select) {
+  background: var(--card); color: var(--ink); border-color: var(--line); font-size: 1rem;
+}
+html[data-ui-theme="classroom-light"] :is(.login-card input, .field-card input, .field-card textarea,
+  .pick-reason-block input.eval-input, .img-rating):focus {
+  border-color: var(--focus); box-shadow: 0 0 0 3px #8ecae6;
+}
+html[data-ui-theme="classroom-light"] .role-toggle { background: var(--surface-muted); }
+html[data-ui-theme="classroom-light"] .rules-card { background: var(--surface-warm); border-color: var(--line); }
+html[data-ui-theme="classroom-light"] .driving-question {
+  background: var(--grad); color: var(--ink); border: 2px solid var(--ink); box-shadow: var(--shadow-action);
+  font-size: 1.25rem;
+}
+html[data-ui-theme="classroom-light"] .field-label { font-size: 1.25rem; }
+html[data-ui-theme="classroom-light"] :is(.field-brief, .draft-label, .iteration-note) { font-size: 0.9rem; }
+html[data-ui-theme="classroom-light"] :is(.chip, .vocab-bank-field .chip, .ai-badge,
+  .img-pill.open, .fchip.mid, .attn-badge, .detail-iter .tag.rejected, .console-help) {
+  background: var(--surface-warm); border-color: var(--amber); color: var(--amber);
+}
+html[data-ui-theme="classroom-light"] :is(.fchip.mid .fchip-c, .struct-label, .struct-sep) { color: var(--amber); }
+html[data-ui-theme="classroom-light"] .vocab-bank-field { background: var(--surface-warm); border-color: var(--card-border); }
+html[data-ui-theme="classroom-light"] :is(.iteration-note b, .img-verdict.worst) { color: var(--ink-soft); }
+html[data-ui-theme="classroom-light"] :is(.step-badge.step-1, .step-badge.step-2, .step-badge.step-3) {
+  background: var(--surface-info); color: var(--ink); border-color: var(--teal);
+}
+html[data-ui-theme="classroom-light"] :is(.step-badge .step-num, .iter-done-card .step-badge .step-num) {
+  background: var(--card); color: var(--ink); border-color: var(--line);
+}
+html[data-ui-theme="classroom-light"] :is(.stage-instruction, .reflection-question, .ai-draft-box) {
+  background: var(--surface-info); border-color: var(--teal);
+}
+html[data-ui-theme="classroom-light"] .stage-instruction { border-left-color: #fb8500; }
+html[data-ui-theme="classroom-light"] :is(.final-text, .done-stripe-wrap .step-stripe) { color: var(--ok); border-color: var(--ok); }
+html[data-ui-theme="classroom-light"] :is(.iter-done-card, .img-iter.best, .pick-reason-block, .img-btn.selected.best) {
+  background: var(--ok-bg); border-color: var(--ok); color: var(--ok);
+}
+html[data-ui-theme="classroom-light"] :is(.error-box, .eval-tag.needs, .img-iter.worst,
+  .pick-reason-block.worst, .img-btn.selected.worst) {
+  background: var(--err-bg); color: var(--err); border-color: var(--err);
+}
+html[data-ui-theme="classroom-light"] :is(.error-box.warning, .improve-block) {
+  background: var(--surface-warm); color: var(--amber); border-color: var(--amber);
+}
+html[data-ui-theme="classroom-light"] .error-box.warning div { color: var(--amber); }
+html[data-ui-theme="classroom-light"] :is(.ok-box, .status.done, .img-pill.done, .fchip.done,
+  .state-pill.complete, .eval-tag.good, .detail-iter .tag.kept) {
+  background: var(--ok-bg); border-color: var(--ok); color: var(--ok);
+}
+html[data-ui-theme="classroom-light"] :is(.field-card.done, .accepted-image, .img-preview-inline) { border-color: var(--ok); }
+html[data-ui-theme="classroom-light"] :is(.state-pill.working, .lesson-pill.done, .attn-badge.ok) {
+  background: var(--surface-info); border-color: var(--teal); color: var(--teal);
+}
+html[data-ui-theme="classroom-light"] :is(.status.open, .state-pill.not-started, .fchip, .img-pill, .lesson-pill) {
+  background: var(--surface-muted); border-color: var(--line);
+}
+html[data-ui-theme="classroom-light"] .complete-banner {
+  background: var(--ok-bg); color: var(--ink); border: 2px solid var(--ok); box-shadow: var(--shadow-card);
+}
+html[data-ui-theme="classroom-light"] .proceed-msg { background: var(--card); border-color: var(--ok); }
+html[data-ui-theme="classroom-light"] :is(.done-detail, .iter-entry, .detail-field, .img-iter, .theme-option, .checklist-item) {
+  background: var(--card); border-color: var(--card-border);
+}
+html[data-ui-theme="classroom-light"] :is(.regen-block, .detail-iter) { border-color: var(--card-border); }
+html[data-ui-theme="classroom-light"] :is(.img-thumb, .pick-reason-thumb, .img-preview-big, .img-preview-inline) {
+  background: var(--surface-muted);
+}
+html[data-ui-theme="classroom-light"] .theme-sample { background: var(--surface-muted); }
+/* Swatch fills and sample font families are inline values from the L4 preset. */
+html[data-ui-theme="classroom-light"] .swatch { border-color: var(--line); }
+html[data-ui-theme="classroom-light"] .student-table thead th { background: var(--surface-muted); font-size: 0.8rem; }
+html[data-ui-theme="classroom-light"] .student-table tbody td { border-bottom-color: var(--card-border); }
+html[data-ui-theme="classroom-light"] .student-table tbody tr.row-complete { opacity: 1; }
+html[data-ui-theme="classroom-light"] tr.detail-row td { background: var(--surface-warm); }
+html[data-ui-theme="classroom-light"] .mini-bar { background: #e6d8b5; }
+html[data-ui-theme="classroom-light"] .mini-bar > span { background: var(--teal); }
+html[data-ui-theme="classroom-light"] .built-link:hover { background: var(--surface-info); }
+/* Dense tables may scroll locally at browser zoom; the page stays within view. */
+#table-wrap { max-width: 100%; overflow-x: auto; padding-bottom: 8px; }
+
+@media (max-width: 860px) {
+  html[data-ui-theme="classroom-light"] :is(.stu-cell, .stu-meta, .act-box, .last-prompt, .student-table td > div) { min-width: 0; }
+  html[data-ui-theme="classroom-light"] .student-table td { flex-wrap: wrap; overflow-wrap: anywhere; }
+  html[data-ui-theme="classroom-light"] .act-box-inline { flex-wrap: wrap; }
+}
+@media (max-width: 600px) {
+  html[data-ui-theme="classroom-light"] .login-body { padding: 16px; }
+  html[data-ui-theme="classroom-light"] .login-card { padding: 28px 22px; }
+  html[data-ui-theme="classroom-light"] .topbar { position: static; gap: 10px; }
+  html[data-ui-theme="classroom-light"] .field-card { padding: 16px; }
+  html[data-ui-theme="classroom-light"] .lesson-tabs { flex-wrap: wrap; }
+  html[data-ui-theme="classroom-light"] .student-correction-controls { min-width: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-ui-theme="classroom-light"] :is(.btn, .lesson-tab, .mini-bar > span, .lesson-pill) { transition: none; }
+}

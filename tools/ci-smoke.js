@@ -2,11 +2,18 @@ const { startServer } = require('../tests/helpers/server');
 (async () => {
   const server = await startServer();
   try {
-    for (const p of ['/api/health', '/workspace.html', '/platform.css', '/app.js']) {
+    const routes = ['/api/health', '/login.html', '/workspace.html', '/teacher.html', '/platform.css', '/app.js', '/teacher.js', '/ui-theme.js'];
+    for (const p of routes) {
       const r = await fetch(server.base + p);
       if (r.status !== 200) throw new Error(p + ' ' + r.status);
+      if (p.endsWith('.js') && !/javascript/.test(r.headers.get('content-type'))) throw new Error('Wrong MIME ' + p);
+      if (p.endsWith('.html') && !(await r.text()).includes('data-ui-theme="classroom-light"')) throw new Error('Missing theme ' + p);
     }
-    console.log('Isolated HTTP smoke: 4/4 PASS');
+    for (const p of ['/server.js', '/ui-theme.js/../server.js', '/data/classes.json', '/.env']) {
+      const r = await fetch(server.base + p);
+      if (r.status === 200) throw new Error('Private path exposed: ' + p);
+    }
+    console.log('Isolated HTTP smoke: 8 routes + 4 private paths PASS');
   } finally {
     await server.stop();
   }
