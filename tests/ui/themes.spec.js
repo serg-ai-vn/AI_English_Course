@@ -1,5 +1,12 @@
 const { test, expect } = require('@playwright/test');
 const key = 'aiEnglishCourse.uiTheme.v1';
+async function fillPrompt(card, text) {
+  for (const label of ['Role', 'Context', 'Task', 'Format']) {
+    const match = new RegExp(label + ':\\s*([\\s\\S]*?)(?=\\s*(?:Role|Context|Task|Format):|$)', 'i').exec(text);
+    await card.getByRole('textbox', { name: label, exact: true }).fill(match ? match[1].trim() : '');
+  }
+  return card.locator('textarea.prompt-area').inputValue();
+}
 
 test('L2 browser workflow: validation, provider failure, loading, generation, review, edit and completion', async ({ page }, info) => {
   await page.addInitScript(t => localStorage.setItem('aiEnglishCourse.uiTheme.v1', t), info.project.metadata.theme);
@@ -10,10 +17,22 @@ test('L2 browser workflow: validation, provider failure, loading, generation, re
   await page.getByRole('button', { name: 'Enter', exact: true }).click();
   await expect(page).toHaveURL(/workspace.html/);
   const card = page.locator('#card-about-me');
+  await expect(page.locator('.helper-panel')).toHaveCount(3);
+  await expect(page.locator('.helper-panel[open]')).toHaveCount(0);
+  const wordHelp = page.locator('.helper-panel').nth(1);
+  await wordHelp.locator(':scope > summary').press('Enter');
+  await wordHelp.locator('.word-help').first().locator('summary').click();
+  await expect(wordHelp.locator('[lang="vi"]').first()).toBeVisible();
+  await wordHelp.locator(':scope > summary').click();
   await card.getByRole('button', { name: /Generate Text/ }).click();
   await expect(card.locator('.error-box')).toContainText('Write a prompt first');
-  const prompt = 'Role: a creative student. Context: I have played football for three years. Task: Write an energetic introduction. Format: one paragraph.';
-  await card.locator('.prompt-area').fill(prompt);
+  const prompt = await fillPrompt(card, 'Role: a creative student. Context: I have played football for three years. Task: Write an energetic introduction. Format: one paragraph.');
+  await expect(card.locator('.gate-chip.met')).toHaveCount(4);
+  await expect(card.locator('.word-used')).not.toHaveCount(0);
+  if (info.project.metadata.theme === 'classroom-light') {
+    expect(await card.locator('.word-used').first().evaluate(e => getComputedStyle(e).backgroundColor)).toBe('rgb(234, 250, 240)');
+    expect(await card.locator('.prompt-builder .struct-label').first().evaluate(e => getComputedStyle(e).color)).toBe('rgb(20, 20, 20)');
+  }
   const before = await (await page.request.get('/api/me')).json();
   await page.route('**/api/prompt', r => r.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ ok: false, errors: [{ hint: 'Provider timed out. Retry your request.' }] }) }), { times: 1 });
   await card.getByRole('button', { name: /Generate Text/ }).click();
@@ -21,6 +40,10 @@ test('L2 browser workflow: validation, provider failure, loading, generation, re
   await expect(card.locator('.prompt-area')).toHaveValue(prompt);
   expect(await (await page.request.get('/api/me')).json()).toEqual(before);
   await card.screenshot({ path: info.outputPath('L2-provider-error.png') });
+  await page.setViewportSize({ width: 320, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBeTruthy();
+  await card.screenshot({ path: info.outputPath('L2-builder-320.png') });
+  await page.setViewportSize({ width: 1280, height: 900 });
   let release;
   const gate = new Promise(resolve => { release = resolve; });
   await page.route('**/api/prompt', async r => { await gate; await r.continue(); }, { times: 1 });
@@ -35,7 +58,19 @@ test('L2 browser workflow: validation, provider failure, loading, generation, re
     await card.screenshot({ path: info.outputPath('L2-eval-' + step + '.png') });
     await card.getByRole('button', { name: new RegExp('Save Step ' + step) }).click();
     if (step === 1) {
-      await card.locator('.prompt-area').fill(prompt + ' Keep the language clear.');
+      await expect(card.locator('.iteration-panel')).toHaveCount(1);
+      await expect(card.locator('.iteration-panel')).not.toHaveAttribute('open', '');
+      await fillPrompt(card, prompt + ' Keep the language clear.');
+      const format = card.getByRole('textbox', { name: 'Format', exact: true });
+      const value = await format.inputValue();
+      await format.focus();
+      const saved = await (await page.request.get('/api/me')).json();
+      await card.locator('.iteration-panel').evaluate(d => { d.open = true; });
+      await expect(format).toBeFocused();
+      await expect(format).toHaveValue(value);
+      await expect(card.locator('.iteration-panel .ai-draft-box')).toBeVisible();
+      await card.locator('.iteration-panel').evaluate(d => { d.open = false; });
+      expect(await (await page.request.get('/api/me')).json()).toEqual(saved);
       await card.getByRole('button', { name: /Regenerate Text/ }).click();
     }
   }
@@ -44,7 +79,16 @@ test('L2 browser workflow: validation, provider failure, loading, generation, re
   await card.locator('.operator-edit').fill(await card.locator('.operator-edit').inputValue() + ' Hello!');
   await card.getByRole('button', { name: /Publish to Website/ }).click();
   await expect(card.locator('.status')).toHaveText('Done');
-  await card.getByRole('button', { name: 'View log', exact: true }).click();
+  await expect(card.locator('.published-text')).toBeVisible();
+  await expect(card.locator('.iteration-panel')).toHaveCount(2);
+  const panels = card.locator('.iteration-panel');
+  await panels.nth(0).locator('summary').click();
+  await panels.nth(1).locator('summary').click();
+  await expect(panels.nth(0)).toHaveAttribute('open', '');
+  await expect(panels.nth(1)).toHaveAttribute('open', '');
+  await panels.nth(0).locator('summary').click();
+  await expect(panels.nth(0)).not.toHaveAttribute('open', '');
+  await expect(panels.nth(1)).toHaveAttribute('open', '');
   await expect(card.locator('.done-detail')).toBeVisible();
   const snapshot = await (await page.request.get('/api/me')).json();
   await page.evaluate(() => window.PlatformTheme.setTheme('night-lab'));

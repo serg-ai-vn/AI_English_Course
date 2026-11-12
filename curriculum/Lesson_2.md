@@ -19,6 +19,8 @@
 10. Experience
 
 **3\. Grammar Focus** Present Perfect (mandatory linguistic constraint for About Me and the three hobby texts to prevent language fossilization and encourage complex sentence structures).  
+
+UI clarification (owner decision D13, 2026-11-12): previous prompt iterations remain available through separate expand/collapse controls during the task and after publication. The current action and final published text stay visible. This changes presentation only; required prompts, reviews and manual editing stay the same.
 **4\. Timing (90 minutes total)**
 
 * **00:00 – 00:05 (5 min):** Introduction and reading the Driving Question aloud.  

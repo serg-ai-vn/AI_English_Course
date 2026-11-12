@@ -8,9 +8,8 @@
     nextStep-driven: I1-prompt -> I1-eval -> ... -> pick -> accept -> done).
    UX guardrails (per Aug 2026 spec):
      - On any card only one stage inputs/buttons are active at a time.
-     - Completed iterations stay VISIBLE inline above the active stage
-       (never hidden behind a "View log" button) so the student always
-       sees what they wrote, what the AI produced, and what they reviewed.
+     - Previous iterations remain individually accessible above the active
+       stage. Each has its own disclosure; the current task stays visible.
        Prompt structure labels (Role / Context / Task / Format) are
        highlighted in gold inside these visible prompts.
      - Once a whole field is done it collapses to a green stripe with a
@@ -89,6 +88,7 @@ function render() {
 
   renderCompleteBanner(me, cfg);
   renderL5VocabWarning(me, cfg);
+  enhanceWorkspace(cfg);
 }
 
 /* Lesson 5 soft gate: after all reflections are saved, at least one of
@@ -297,6 +297,7 @@ function renderCompleteBanner(me, cfg) {
 }
 
 function renderField(def) {
+  workspaceRenderingField = def.id;
   var me = state.me;
   var fstate = me.progress.fields[def.id] || emptyFstate(def);
   var isDone = fstate.status === 'done';
@@ -307,10 +308,13 @@ function renderField(def) {
   var head = el('div', 'field-head');
   var status = isDone ? 'done' : 'open';
   head.appendChild(el('span', 'field-label', def.label));
-  if (def.brief) head.appendChild(el('span', 'field-brief', def.brief));
+  if (def.brief && !(me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input))) head.appendChild(el('span', 'field-brief', def.brief));
   head.appendChild(el('span', 'spacer'));
-  head.appendChild(el('span', 'status ' + status, isDone ? 'Done' : 'Open'));
+  var statusNode = el('span', 'status ' + status, isDone ? 'Done' : 'Open');
+  statusNode.hidden = !isDone && me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input);
+  head.appendChild(statusNode);
   card.appendChild(head);
+  if (me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input)) card.appendChild(renderStepper(def, fstate));
 
   if (isDone) {
     card.appendChild(renderDoneStripe(def, fstate));
@@ -552,6 +556,10 @@ function renderDoneStripe(def, fstate) {
     detail.appendChild(renderThemeDetail(fstate));
   }
   wrap.appendChild(detail);
+  if ((fstate.iterations || []).length) {
+    viewBtn.remove();
+    detail.hidden = false;
+  }
   return wrap;
 }
 
@@ -626,7 +634,7 @@ function renderReadOnlyIteration(it, i, kind) {
     }
     if (it.reason) box.appendChild(el('div', 'iter-row iter-notes', 'Why improve: ' + it.reason));
   }
-  return box;
+  return iterationPanel(box, 'Iteration ' + (i + 1) + (kind === 'about-me' ? (i === 0 ? ' · First Draft' : ' · Improved Draft') : '') + ' · Saved ✓');
 }
 
 /* Render text with the prompt formula labels highlighted in gold. Safe:
@@ -648,12 +656,14 @@ function renderPromptHighlighted(promptText, labels) {
     if (m.index > lastIndex) {
       box.appendChild(document.createTextNode(txt.slice(lastIndex, m.index)));
     }
-    box.appendChild(el('span', 'struct-label', m[1]));
-    box.appendChild(el('span', 'struct-sep', ': '));
-    box.appendChild(document.createTextNode(String(m[2]).replace(/\s+$/, '')));
+    var row = el('div', 'prompt-part');
+    row.appendChild(el('span', 'struct-label', m[1]));
+    row.appendChild(el('span', 'prompt-part-text', String(m[2]).replace(/\s+$/, '')));
+    box.appendChild(row);
     lastIndex = re.lastIndex;
   }
   if (!matched) {
+    box.style.whiteSpace = 'pre-wrap';
     box.appendChild(document.createTextNode(txt));
   } else if (lastIndex < txt.length) {
     box.appendChild(document.createTextNode(txt.slice(lastIndex)));
@@ -664,18 +674,13 @@ function renderPromptHighlighted(promptText, labels) {
 var L3_LABELS = ['Subject', 'Style', 'Framing', 'Lighting'];
 
 function renderEvalLine(kind, value) {
-  var line = el('div', 'eval-line');
+  var line = el('div', 'eval-line review-card ' + kind);
   line.appendChild(el('span', 'eval-tag ' + kind, kind === 'good' ? 'Good' : 'Needs to change'));
-  line.appendChild(document.createTextNode(': ' + value));
+  line.appendChild(el('span', 'review-text', value));
   return line;
 }
 
-/* Always-visible completed iteration card shown ABOVE the active stage in
-   About Me. Renders the prompt (with highlighted structure labels), the
-   AI draft, and the student's saved critical review. Nothing is hidden
-   behind a View log toggle, so the student always sees what they wrote,
-   what the AI produced, and what they reviewed - while working on the
-   next stage. */
+/* Individually expandable completed iteration above the active task. */
 function renderCompletedIteration(it, i, kind) {
   var wrap = el('div', 'iter-done-card');
   var stage = it.stage || (i + 1);
@@ -695,7 +700,7 @@ function renderCompletedIteration(it, i, kind) {
     if (it.good) wrap.appendChild(renderEvalLine('good', it.good));
     if (it.needsChange) wrap.appendChild(renderEvalLine('needs', it.needsChange));
   }
-  return wrap;
+  return iterationPanel(wrap, 'Iteration ' + (i + 1) + (kind === 'about-me' ? (i === 0 ? ' · First Draft' : ' · Improved Draft') : ' · Draft') + ' · Reviewed ✓');
 }
 
 /* ---------- direct fields ---------- */
@@ -1554,7 +1559,7 @@ function renderCompletedRapidIteration(it, i) {
   img.alt = 'version ' + (i + 1);
   wrap.appendChild(img);
   if (it.reason) wrap.appendChild(el('div', 'iter-row iter-notes', 'Why change: ' + it.reason));
-  return wrap;
+  return iterationPanel(wrap, 'Version V' + (i + 1) + ' · Saved');
 }
 
 /* ---------- Website theme (theme-picker, Lesson 4) ----------
@@ -1759,7 +1764,7 @@ function renderCompletedImageIteration(it, i) {
     'Best: ' + (it.best.reason || '')));
   if (it.worst) wrap.appendChild(el('div', 'img-verdict worst',
     'Worst: ' + (it.worst.reason || '')));
-  return wrap;
+  return iterationPanel(wrap, 'Iteration ' + (i + 1) + ' · Reviewed ✓');
 }
 
 function statusPill(label, n, min, ok) {
