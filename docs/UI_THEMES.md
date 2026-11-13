@@ -95,17 +95,17 @@ theme-only checkpoint `1fb8b2f` is retained. [Follow-up report](history/2026-11-
 and [task](../tasks/TASK-07-guided-workspace.md) describe the current behavior.
 
 Each historical iteration has its own native `details`/`summary`, initially
-collapsed; opening one never closes siblings. Its chevron and Show/Hide label
-make the state visible. Current inputs/current AI result remain outside the
+collapsed; opening one never closes siblings. Its native chevron shows the
+state (Show/Hide labels removed in TASK-09). Current inputs/current AI result remain outside the
 disclosures, and published text stays visible. There is no whole-history toggle
 for fields with iterations. Open states are held in memory, per pupil/lesson/
 field/iteration, across UI refreshes; they never enter progress or localStorage.
 Night Lab supports the same controls with its original palette and fonts.
 
 Three independent helper drawers show goals/steps, words and lesson-appropriate
-language tips. Complete original requirements remain in a nested disclosure.
-Present Perfect guidance and six A2/Vietnamese glosses are specific to L2;
-image lessons do not display irrelevant grammar requirements.
+language support. Complete requirements remain in a nested disclosure.
+Present Perfect guidance is specific to L2; image lessons have review/comparison
+sentence frames. L2–L5 vocabulary cards include English/Vietnamese support.
 
 L2's four labeled prompt fields serialize to the existing labeled string API.
 Prefilled accepted prompts retain their original string until the learner edits
@@ -134,8 +134,8 @@ its own native disclosure. Small green text on yellow uses `#12502c` (5.44:1 on
 `#ffb703`). This replaces the earlier all-green completion hierarchy.
 
 Goal cards use numbered badges, yellow/orange accents and a blue supporting
-surface. Every lesson has three goal cards. Requirements retain their complete
-original text but appear in numbered, titled cards (two columns, one on mobile).
+surface. Every lesson has three goal cards. Requirements retain their meaning
+and configured limits in numbered, titled cards (two columns, one on mobile).
 Helper summaries remain one line at 320px and wider; the label is 14px, distinct
 from the larger teaching content inside. Live checks are centered, noninteractive
 To do / Ready hints; their note refers to the teacher only.
@@ -148,3 +148,23 @@ in its config from the lesson plan; a frontend fallback supports older running
 pilot-1 servers whose cached L3 config omits that display property.
 
 Current evidence and checks: [visual review report](history/2026-11-12-visual-review.md).
+
+## Learning support and journals (TASK-09)
+
+Words now use independently expandable branded cards: yellow header, numbered
+badge, English meaning and blue Vietnamese area. The global duplicate word
+strip is removed; field-level banks remain where prompts are written. The
+same mechanic covers L2–L5, including L4 design-bank terms.
+
+L2's compact Present Perfect support explains three uses, signal words and a
+Past Simple contrast. L3/L4/L5 provide useful writing frames instead of generic
+tips. Requirements are split into action lines without changing gate values.
+
+Iteration summaries use green titles/status with the heading font, native
+chevrons and no Show/Hide labels. Image feedback has full labels in green/red
+cards beside the image, stacked below on mobile. Selected theme/justification
+stay visible; Option 1/2 each have a separate prompt/preview disclosure. Inline
+preset colors and font families remain authoritative in either shell theme.
+The workspace loads these existing font families for the samples.
+
+Current verification: [learning support report](history/2026-11-13-learning-support.md).
