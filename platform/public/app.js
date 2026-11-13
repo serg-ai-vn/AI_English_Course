@@ -8,13 +8,12 @@
     nextStep-driven: I1-prompt -> I1-eval -> ... -> pick -> accept -> done).
    UX guardrails (per Aug 2026 spec):
      - On any card only one stage inputs/buttons are active at a time.
-     - Completed iterations stay VISIBLE inline above the active stage
-       (never hidden behind a "View log" button) so the student always
-       sees what they wrote, what the AI produced, and what they reviewed.
+     - Previous iterations remain individually accessible above the active
+       stage. Each has its own disclosure; the current task stays visible.
        Prompt structure labels (Role / Context / Task / Format) are
        highlighted in gold inside these visible prompts.
-     - Once a whole field is done it collapses to a green stripe with a
-       read-only "View log" expander. No edits allowed.
+     - Completed fields keep their final result visible, with separate
+       read-only disclosures for each saved iteration. No edits allowed.
    ============================================================ */
 'use strict';
 
@@ -89,6 +88,7 @@ function render() {
 
   renderCompleteBanner(me, cfg);
   renderL5VocabWarning(me, cfg);
+  enhanceWorkspace(cfg);
 }
 
 /* Lesson 5 soft gate: after all reflections are saved, at least one of
@@ -116,24 +116,21 @@ function renderL5VocabWarning(me, cfg) {
 function renderDrivingQuestion(cfg) {
   var b = document.getElementById('driving-question');
   if (!b) return;
-  if (cfg.drivingQuestion) {
+  // Older long-running pilot-1 servers may still serve the previous L3 config.
+  var question = cfg.drivingQuestion || (cfg.lesson === 3 ? 'How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?' : '');
+  if (question) {
     b.hidden = false;
-    b.textContent = cfg.drivingQuestion;
+    b.textContent = question;
   } else {
     b.hidden = true;
   }
 }
 
-/* The global vocab strip is only shown for lessons that do NOT have a
-   per-field bank (Lesson 3 keeps the global strip; Lesson 2 hides it
-   and renders a per-field bank inside each prompt card). */
+/* The lesson glossary lives in its drawer; field-specific writing banks remain. */
 function renderVocabStrip(cfg) {
   var strip = document.getElementById('vocab-strip');
-  strip.innerHTML = '';
-  if (cfg.lesson === 2 && cfg.vocabByField) { strip.hidden = true; return; }
-  strip.hidden = false;
-  strip.appendChild(el('span', 'strip-label', "Today's words:"));
-  cfg.targetVocabulary.forEach(function (w) { strip.appendChild(el('span', 'chip', w)); });
+  strip.replaceChildren();
+  strip.hidden = true;
 }
 
 /* A small inline vocab bank shown above a prompt area inside a card.
@@ -204,44 +201,45 @@ function renderRules(cfg) {
   var items;
   if (cfg.lesson === 2) {
     items = [
-      'About Me runs in <b>three stages</b>: Step 1 (write your first prompt), Step 2 (improve the prompt), Step 3 (you are the Operator - polish & publish).',
-      'Every prompt uses the formula: <b>Role: ... Context: ... Task: ... Format: ...</b>',
-      'First prompt: at least <b>' + r.promptMinWordsFirst + ' words</b>. Step 2 prompt: at least <b>' +
-        r.promptGrowthWords + ' words longer</b> than Step 1. About Me lesson words: at least <b>' + r.promptMinTargetWords + '</b>.',
-      '<b>Present Perfect</b> is required in the Context line ("I have played...", "I have been playing...").',
-      'Hobbies: one prompt in the same formula. You can <b>Publish</b> straight away or choose <b>Improve this text (bonus)</b> and edit the AI draft by hand + write why you changed it.',
-      'After each About Me draft, write your <b>critical review</b>: what is good and what needs to change. This is your analytical feedback - it stays in the journal.'
+      ['<b>Step 1:</b> Write your first prompt and review the AI draft.', '<b>Step 2:</b> Improve your prompt and review the new draft.', '<b>Step 3:</b> Edit the final text by hand, then publish it.'],
+      ['Use all four parts in every prompt:', '<b>Role → Context → Task → Format</b>', 'Write something in each part.'],
+      ['<b>First prompt:</b> write at least ' + r.promptMinWordsFirst + ' words.', '<b>Second prompt:</b> write at least ' + r.promptGrowthWords + ' more words than your first prompt.', '<b>Both About Me prompts:</b> include at least ' + r.promptMinTargetWords + ' different words from today’s vocabulary.'],
+      ['Describe your experience in <b>Context</b> using Present Perfect.', 'Example: <b>I have played football for two years.</b>', 'Keep Present Perfect in your final text too.'],
+      ['Write <b>one prompt</b> for each hobby.', '<b>Publish</b> the text, or choose the bonus: edit it by hand.', 'For the bonus, explain <b>why</b> you changed it.'],
+      ['After <b>each</b> About Me draft, write:', '<b>What is good?</b> Explain what works.', '<b>What needs to change?</b> Explain what you would improve. Your review stays in the journal.']
     ];
   } else if (cfg.lesson === 3) {
     items = [
-      'Write your prompt with the formula: <b>Subject:, Style:, Framing:, Lighting:</b>.',
-      'Use today\'s visual words: <b>concept art</b>, <b>close-up</b>, <b>volumetric lighting</b>, <b>avatar</b>, <b>background</b>, ...',
-      'Generate at least <b>' + (r.minImageIterations || 3) + '</b> iterations. <b>Each one must change</b> at least one formula field (Subject / Style / Framing / Lighting) from your previous prompt.',
-      'After every image, fill in <b>pros</b> (what you like) and <b>cons</b> (what you do not like / could be improved) - at least 3 words each.',
-      'When done, pick your <b>best</b> image (it goes on your website) and your <b>worst</b> image (a record of what you caught), each with a short English reason.',
-      'Act as the Operator: catch AI <b>hallucinations</b> - extra fingers, melted hands, fake text, watermarks, real faces - and put them in your cons.'
+      ['Use all four parts:', '<b>Subject → Style → Framing → Lighting</b>'],
+      ['Use visual vocabulary to describe your idea.', 'Try <b>Concept art</b>, <b>Close-up</b> or <b>Volumetric lighting</b>.'],
+      ['Create at least <b>' + r.minImageIterations + '</b> versions, up to <b>' + r.maxImageIterations + '</b>.', 'In each new prompt, change at least <b>one</b> formula part.'],
+      ['After <b>every</b> image, write two comments:', '<b>What I like:</b> at least ' + r.prosMinWords + ' words.', '<b>What needs to change:</b> at least ' + r.consMinWords + ' words.'],
+      ['Pick <b>different</b> best and worst images.', 'Write an English reason for <b>each</b> choice.', 'Your best image goes on your site. The less suitable one stays in your journal.'],
+      ['Be the Operator: check for <b>AI hallucinations</b> and unsuitable details.', 'Look for extra fingers, distorted hands, fake text, watermarks or real faces.', 'Describe any problem under <b>What needs to change</b>.']
     ];
   } else if (cfg.lesson === 4) {
     items = [
-      'Hobby images: keep the formula <b>Subject:, Style:, Framing:, Lighting:</b>. You can <b>publish the first image</b> or improve it - up to <b>' + (r.maxImageIterations || 6) + ' attempts</b>.',
-      'Each regeneration needs: a <b>reason</b> why the image must change (at least ' + (r.changeReasonMinWords || 3) + ' words) and <b>at least one formula field changed</b> in your new prompt.',
-      'Website theme: use the text formula <b>Role:, Context:, Task:, Format:</b> and a <b>mood word</b> in Format (warm, calm, natural, bold, energetic, mysterious (and their related mood words)).',
-      'Generate <b>two theme options</b> and compare them. Pick your favorite and <b>justify the choice</b> using comparative words: brighter, calmer, bolder, the boldest...',
-      'Your justification also needs a <b>design word</b>: theme, palette, contrast, font, bold, or soft.'
+      ['Use <b>Subject → Style → Framing → Lighting</b>.', 'Keep the first image, or improve it — up to <b>' + r.maxImageIterations + '</b> versions.'],
+      ['Before you regenerate, write <b>why</b> the image should change: at least ' + (r.changeReasonMinWords || 3) + ' words.', 'Change at least <b>one</b> formula part in the next prompt.'],
+      ['Use <b>Role → Context → Task → Format</b>.', 'In Format, describe a mood: <b>warm, calm, natural, bold, energetic</b> or <b>mysterious</b>. Related mood words also work.'],
+      ['Generate <b>two</b> theme options and compare them.', 'Choose one, then explain why.', 'Use a comparison, such as <b>brighter than</b>, <b>calmer than</b> or <b>the boldest</b>.'],
+      ['In your explanation, include a design word.', 'For example: <b>theme, palette, contrast, font, bold</b> or <b>soft</b>.']
     ];
   } else if (cfg.lesson === 5) {
     items = [
-      'Final audit: check your site as the <b>Operator</b> - no real personal data, no AI-invented facts. Confirm both items.',
-      'Write your <b>final reflection</b> - six questions, at least <b>' + (r.reflectionMinWords || 15) + ' words</b> each.',
-      'Use one of today\'s words in your reflection: <b>publish, export, change, presentation</b>.',
-      'When everything is done, your teacher <b>publishes</b> your site and you get the link to share with your family.'
+      ['Check for real personal data and AI-invented facts.', 'Confirm <b>both</b> audit items.'],
+      ['Answer <b>six</b> reflection questions.', 'Write at least <b>' + r.reflectionMinWords + ' words</b> in each answer.'],
+      ['Include at least one of these words across your answers:', '<b>Publish, Export, Change, Presentation</b>'],
+      ['Finish the audit and reflections.', 'Your teacher publishes the site and gives you a link to share.']
     ];
   } else {
     items = ['(Rules for this lesson are not configured yet.)'];
   }
   items.forEach(function (r) {
     var li = document.createElement('li');
-    li.innerHTML = r;
+    (Array.isArray(r) ? r : [r]).forEach(function (line) {
+      var paragraph = el('p', 'requirement-line'); paragraph.innerHTML = line; li.appendChild(paragraph);
+    });
     rules.appendChild(li);
   });
 }
@@ -297,6 +295,7 @@ function renderCompleteBanner(me, cfg) {
 }
 
 function renderField(def) {
+  workspaceRenderingField = def.id;
   var me = state.me;
   var fstate = me.progress.fields[def.id] || emptyFstate(def);
   var isDone = fstate.status === 'done';
@@ -305,12 +304,16 @@ function renderField(def) {
   card.id = 'card-' + def.id;
 
   var head = el('div', 'field-head');
-  var status = isDone ? 'done' : 'open';
+  if (isDone) {
+    var check = el('span', 'completion-check', '✓');
+    check.setAttribute('aria-hidden', 'true');
+    head.appendChild(check);
+  }
   head.appendChild(el('span', 'field-label', def.label));
-  if (def.brief) head.appendChild(el('span', 'field-brief', def.brief));
-  head.appendChild(el('span', 'spacer'));
-  head.appendChild(el('span', 'status ' + status, isDone ? 'Done' : 'Open'));
+  if (isDone) head.appendChild(el('span', 'status done', completionLabel(def)));
   card.appendChild(head);
+  if (!isDone && def.brief && !(me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input))) card.appendChild(el('p', 'field-brief', def.brief));
+  if (!isDone && me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input)) card.appendChild(renderStepper(def, fstate));
 
   if (isDone) {
     card.appendChild(renderDoneStripe(def, fstate));
@@ -480,42 +483,8 @@ function emptyFstate(def) {
 
 function renderDoneStripe(def, fstate) {
   var wrap = el('div', 'done-stripe-wrap');
-  var stripe = el('div', 'step-stripe done');
-  var label;
-  if (def.input === 'ai-text-3step') label = '\u2713 About Me published';
-  else if (def.input === 'ai-cycle-bonus') {
-    label = '\u2713 ' + def.label + ' published' + (fstate.bonusClaimed ? ' (bonus claimed)' : '');
-  } else if (def.input === 'direct') {
-    var dv = String(fstate.value || '');
-    label = '\u2713 ' + def.label + ': ' + (dv.length > 70 ? dv.slice(0, 70) + '\u2026' : dv);
-  } else if (def.input === 'checklist') {
-    label = '\u2713 Final Operator Audit completed';
-  } else if (def.input === 'ai-image-cycle') {
-    label = '\u2713 ' + def.label + ' accepted';
-  } else if (def.input === 'ai-image-rapid') {
-    label = '\u2713 ' + def.label + ' published (V' + (fstate.publishedVersion || '') + ')';
-  } else if (def.input === 'theme-picker') {
-    var pName = presetName(fstate);
-    label = '\u2713 Website theme selected' + (pName ? ': ' + pName : '');
-  } else {
-    label = '\u2713 ' + def.label;
-  }
-  stripe.appendChild(el('span', 'stripe-text', label));
-  var viewBtn = el('button', 'btn btn-ghost mini-btn view-log-btn', 'View log');
-  viewBtn.addEventListener('click', function () {
-    wrap.classList.toggle('expanded');
-    viewBtn.textContent = wrap.classList.contains('expanded') ? 'Hide log' : 'View log';
-  });
-  stripe.appendChild(viewBtn);
-  wrap.appendChild(stripe);
-
   var detail = el('div', 'done-detail');
-  detail.hidden = true;
-  /* keep detail in sync with the wrap.expanded class via a MutationObserver
-     is overkill - simpler: toggle the hidden attr right here. */
-  viewBtn.addEventListener('click', function () {
-    detail.hidden = !wrap.classList.contains('expanded');
-  });
+  detail.hidden = false;
 
   /* read-only detail content per input type */
   if (def.input === 'direct') {
@@ -551,33 +520,32 @@ function renderDoneStripe(def, fstate) {
   } else if (def.input === 'theme-picker') {
     detail.appendChild(renderThemeDetail(fstate));
   }
-  wrap.appendChild(detail);
+  if (detail.childNodes.length) wrap.appendChild(detail);
   return wrap;
 }
 
-/* read-only summary of a finalized theme-picker field (View log). */
+/* Read-only summary of a finalized theme-picker field. */
 function renderThemeDetail(fstate) {
-  var box = el('div', 'iter-entry read-only');
-  var pName = presetName(fstate);
-  if (pName) box.appendChild(el('div', 'iter-head', 'Theme: ' + pName));
+  var box = el('div', 'theme-history');
+  var winner = fstate.choice === 1 ? fstate.option1 : fstate.choice === 2 ? fstate.option2 : null;
+  var selected = el('section', 'theme-choice-card');
+  if (winner) selected.appendChild(renderThemeOptionCard(winner, fstate.choice));
+  else selected.appendChild(el('p', null, presetName(fstate) || String(fstate.value || '')));
+  if (fstate.justification) {
+    selected.appendChild(el('h4', null, 'Why this theme fits me'));
+    selected.appendChild(el('p', 'theme-justification', fstate.justification));
+  }
+  box.appendChild(selected);
   ['option1', 'option2'].forEach(function (key) {
     var o = fstate[key];
     if (!o) return;
     var num = key === 'option1' ? 1 : 2;
-    var head = el('div', 'di-row', 'Option ' + num + ' \u00B7 ' + o.presetName);
-    box.appendChild(head);
-    box.appendChild(el('div', 'iter-row-label', 'Prompt:'));
-    box.appendChild(renderPromptHighlighted(o.prompt));
-    box.appendChild(el('div', 'iter-row', 'Mood: ' + (o.moodWord || '') + ' \u00B7 Preset: ' + o.presetName));
+    var detail = el('div', 'iter-entry read-only');
+    detail.appendChild(el('div', 'iter-row-label', 'My prompt'));
+    detail.appendChild(renderPromptHighlighted(o.prompt));
+    detail.appendChild(renderThemeOptionCard(o, num));
+    box.appendChild(iterationPanel(detail, 'Option ' + num + ' · ' + (o.presetName || '') + (num === fstate.choice ? ' · Selected ✓' : ' · Saved ✓')));
   });
-  box.appendChild(el('div', 'iter-row-label', 'Your choice:'));
-  box.appendChild(el('div', 'iter-row', 'Option ' + (fstate.choice || '-') + ' (' +
-    (fstate.choice === 1 ? (fstate.option1 && fstate.option1.presetName) :
-      (fstate.choice === 2 ? (fstate.option2 && fstate.option2.presetName) : '')) + ')'));
-  if (fstate.justification) {
-    box.appendChild(el('div', 'iter-row-label', 'Why you chose it:'));
-    box.appendChild(el('div', 'iter-row', fstate.justification));
-  }
   return box;
 }
 
@@ -605,15 +573,8 @@ function renderReadOnlyIteration(it, i, kind) {
     if (it.image && it.image.url) {
       var im = document.createElement('img');
       im.src = it.image.url; im.alt = 'iter ' + (i + 1); im.className = 'img-thumb';
-      box.appendChild(im);
     }
-    if (it.reason) box.appendChild(el('div', 'iter-row iter-notes', 'Why change: ' + it.reason));
-    if (kind === 'image') {
-      if (it.pros) box.appendChild(el('div', 'iter-row', 'pros: ' + it.pros));
-      if (it.cons) box.appendChild(el('div', 'iter-row', 'cons: ' + it.cons));
-      if (it.best) box.appendChild(el('div', 'img-verdict best', 'Best: ' + (it.best.reason || '')));
-      if (it.worst) box.appendChild(el('div', 'img-verdict worst', 'Worst: ' + (it.worst.reason || '')));
-    }
+    box.appendChild(renderImageReview(im || null, it));
   } else {
     box.appendChild(renderPromptHighlighted(it.prompt));
     box.appendChild(el('div', 'iter-row-label', 'AI draft:'));
@@ -626,7 +587,7 @@ function renderReadOnlyIteration(it, i, kind) {
     }
     if (it.reason) box.appendChild(el('div', 'iter-row iter-notes', 'Why improve: ' + it.reason));
   }
-  return box;
+  return iterationPanel(box, 'Iteration ' + (i + 1) + (kind === 'about-me' ? (i === 0 ? ' · First Draft' : ' · Improved Draft') : '') + ' · Saved ✓');
 }
 
 /* Render text with the prompt formula labels highlighted in gold. Safe:
@@ -648,12 +609,14 @@ function renderPromptHighlighted(promptText, labels) {
     if (m.index > lastIndex) {
       box.appendChild(document.createTextNode(txt.slice(lastIndex, m.index)));
     }
-    box.appendChild(el('span', 'struct-label', m[1]));
-    box.appendChild(el('span', 'struct-sep', ': '));
-    box.appendChild(document.createTextNode(String(m[2]).replace(/\s+$/, '')));
+    var row = el('div', 'prompt-part');
+    row.appendChild(el('span', 'struct-label', m[1]));
+    row.appendChild(el('span', 'prompt-part-text', String(m[2]).replace(/\s+$/, '')));
+    box.appendChild(row);
     lastIndex = re.lastIndex;
   }
   if (!matched) {
+    box.style.whiteSpace = 'pre-wrap';
     box.appendChild(document.createTextNode(txt));
   } else if (lastIndex < txt.length) {
     box.appendChild(document.createTextNode(txt.slice(lastIndex)));
@@ -664,18 +627,13 @@ function renderPromptHighlighted(promptText, labels) {
 var L3_LABELS = ['Subject', 'Style', 'Framing', 'Lighting'];
 
 function renderEvalLine(kind, value) {
-  var line = el('div', 'eval-line');
+  var line = el('div', 'eval-line review-card ' + kind);
   line.appendChild(el('span', 'eval-tag ' + kind, kind === 'good' ? 'Good' : 'Needs to change'));
-  line.appendChild(document.createTextNode(': ' + value));
+  line.appendChild(el('span', 'review-text', value));
   return line;
 }
 
-/* Always-visible completed iteration card shown ABOVE the active stage in
-   About Me. Renders the prompt (with highlighted structure labels), the
-   AI draft, and the student's saved critical review. Nothing is hidden
-   behind a View log toggle, so the student always sees what they wrote,
-   what the AI produced, and what they reviewed - while working on the
-   next stage. */
+/* Individually expandable completed iteration above the active task. */
 function renderCompletedIteration(it, i, kind) {
   var wrap = el('div', 'iter-done-card');
   var stage = it.stage || (i + 1);
@@ -695,7 +653,7 @@ function renderCompletedIteration(it, i, kind) {
     if (it.good) wrap.appendChild(renderEvalLine('good', it.good));
     if (it.needsChange) wrap.appendChild(renderEvalLine('needs', it.needsChange));
   }
-  return wrap;
+  return iterationPanel(wrap, 'Iteration ' + (i + 1) + (kind === 'about-me' ? (i === 0 ? ' · First Draft' : ' · Improved Draft') : ' · Draft') + ' · Reviewed ✓');
 }
 
 /* ---------- direct fields ---------- */
@@ -1234,23 +1192,24 @@ function renderImageCycle(card, def, fstate) {
     img.className = 'img-preview-big';
     img.src = lastIter.image.url;
     img.alt = 'iteration ' + iterN;
-    card.appendChild(img);
-
-    card.appendChild(el('div', 'draft-label', 'Your critical review (write in English)'));
-    card.appendChild(el('div', 'stage-instruction',
+    var reviewLayout = el('div', 'image-review-layout');
+    var review = el('div', 'image-feedback');
+    reviewLayout.append(img, review); card.appendChild(reviewLayout);
+    review.appendChild(el('div', 'draft-label', 'Your critical review (write in English)'));
+    review.appendChild(el('div', 'stage-instruction',
       'What do you like? What could be improved? (min ' + minWords + ' words each)'));
 
     var prosInput = document.createElement('input');
     prosInput.type = 'text';
     prosInput.className = 'eval-input';
     prosInput.placeholder = 'What is good about this image?';
-    card.appendChild(prosInput);
+    review.appendChild(reviewInput('good', '✓ What I like', prosInput));
 
     var consInput = document.createElement('input');
     consInput.type = 'text';
     consInput.className = 'eval-input';
     consInput.placeholder = 'What needs to change?';
-    card.appendChild(consInput);
+    review.appendChild(reviewInput('needs', '🔧 What needs to change', consInput));
 
     var act = el('div', 'field-actions');
     var saveBtn = el('button', 'btn btn-primary', 'Save iteration \u{1F4BE}');
@@ -1552,9 +1511,8 @@ function renderCompletedRapidIteration(it, i) {
   img.className = 'img-preview-inline';
   img.src = it.image.url;
   img.alt = 'version ' + (i + 1);
-  wrap.appendChild(img);
-  if (it.reason) wrap.appendChild(el('div', 'iter-row iter-notes', 'Why change: ' + it.reason));
-  return wrap;
+  wrap.appendChild(renderImageReview(img, it));
+  return iterationPanel(wrap, 'Version V' + (i + 1) + ' · Saved');
 }
 
 /* ---------- Website theme (theme-picker, Lesson 4) ----------
@@ -1748,18 +1706,8 @@ function renderCompletedImageIteration(it, i) {
   img.className = 'img-preview-inline';
   img.src = it.image.url;
   img.alt = 'iteration ' + (i + 1);
-  wrap.appendChild(img);
-
-  if (it.pros || it.cons) {
-    wrap.appendChild(el('div', 'draft-label', 'Your critical review'));
-    if (it.pros) wrap.appendChild(renderEvalLine('good', it.pros));
-    if (it.cons) wrap.appendChild(renderEvalLine('needs', it.cons));
-  }
-  if (it.best) wrap.appendChild(el('div', 'img-verdict best',
-    'Best: ' + (it.best.reason || '')));
-  if (it.worst) wrap.appendChild(el('div', 'img-verdict worst',
-    'Worst: ' + (it.worst.reason || '')));
-  return wrap;
+  wrap.appendChild(renderImageReview(img, it));
+  return iterationPanel(wrap, 'Iteration ' + (i + 1) + ' · Reviewed ✓');
 }
 
 function statusPill(label, n, min, ok) {
@@ -1787,8 +1735,8 @@ function renderPickPanel(fieldId, fstate) {
     img.src = it.image.url; img.alt = 'iteration ' + (i + 1); img.className = 'img-thumb';
     cell.appendChild(img);
     cell.appendChild(el('div', 'img-prompt', it.prompt));
-    if (it.pros) cell.appendChild(el('div', 'img-pros', 'pros: ' + it.pros));
-    if (it.cons) cell.appendChild(el('div', 'img-cons', 'cons: ' + it.cons));
+    if (it.pros) cell.appendChild(el('div', 'img-pros', '✓ What I like: ' + it.pros));
+    if (it.cons) cell.appendChild(el('div', 'img-cons', '🔧 What needs to change: ' + it.cons));
 
     var row = el('div', 'img-actions');
     var bestBtn = el('button', 'btn btn-ghost img-btn' + (it.best ? ' selected best' : ''),

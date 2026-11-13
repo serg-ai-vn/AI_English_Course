@@ -16,6 +16,12 @@ jobs:
       - run: npm run smoke:isolated
       - run: npx playwright install --with-deps chromium
       - run: npm run test:ui
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: synthetic-ui-theme-evidence
+          path: test-results/
+          if-no-files-found: ignore
   container:
     runs-on: ubuntu-latest
     steps:
