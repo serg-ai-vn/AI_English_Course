@@ -30,6 +30,9 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
       for (const n of [1, 2, 3]) {
         await card.locator('.prompt-area').fill(imagePrompt(field, n));
         await card.getByRole('button', { name: /^Generate (another )?image/i }).click();
+        await expect(card.getByText('✓ What I like', { exact: true }).last()).toBeVisible();
+        await expect(card.getByText('🔧 What needs to change', { exact: true }).last()).toBeVisible();
+        if (field === 'avatar' && n === 1) await page.screenshot({ path: info.outputPath('L3-active-feedback.png'), fullPage: true });
         await card.getByPlaceholder('What is good about this image?').fill('I like the style');
         await card.getByPlaceholder('What needs to change?').fill('I want softer light');
         await card.getByRole('button', { name: /Save iteration/ }).click();

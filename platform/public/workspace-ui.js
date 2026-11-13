@@ -11,12 +11,43 @@ function completionLabel(def) {
   if (def.input === 'theme-picker') return 'Selected';
   return 'Published';
 }
+function imageFeedback(kind, heading, text) {
+  var card = el('section', 'image-review-card ' + kind);
+  card.appendChild(el('h4', 'image-review-title', heading));
+  card.appendChild(el('p', 'image-review-text', text));
+  return card;
+}
+function reviewInput(kind, heading, input) {
+  var label = el('label', 'image-review-card feedback-input ' + kind);
+  label.appendChild(el('span', 'image-review-title', heading));
+  label.appendChild(input);
+  return label;
+}
+function renderImageReview(image, iteration) {
+  var row = el('div', 'image-review-layout');
+  if (image) {
+    var figure = el('figure', 'image-review-figure'); figure.appendChild(image); row.appendChild(figure);
+  }
+  var feedback = el('div', 'image-feedback');
+  if (iteration.pros) feedback.appendChild(imageFeedback('good', '✓ What I like', iteration.pros));
+  if (iteration.cons) feedback.appendChild(imageFeedback('needs', '🔧 What needs to change', iteration.cons));
+  if (iteration.reason) feedback.appendChild(imageFeedback('change', '↻ Why I changed it', iteration.reason));
+  if (iteration.best) feedback.appendChild(imageFeedback('good', '✓ My best choice', iteration.best.reason || ''));
+  if (iteration.worst) feedback.appendChild(imageFeedback('needs', '🔎 My less suitable choice', iteration.worst.reason || ''));
+  if (feedback.childNodes.length) row.appendChild(feedback);
+  if (!image || !feedback.childNodes.length) row.classList.add('image-only');
+  return row;
+}
 function iterationPanel(content, title) {
   var panel = el('details', 'iteration-panel');
   // No `name` attribute: opening one iteration never closes a sibling.
   var key = state.me.student.id + ':' + state.me.config.lesson + ':' + workspaceRenderingField + ':' + title + ':' + content.textContent;
   panel.open = workspaceDisclosure[key] === true;
-  panel.appendChild(el('summary', 'iteration-summary', title));
+  var summary = el('summary', 'iteration-summary');
+  var parts = /^(.*?)(?:\s*·\s*(Saved|Reviewed|Selected)\s*✓?)$/.exec(title);
+  summary.appendChild(el('span', 'iteration-title', parts ? parts[1] : title));
+  if (parts) summary.appendChild(el('span', 'iteration-state', '✓ ' + parts[2]));
+  panel.appendChild(summary);
   var head = content.querySelector('.step-badge, .iter-head');
   if (head) head.remove();
   panel.appendChild(content);
@@ -46,7 +77,38 @@ var workspaceWordHelp = {
   creative: ['Good at making new things or ideas.', 'Sáng tạo'],
   paragraph: ['A group of sentences about one idea.', 'Đoạn văn'],
   experience: ['Something you have done or learned.', 'Trải nghiệm; kinh nghiệm'],
-  interesting: ['Makes you want to know more.', 'Thú vị']
+  interesting: ['Makes you want to know more.', 'Thú vị'],
+  prompt: ['Words that tell AI what to make.', 'Câu lệnh cho AI'],
+  avatar: ['A picture that represents you online.', 'Ảnh đại diện'],
+  background: ['The part behind the main person or object.', 'Phông nền'],
+  generate: ['Create something, such as an image or text.', 'Tạo ra'],
+  'concept art': ['An early picture that shows a design idea.', 'Tranh ý tưởng'],
+  'close-up': ['A view from near an object, showing its details.', 'Cận cảnh'],
+  'volumetric lighting': ['Light you can see as rays in mist or smoke.', 'Ánh sáng thành tia trong sương hoặc khói'],
+  hallucination: ['A false fact or wrong detail made by AI.', 'Thông tin sai hoặc chi tiết sai do AI tạo ra'],
+  fact: ['Something true that you can check.', 'Sự thật'],
+  detail: ['A small part of a picture or description.', 'Chi tiết'],
+  section: ['One part of a web page.', 'Một phần của trang web'],
+  layout: ['The way pictures and text are arranged.', 'Bố cục'],
+  portrait: ['A picture of a person.', 'Chân dung'],
+  'soft light': ['Gentle light without strong, dark shadows.', 'Ánh sáng dịu'],
+  'bold colors': ['Strong colors that are easy to notice.', 'Màu sắc nổi bật'],
+  theme: ['The overall look and style of a website.', 'Giao diện; chủ đề'],
+  palette: ['A set of colors used together.', 'Bảng màu'],
+  mood: ['The feeling a picture or design gives you.', 'Cảm giác; không khí'],
+  contrast: ['A clear difference, such as light against dark.', 'Độ tương phản'],
+  font: ['A style of letters used in text.', 'Phông chữ'],
+  bold: ['Strong and easy to notice.', 'Đậm; nổi bật'],
+  soft: ['Gentle, rather than strong or bright.', 'Nhẹ nhàng'],
+  match: ['Look good together or fit an idea.', 'Phù hợp'],
+  publish: ['Make your finished work available to other people.', 'Xuất bản'],
+  audit: ['Check your work carefully for problems.', 'Kiểm tra kỹ; rà soát'],
+  operator: ['The person who guides AI and checks its work.', 'Người điều khiển và kiểm tra AI'],
+  data: ['Information used by a person or computer.', 'Dữ liệu'],
+  export: ['Save your work as a file you can use elsewhere.', 'Xuất thành tệp'],
+  link: ['An address you click to open a page.', 'Liên kết'],
+  change: ['Make something different.', 'Thay đổi'],
+  presentation: ['A talk that shows and explains your work.', 'Bài thuyết trình']
 };
 function helperPanel(title, id) {
   var panel = el('details', 'helper-panel');
@@ -71,28 +133,31 @@ function enhanceWorkspace(cfg) {
   allRules.appendChild(list);
   goal.appendChild(allRules);
   bar.appendChild(goal);
-  var words = cfg.lesson === 2 ? cfg.vocabByField['about-me'] : cfg.targetVocabulary;
+  var words = glossaryWords(cfg);
   var vocab = helperPanel("📚 Today's Words (" + words.length + ')', 'words');
   var vocabGrid = el('div', 'helper-words');
-  words.forEach(function (word) {
+  words.forEach(function (word, index) {
     var label = word.charAt(0).toUpperCase() + word.slice(1);
     var help = workspaceWordHelp[word.toLowerCase()];
-    if (!help) { vocabGrid.appendChild(el('span', 'chip', label)); return; }
+    if (!help) return; // Coverage is checked against every configured glossary word.
     var entry = el('details', 'word-help');
-    entry.appendChild(el('summary', null, label));
-    entry.appendChild(el('p', null, help[0]));
-    var vi = el('p', null, help[1]); vi.lang = 'vi'; entry.appendChild(vi);
+    entry.dataset.word = word.toLowerCase();
+    var heading = el('summary');
+    heading.appendChild(el('span', 'word-number', String(index + 1).padStart(2, '0')));
+    heading.appendChild(el('span', 'word-title', label));
+    entry.appendChild(heading);
+    var meaning = el('div', 'word-meaning');
+    meaning.appendChild(el('span', 'word-caption', 'Meaning'));
+    meaning.appendChild(el('p', null, help[0]));
+    var translation = el('div', 'word-translation');
+    translation.appendChild(el('span', 'word-caption', 'Tiếng Việt'));
+    var vi = el('p', null, help[1]); vi.lang = 'vi'; translation.appendChild(vi);
+    entry.append(meaning, translation);
     vocabGrid.appendChild(entry);
   });
   vocab.appendChild(vocabGrid); bar.appendChild(vocab);
-  var grammar = helperPanel(cfg.lesson === 2 ? '🧩 Grammar: Present Perfect' : '🧩 Language tips', 'grammar');
-  if (cfg.lesson === 2) {
-    grammar.appendChild(el('p', 'grammar-formula', 'have / has + V3 (past participle)'));
-    grammar.appendChild(el('p', null, 'Use it in Context: I have skated for two years.'));
-    grammar.appendChild(el('p', null, 'I have drawn many pictures.'));
-  } else {
-    grammar.appendChild(el('p', null, cfg.lesson === 4 ? 'Compare your choices: brighter, calmer, bolder. Explain why your theme fits.' : cfg.lesson === 3 ? 'Explain what is good and what needs to change. Give reasons for your best and worst choices.' : 'Explain your choices and changes in full sentences.'));
-  }
+  var grammar = helperPanel(cfg.lesson === 2 ? '🧩 Grammar: Present Perfect' : cfg.lesson === 3 ? '🗣 Review phrases' : cfg.lesson === 4 ? '🗣 Compare & explain' : '🗣 Reflection phrases', 'grammar');
+  grammar.appendChild(languageSupport(cfg.lesson));
   bar.appendChild(grammar);
   rules.replaceChildren(bar);
   rules.classList.add('helper-shell');
@@ -121,6 +186,57 @@ function enhanceWorkspace(cfg) {
     });
   });
   if (cfg.lesson === 2) groupHobbies();
+}
+function glossaryWords(cfg) {
+  if (cfg.lesson === 2) return cfg.vocabByField['about-me'].slice();
+  var words = (cfg.targetVocabulary || []).slice();
+  Object.values(cfg.vocabByField || {}).forEach(function (bank) {
+    (Array.isArray(bank) ? bank : (bank.new || []).concat(bank.review || [])).forEach(function (word) {
+      if (words.indexOf(word) === -1) words.push(word);
+    });
+  });
+  return words;
+}
+function languageSupport(lesson) {
+  var box = el('div', 'language-support');
+  if (lesson === 2) {
+    box.appendChild(el('p', 'language-intro', 'Present Perfect connects a past action or experience to now.'));
+    box.appendChild(el('p', 'grammar-formula', 'have / has + V3 (past participle)'));
+    var uses = el('div', 'language-cards');
+    [['Still true now', 'I have skated for two years.', 'for = how long · since = when it started'],
+      ['Experience, no exact time', 'I have tried skating.', 'ever · never'],
+      ['A result now', 'I have finished my picture. It is ready.', 'already · yet']].forEach(function (item) {
+      var card = el('article', 'language-card');
+      card.appendChild(el('h3', null, item[0]));
+      card.appendChild(el('p', 'language-example', item[1]));
+      card.appendChild(el('p', 'language-clue', item[2])); uses.appendChild(card);
+    });
+    box.appendChild(uses);
+    var timeline = el('p', 'grammar-timeline', 'Started before ━━━━━▶ NOW · still true now');
+    box.appendChild(timeline);
+    box.appendChild(el('p', 'grammar-contrast', 'A finished time? Use Past Simple: “I skated yesterday.” Signal words are clues — choose the tense by meaning.'));
+    return box;
+  }
+  var phrases = {
+    3: [['✓ What I like', 'I like the ___ because ___.', 'I like the lighting because the face is clear.'],
+      ['🔧 What needs to change', 'The ___ looks ___. I want ___.', 'The hands look strange. I want natural hands.'],
+      ['Explain a choice', 'Version ___ is better because ___.', 'Version 2 is better because the face is clearer.']],
+    4: [['Compare colors', 'This palette is ___ than ___.', 'This palette is calmer than the other palette.'],
+      ['Explain an improvement', 'I changed ___ because ___.', 'I changed the lighting because the picture was too dark.'],
+      ['Explain your theme', 'I chose ___ because its ___ matches ___.', 'I chose Ocean Calm because its softer palette matches my mood.']],
+    5: [['Describe a change', 'At first, ___. Then I changed ___.', 'At first, my prompt was short. Then I added a clear Format.'],
+      ['Explain your thinking', 'I chose ___ because ___.', 'I chose this image because it shows my hobby clearly.'],
+      ['Plan your next step', 'Next time, I will ___.', 'Next time, I will check the details before I publish.']]
+  };
+  var cards = el('div', 'language-cards');
+  (phrases[lesson] || []).forEach(function (item) {
+    var card = el('article', 'language-card');
+    card.appendChild(el('h3', null, item[0]));
+    card.appendChild(el('p', 'sentence-frame', item[1]));
+    card.appendChild(el('p', 'language-example', item[2])); cards.appendChild(card);
+  });
+  box.appendChild(cards);
+  return box;
 }
 function lessonGoals(cfg) {
   var rules = cfg.rules;
