@@ -529,7 +529,6 @@ function renderThemeDetail(fstate) {
   var box = el('div', 'theme-history');
   var winner = fstate.choice === 1 ? fstate.option1 : fstate.choice === 2 ? fstate.option2 : null;
   var selected = el('section', 'theme-choice-card');
-  selected.appendChild(el('h3', null, '✓ Your selected theme'));
   if (winner) selected.appendChild(renderThemeOptionCard(winner, fstate.choice));
   else selected.appendChild(el('p', null, presetName(fstate) || String(fstate.value || '')));
   if (fstate.justification) {

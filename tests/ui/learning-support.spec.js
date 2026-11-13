@@ -109,6 +109,7 @@ test('learning support: independent glossary cards, useful language, image feedb
       const chosen = before.progress.fields.theme.choice;
       await expect(history.locator('.theme-choice-card .theme-option-head')).toContainText('Option ' + chosen);
       await expect(history.locator('.theme-justification')).toHaveText(before.progress.fields.theme.justification);
+      await expect(history.getByText('✓ Your selected theme', { exact: true })).toHaveCount(0);
       await expect(options.nth(chosen - 1).locator('summary')).toContainText('Selected');
       await options.nth(0).locator('summary').click();
       await options.nth(1).locator('summary').click();

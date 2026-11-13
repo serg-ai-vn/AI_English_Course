@@ -1604,7 +1604,6 @@ html[data-ui-theme="classroom-light"] .built-link:hover { background: var(--surf
 .image-review-card.change { border-color: var(--amber); }
 .feedback-input input { margin: 0; }
 .theme-choice-card { padding: 18px; border: 2px solid var(--ok); border-radius: 20px; background: var(--ok-bg); margin-bottom: 22px; }
-.theme-choice-card > h3 { margin: 0 0 16px; font-size: 20px; color: var(--ok); }
 .theme-choice-card h4 { font-size: 16px; margin-bottom: 8px; }
 .theme-justification { font-size: 18px; line-height: 1.55; margin: 0; }
 html[data-ui-theme="classroom-light"] :is(.iteration-title, .iteration-state) { color: #12502c; }

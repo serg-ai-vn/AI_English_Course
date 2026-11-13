@@ -39,8 +39,8 @@ DATA_DIR per theme; owner preview data excluded.
   `19982ef50c7f3a246c3cbd0a8c67d933b4e2ead5f01b996292101000a33125d5`.
 - PASS: complete browser suite, 14/14 in both themes (3.2m), including L2
   generation/review/edit, L3–L5 publishing/build/download and correction revocation.
-- PASS: focused final-copy rerun, 2/2 (52.8s), after retaining the complete
-  Operator checklist in the simplified L3 requirement card.
+- PASS: focused final presentation rerun, 2/2, after retaining the complete
+  Operator checklist and removing the repeated theme completion heading.
 - Focused cases passed in both themes: independent word/option disclosures,
   complete translations, no duplicate strip, language frames, requirement lines,
   image review columns/mobile stacking, no Show/Hide generated text, unchanged
@@ -58,6 +58,8 @@ Visual inspection covered branded vocabulary, grammar, full image-feedback
 labels and columns, requirement lines, theme choices and mobile stacking in
 Classroom Light, plus retained Night Lab colors. This is not a complete
 accessibility audit. Implementation commit: `69a38cf`.
+Final visual cleanup removes the repeated completion heading inside the theme
+result; the outer yellow heading keeps the single overall completion cue.
 
 ## Preview and recovery
 
