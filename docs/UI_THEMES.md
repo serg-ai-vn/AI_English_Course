@@ -4,6 +4,14 @@ Classroom Light is the default on login, student workspace and teacher console.
 Night Lab remains the original fallback CSS and is selected explicitly with
 `html[data-ui-theme="night-lab"]`. No lesson data migration is involved.
 
+The owner accepted TASK-06–09 as the baseline for the next development phase on
+2026-11-18. Independent implementation acceptance: PASS at `74f6585`.
+[Acceptance report](history/2026-11-18-ui-baseline-acceptance.md);
+[PR #3](https://github.com/serg-ai-vn/AI_English_Course/pull/3) records the final
+reviewed head and merge. Night Lab restores an alternative palette, not an
+earlier lesson workflow. Full code recovery uses the accepted Git checkpoint;
+runtime data is backed up separately.
+
 ## Select or restore
 
 Run in the browser console on any platform page:
