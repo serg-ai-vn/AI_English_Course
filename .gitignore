@@ -17,3 +17,6 @@ test-results/
 Thumbs.db
 .vscode/
 .idea/
+
+# Owner's private presentation drafts (normally kept outside this repository).
+Создание презы первого урока/

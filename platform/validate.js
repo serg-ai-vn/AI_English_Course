@@ -12,6 +12,7 @@
    - text length: >= textMinWords per field
    - iterations: field closes only after minIterations accepted prompts
    ============================================================ */
+(function () {
 'use strict';
 
 function countWords(text) {
@@ -561,7 +562,7 @@ function checkThemeJournal(text, cfg) {
   return { ok: errors.length === 0, errors: errors };
 }
 
-module.exports = {
+var validationApi = {
   countWords: countWords,
   targetWordsUsed: targetWordsUsed,
   fieldBank: fieldBank,
@@ -588,3 +589,6 @@ module.exports = {
   matchThemePreset: matchThemePreset,
   checkThemeJournal: checkThemeJournal
 };
+if (typeof module !== 'undefined' && module.exports) module.exports = validationApi;
+else window.PlatformValidation = Object.freeze(validationApi);
+}());

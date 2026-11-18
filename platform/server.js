@@ -1734,6 +1734,7 @@ const server = http.createServer(async (req, res) => {
       return sendJson(res, 403, { error: 'Forbidden' });
     }
     const rel = u === '/' ? 'login.html' : u.slice(1);
+    if (rel === 'prompt-validation.js') return sendFile(res, path.join(ROOT, 'validate.js'));
     if (
       ![
         'login.html',
@@ -1742,6 +1743,8 @@ const server = http.createServer(async (req, res) => {
         'app.js',
         'teacher.js',
         'platform.css',
+        'ui-theme.js',
+        'workspace-ui.js',
       ].includes(rel)
     )
       return sendJson(res, 404, { error: 'Not found' });
