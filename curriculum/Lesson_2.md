@@ -96,3 +96,5 @@ Rule / ConditionAction if Failed (System Prompt/Hint)**Minimum Iterations**"You 
 * The prepared bad and good text examples are included above.
 * **Photo Protocol:** Not applicable for this specific lesson as students are working directly within the digital platform, which automatically logs their prompts and iterations into the database.
 
+
+**Next time:** “We will design your avatar. You can also make a picture for one of your hobbies.”

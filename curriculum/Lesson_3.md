@@ -1,102 +1,51 @@
-**Lesson Spec Sheet: Lesson 3**
+# L3 · Pictures: my avatar and my hobbies
 
-**1. Lesson Objective**
-* **Content**: Students will generate and iteratively refine images for their websites using text-to-image AI tools, and practically identify factual errors and visual anomalies in AI outputs.
-* **Language**: Students will acquire and apply specific vocabulary related to visual styles and lighting, and practice expressing reasons for rejecting or modifying AI outputs.
-* **AI-literacy**: Students will understand the concept of AI "hallucinations" (confident fabrication of false facts) and visual deepfake flaws (struggles with small details), reinforcing the "Operator" mindset of critically verifying all AI content.
+**Итог для ребёнка.** “I can describe a picture, check a detail and explain my choice.” Обязательный результат — один собственный стилизованный аватар с тремя оценёнными версиями. Дети, закончившие раньше, могут сделать иллюстрации к любому из трёх текстов L2. Для работы достаточно экрана, двух PNG велосипеда, листка и ручки на пару.
 
-**2. Target Vocabulary**
-*(Note: kept to 10 words for low cognitive load, since students are navigating a new interface — image generation — while practicing critical hallucination detection simultaneously.)*
-1. Prompt
-2. Avatar
-3. Background
-4. Generate
-5. Concept art
-6. Close-up
-7. Volumetric lighting
-8. Hallucination
-9. Fact
-10. Detail
+| Минуты | Что делает преподаватель | Что получается у ученика |
+|---|---|---|
+| 0–5 | Вернитесь к вопросу курса «How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?» Спросите «Who decides which picture goes on your site?» В версии с баллами покажите одно короткое сообщение о выполнении шага. | “I do. I am the Operator.” |
+| 5–20 | 5 минут на слова, 5 на показ четырёх частей запроса, 5 на Describe & Guess. | Одна устная инструкция с конкретным объектом и ракурсом. |
+| 20–33 | 7 минут на выдуманный отчёт о клубе, 6 на сравнение запроса с картинкой. | Одна проверенная деталь и одна правка. |
+| 33–38 | Покажите две картинки велосипеда. Задайте два разных задания с разными удачными ответами. | Ребёнок называет часть формулы и объясняет выбор. |
+| 38–60 | Аватар. Три версии, отзыв на каждую, выбор лучшей и менее подходящей, причины. | Принятый аватар и история решений. |
+| 60–82 | Предложите открыть одно хобби из L2. Кто ещё делает аватар, продолжает ядро. Готовую первую иллюстрацию разрешено сразу принять. | 0–3 добровольных иллюстрации. Обычный ориентир для желающих — одна или две. |
+| 82–90 | 3 минуты на проверку журнала, 4 на разговор в паре, 1 на выход. | “I chose version __ because __.” |
 
-**3. Grammar Focus**
-Not specified for this lesson (не задан для этого занятия).
+**Слова для показа.** *prompt* — the instructions I give AI; *avatar* — a character that represents me; *generate* — make something from instructions; *concept art* — a drawing that explores an idea; *close-up* — a view from very near; *volumetric lighting* — light you can see in the air, like sunbeams in mist; *hallucination* — something AI presents as true even though it made it up; *fact* — something we can check is true; *detail* — one small part. Попросите показать пальцами рамку close-up, найти detail на изображении, назвать источник для fact.
 
-**4. Timing (90 minutes total)**
-* **00:00 – 00:05 (5 min)**: Introduction and reading the Driving Question aloud.
-* **00:05 – 00:20 (15 min)**: Visual styles and teacher modeling.
-* **00:20 – 00:35 (15 min)**: Prepared Hallucination Hunt.
-* **00:35 – 01:15 (40 min)**: Individual avatar/background generation, rating and best/worst; discuss prepared visual flaw while waiting.
-* **01:15 – 01:30 (15 min)**: Prompt Journal completion and Wrap-up.
+### Карточки и ключи L3
 
-**5. Scenario**
+**Describe & Guess.** Ученик A видит одну картинку велосипеда: [широкий план](materials/l3-l4/cards/bicycle-wide.png) или [крупный план](materials/l3-l4/cards/bicycle-close.png). B закрывает глаза при выборе. A описывает сначала ракурс, затем одну деталь, без названия предмета. B угадывает и объясняет догадку; затем меняются. “I can see two round shapes. There is a basket above one of them.” — “Is it a bicycle? The round shapes are wheels.” Второй раунд: “I can see yellow petals very near me. What is the camera looking at?” Опора A2: “I can see __. It has __.” Усложнение B1: “If I moved the camera back, you would see __.”
 
-**Intro & Driving Question (5 min) – Scripted:**
-**Teacher**: "Welcome back! Today we focus on visuals and keeping a critical eye on the AI. Let's remember our main goal for the whole course. Listen carefully: **How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?**"
+**Hallucination Hunt · покажите обе записи.**
 
-**Visual Styles & Image Generation (25 min) – Scripted:**
-**Teacher**: "We need pictures for your website. But for safety, we will not use real photos of your faces. Instead, we will generate an **avatar** or a cool **background** picture. To do this, you need a **prompt**. A prompt is a set of clear instructions you write to tell the AI exactly what to make or write for you."
+> Club diary, Friday: Six children visited the art club. They drew bicycles. There was no competition.
+>
+> AI report: Ten children came to the art club on Friday. They drew bicycles. Mia won first prize.
 
-*(Teacher note, can mention briefly: today's background is a picture — like a photo behind your avatar. In Lesson 4, we'll also choose an overall theme with colors and fonts for the whole site. Two different things!)*
+“Underline one detail that matches. Circle two claims we should check. Which words in the diary helped you?” Ключ: день и рисунки совпадают; число 10 противоречит 6; победа противоречит отсутствию конкурса. Само присутствие Mia по дневнику установить нельзя. “The diary says six children came.” / “There was no competition, so nobody won first prize.” Вопрос B1: “What could the AI say if the diary does not give a name?” — “The diary does not say.”
 
-**Teacher**: "If you just say 'a boy', the image will be boring. We must use style words to **generate** something unique. You can ask for **concept art** if you want it to look like a video game. If you want the camera very near, ask for a **close-up**. For beautiful, realistic shadows, add the words **volumetric lighting**."
+**Проверяем картинку.** Прочитайте учебный запрос, затем откройте широкий план велосипеда: “Draw a green bicycle with an **empty red basket**. Show both wheels.” Дайте 10 секунд молча рассмотреть результат. “What did it get right? Point to one detail that breaks the instruction. What would you change?” Ключ: есть зелёный велосипед и два колеса; в красной корзине жёлтые цветы. “The basket has flowers. I asked for an empty basket.” Правка Subject: “a green bicycle with an empty red basket; you can see the bottom of the basket”. Это специально подготовленная пара «условие — результат» для проверки инструкций. Выдуманный факт из предыдущего упражнения можно проверить по источнику; картинку здесь проверяем по запросу.
 
-*Example 1*: "Generate a **close-up** of a 12-year-old boy playing chess, **concept art** style, **volumetric lighting**."
-*Example 2*: "Generate a **background** with a futuristic city, **volumetric lighting**, no people."
-*Example 3*: "Generate a **close-up** of a girl reading a book in a forest, **concept art**."
+**Проверка понимания по двум картинкам.** Покажите широкий и крупный планы рядом. Заказ A: “I want to see the whole bicycle.” Заказ B: “I want to see the flowers clearly.” Пары выбирают по одной картинке для каждого заказа. “Which part of the prompt changes?” Ключ: Framing; для A — wide view, для B — close-up. Допустим ответ “Both are good for different jobs” с указанием детали. Подсказка: “In picture __, I can see __ more clearly.”
 
-**The "Hallucination Hunt" (25 min) – Scripted intro, then Open Discussion:**
-**Teacher**: "Let's test if the AI always tells the truth. Here's what happened when I asked the chatbot **before class** to describe our school basketball team's 2025 championship." *(Teacher projects the text below.)*
+**Живой показ аватара.** Учитель берёт вымышленный псевдоним и персонажа. Без фотографии, полного имени или личных данных. Запрос для экрана:
 
-> "Our school's basketball team had an incredible 2025 season! Led by team captain John Miller, the Eagles finished the regular season with a 14-2 record. In the championship final, they defeated Lincoln Middle School 58-52, with John Miller scoring a career-high 24 points, including the game-winning three-pointer with just 8 seconds left on the clock. Coach Davies called it 'the greatest moment in school history.' The team celebrated with a parade through the school courtyard the following Monday."
+> Subject: a fox avatar holding a sketchbook. Style: playful concept art. Framing: full body. Lighting: soft morning light.
 
-**Teacher**: "Look! The AI wrote this with 100% confidence, but it is a complete lie! This is a **hallucination**! The AI can invent a false **fact**."
+V2 замените только Framing на “close-up of the face and sketchbook”. До запуска спросите “What might disappear?” V3 оставьте удачный ракурс и измените Lighting на “warm light from the left”. После генерации смотрите на реальный результат. Возможные отзывы при соответствующей картинке: “The eyes look friendly.” / “The sketchbook is too small.” Выбор: “This is my best version because the sketchbook is easy to see.” / “This version fits my page less well because the face is too small.” Если нет дефекта, ребёнок может оценить композицию, цвет или сходство с задумкой.
 
-**Teacher**: "When something surprises us, good fact-checkers do three things: they **Stop**, they **Investigate** where the information came from, and they **Trace** the claim back to see if it's real. Let's do that right now with this text."
+**Хобби и выход.** Пример к тексту о музыке: “Subject: a blue guitar on a wooden chair. Style: concept art. Framing: close-up of the strings. Lighting: warm light from a window.” Предложите две равноправные фразы: “I kept the first picture because I can see the strings clearly.” / “I changed the framing because the strings were too small.” Одинаково конкретное объяснение заслуживает одинаковой ручной награды. На выходе партнёр задаёт “Which detail helped you choose?” Учитель слушает, может ли ребёнок назвать деталь своими словами.
 
-*Question Bank*: "Can you find three invented facts in this text?", "Why did the AI invent this story instead of saying 'I don't know'?", "How can we change the prompt to stop this hallucination?"
-*Expected Child Answers*: "Our team didn't win in 2025, that did not happen in our example!", "There is no player named John in our school!", "Maybe the AI just wants to make us happy and give us an answer."
+**Если времени мало.** Обсудите корзину во время ожидания первой генерации. При дальнейшем отставании уберите блок хобби и сохраните обязательные отзывы и выбор. Если сеть недоступна, используйте два готовых PNG для устной репетиции. Отметьте, кому ещё нужен цифровой этап. Поздний бонус можно доделать до публикации в подходящую паузу.
 
-*Teacher note (not read aloud): if your school has a real team or a real 2025 result, swap the name/score/year above so nothing accidentally matches something true — the fabrication needs to be unmistakable to your specific class.*
 
-**Deepfakes and Visual Flaws (20 min) – Open Discussion:**
-**Teacher**: "AI also makes hallucinations in pictures. Look at this generated character on the board." *(Teacher projects a pre-generated image with a visible flaw — see Materials below for how to prepare this.)*
+## Платформа и критерии завершения
 
-*Question Bank*: "Look closely at the **detail** in this picture. What is wrong with the hands?", "Why do you think the AI struggles with small details like this?"
-*Expected Child Answers*: "He has six fingers on one hand!", "The hand looks like it is melting.", "The AI doesn't know what a real hand is."
+| Поле | Урок и режим | Завершение и сайт |
+|---|---|---|
+| avatar | L3 strict, 3–6 версий; формула Subject/Style/Framing/Lighting; при новой версии изменяется ≥1 часть; на каждую принятую версию pros и cons по ≥3 слова; разные best/worst с причинами | Обязательно; лучший вариант 256×256 transparent PNG, существующие alt и частицы. Worst может быть менее подходящим без явной ошибки. |
+| hobby-image-1…3 | L3 rapid, каждая из трёх независима, 1–6 попыток при участии; можно принять первую или любую допустимую из истории; следующая требует изменённую часть формулы и причину ≥3 слова | Добровольно; 640×480 JPG, alt из соответствующего hobby-title-N, привязка к тому же хобби L2. |
 
-**Teacher**: "Look at the fingers of the generated character — AI struggles with small details. You must act as the Operator and check every **detail** before using it."
-
-**Individual work starts at 00:35; Prompt Journal & Wrap-up (15 min) – Scripted:**
-**Teacher**: "Now, open your platform and start generating your avatar and backgrounds. Write your prompt using our formula: **Subject**, **Style**, **Framing**, **Lighting**. After each image, write two short notes in English: what you like and what you don't like. Try at least 3 iterations — each time, change at least one part of the formula, so you can compare results. Prefer changing one variable to understand its effect; more changes are allowed."
-
-**Teacher**: "Before we finish — make sure you've picked your **best** image and your **worst** image, each with a short English reason. The best goes on your website; the worst stays in your journal as a record of what you learned to catch. Next time, we put everything together: your text and your pictures, into your actual website!"
-
-**6. Prompt Journal**
-* **Format**: Digital table integrated into the platform.
-* **Prompt structure**: Every prompt must follow the four-part formula — `Subject: ...  Style: ...  Framing: ...  Lighting: ...`. This is what the platform parses and compares across iterations.
-* **Per-iteration log (mandatory on every iteration)**: the prompt itself plus two short English notes from the student:
-  * **pros** — what the student likes about this image (≥3 words);
-  * **cons** — what the student does not like or wants to improve (≥3 words). Hallucinations, visual flaws, off-goal framing belong here.
-* **Iteration rule**: each new iteration must differ from the previous one in at least one of the four formula fields (`Subject` / `Style` / `Framing` / `Lighting`). Changing all four is allowed; changing none is not — the student must keep at least one variable changed; changing only one at a time is recommended to see how the AI reacts to it.
-* **Minimum**: 3 rated iterations per image field (avatar, background). The student may keep generating (up to a cap) until they are ready to choose.
-* **Final pick**: after the iterations, the student selects one **best** image (→ goes on the website) and one **worst** image (stays in the journal), each with an English reason. The third (and any extra) iterations remain in the journal as a record without a best/worst mark.
-
-**7. Gating Rules (Platform Logic Table)**
-
-| Rule / Condition | Action if Failed (System Prompt/Hint) |
-|---|---|
-| **Prompt Structure Check** — every prompt must contain all four labels `Subject:`, `Style:`, `Framing:`, `Lighting:` | "Use the formula: Subject:, Style:, Framing:, Lighting:." |
-| **Structure Change Check** — the current prompt must differ from the previous one in at least one of the four fields | "Change at least one of Subject / Style / Framing / Lighting from your last prompt." |
-| **Target Vocabulary Check** — at least 1 of today's visual words appears in the prompt | "Try using one of today's visual words: concept art, close-up, or volumetric lighting." |
-| **Pros Check** — `pros` field has ≥3 words on every iteration | "Tell what you like about this image (at least 3 words)." |
-| **Cons Check** — `cons` field has ≥3 words on every iteration | "Tell what you don't like or what could be improved (at least 3 words)." |
-| **Minimum Image Iterations** — ≥3 rated iterations (i.e. 3 iterations with pros+cons that passed the structure + change checks) | "You need at least 3 iterations for your image. Try changing the lighting or style." |
-| **Best Pick Check** — exactly one iteration marked `best` with a non-empty reason | "Pick your best image and say why it is your best." |
-| **Worst Pick Check** — exactly one iteration marked `worst` with a non-empty reason, and `worst ≠ best` | "Pick your worst image and say why it is your worst." |
-
-**8. Materials / Assets**
-* Access to the student digital workspace (platform wrapper over LLM and Text-to-Image API).
-* Teacher console to monitor prompts and image generations.
-* The Hallucination Hunt text is already written into the script above — nothing further to prepare for that part.
-* **Deepfake image — prepare this yourself before class**: generate 2-3 images through your own image API in advance (hands on a close-up shot are one of the most reliable ways to catch a visible flaw — try prompts like *"two people shaking hands, photorealistic, close-up"* or *"a person holding a pen, detailed hands"*). Save the most obviously flawed result as your projector image.
-* **Photo Protocol**: Strict prohibition on uploading real photos of students' faces into the image generator. All visual representations of students must be stylized avatars generated entirely via text descriptions (prompts) using their digital mask.
+Учитель открывает L4 после принятия аватара. Для каждой новой версии аватара и дополнительной картинки проверяется четырёхчастная формула и ≥1 слово банка.

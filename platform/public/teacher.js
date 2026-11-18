@@ -319,7 +319,7 @@ function renderRow(stu) {
   var c2 = el('td'); c2.setAttribute('data-th', 'Progress');
   var p = el('div');
   p.appendChild(el('span', 'iteration-note',
-    stu.progress.done + '/' + stu.progress.total + ' done \u00B7 setup ' + stu.setup.done + '/' + stu.setup.total));
+    stu.progress.done + '/' + stu.progress.total + ' core · ' + stu.progress.bonusDone + '/' + stu.progress.bonusTotal + ' bonus \u00B7 setup ' + stu.setup.done + '/' + stu.setup.total));
   var bar = el('div', 'mini-bar');
   var fill = el('span');
   fill.style.width = (stu.progress.total ? (100 * stu.progress.done / stu.progress.total) : 0) + '%';

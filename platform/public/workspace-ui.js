@@ -244,12 +244,12 @@ function lessonGoals(cfg) {
     2: [['Write your first prompt', 'Role + Context + Task + Format. Start with ' + rules.promptMinWordsFirst + '+ words.'],
       ['Review & improve', 'Check the AI draft. Add ' + rules.promptGrowthWords + '+ words to your next prompt.'],
       ['Polish & publish', 'Edit the final text by hand. Make it sound like you.']],
-    3: [['Create your visuals', 'Write Subject, Style, Framing and Lighting for your avatar and background.'],
-      ['Compare your images', 'Try ' + rules.minImageIterations + '–' + rules.maxImageIterations + ' versions. Review what is good and what needs to change.'],
+    3: [['Create your visuals', 'Write Subject, Style, Framing and Lighting for your avatar and optional hobby pictures.'],
+      ['Compare your images', 'Try ' + rules.minImageIterations + '–' + rules.maxImageIterations + '  avatar versions. Review what is good and what needs to change.'],
       ['Choose & explain', 'Pick different best and worst images. Explain both choices.']],
-    4: [['Create hobby images', 'Keep your first image or improve it, up to ' + rules.maxImageIterations + ' versions.'],
-      ['Compare two themes', 'Use Role, Context, Task and Format. Try two moods and compare the palettes and fonts.'],
-      ['Choose your design', 'Pick a theme and explain why it fits, using comparative and design words.']],
+    4: [['Compare two themes', 'Use Role, Context, Task and Format. Try two moods and compare the palettes and fonts.'],
+      ['Choose your design', 'Pick a theme and explain why it fits, using comparative and design words.'],
+      ['Bonus background', 'Match your palette. Keep your first image or explain a change.']],
     5: [['Audit your site', 'Check for real personal data and AI-invented facts. Confirm both checks.'],
       ['Reflect on your work', 'Answer six questions with at least ' + rules.reflectionMinWords + ' words each.'],
       ['Share your result', 'Use a lesson word in your reflection. Your teacher publishes the finished site.']]
@@ -267,8 +267,8 @@ function lessonGoals(cfg) {
 function styleRequirements(list, cfg) {
   var titles = {
     2: ['Your three steps', 'The prompt formula', 'Words in your prompt', 'Your experience', 'Your hobbies', 'Your critical review'],
-    3: ['The image formula', 'Visual vocabulary', 'Try different versions', 'Review every image', 'Best & worst', 'Be the Operator'],
-    4: ['Your hobby images', 'Explain each improvement', 'Design a theme', 'Compare your choices', 'Use design words'],
+    3: ['The image formula', 'Visual vocabulary', 'Try different versions', 'Review every image', 'Best & worst', 'Bonus hobby pictures', 'Be the Operator'],
+    4: ['Bonus background', 'Explain each improvement', 'Design a theme', 'Compare your choices', 'Use design words'],
     5: ['Your final audit', 'Your reflections', 'Use lesson vocabulary', 'Share your finished site']
   };
   list.classList.add('requirement-grid');

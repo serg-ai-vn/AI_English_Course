@@ -73,7 +73,7 @@
       "guidance": "Student alias (pseudonym), shown in the footer credit. No real full names."
     },
     {
-      "name": "background", "type": "image", "lesson": 3, "required": true,
+      "name": "background", "type": "image", "lesson": 4, "required": false,
       "spec": { "width": 1600, "height": 900, "format": "jpg", "quality": 82 },
       "alt": "",
       "guidance": "Thematic photo matching the student's story. NO people, NO text, NO watermarks. Atmospheric, not distracting (theme scrim sits on top)."
@@ -86,17 +86,17 @@
       "guidance": "AI-generated only, personal photos are forbidden. Transparent background: pixels with alpha < 128 produce no particles, so the particle shape follows the silhouette."
     },
     {
-      "name": "hobby-image-1", "type": "image", "lesson": 3, "required": true,
+      "name": "hobby-image-1", "type": "image", "lesson": 3, "required": false,
       "spec": { "width": 640, "height": 480, "format": "jpg" },
       "alt": "{hobby-title-1}", "group": "hobby-1"
     },
     {
-      "name": "hobby-image-2", "type": "image", "lesson": 3, "required": true,
+      "name": "hobby-image-2", "type": "image", "lesson": 3, "required": false,
       "spec": { "width": 640, "height": 480, "format": "jpg" },
       "alt": "{hobby-title-2}", "group": "hobby-2"
     },
     {
-      "name": "hobby-image-3", "type": "image", "lesson": 3, "required": true,
+      "name": "hobby-image-3", "type": "image", "lesson": 3, "required": false,
       "spec": { "width": 640, "height": 480, "format": "jpg" },
       "alt": "{hobby-title-3}", "group": "hobby-3"
     }

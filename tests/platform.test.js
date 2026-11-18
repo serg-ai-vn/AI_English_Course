@@ -223,7 +223,7 @@ test('complete L2-L5 flow, permissions, corrections, export and restart', async 
       field,
       prompt: `Subject: a fictional ${field}. Style: concept art. Framing: close-up. Lighting: soft light number ${n}.`,
     });
-    for (const field of ['avatar', 'background']) {
+    for (const field of ['avatar']) {
       for (let n = 1; n <= 3; n++) {
         await ok('/api/image-prompt', image(field, n), student);
         assert.equal((await call('/api/image-prompt', image(field, n + 1), student)).status, 409);
@@ -340,6 +340,11 @@ test('complete L2-L5 flow, permissions, corrections, export and restart', async 
     assert.equal(p.fields['about-me'].corrections.length, 1);
     assert(!p.published && !p.built && !p.fields.audit);
     assert.equal((await call(published.url)).status, 404);
+    assert.equal((await call('/api/image-prompt', image('background', 1), student)).status, 403);
+    await ok('/api/teacher/allow-correction', {studentId:'ziggy',field:'background',reason:'Add a lake'}, teacher);
+    await ok('/api/image-prompt', image('background',1),student);
+    await ok('/api/image-publish', {field:'background',version:1,reason:'Matches my palette'},student);
+    assert.equal((await call('/api/me', undefined, student)).data.progress.fields.background.corrections.length,1);
     await stop();
     await start();
     const me = await call('/api/me', undefined, student);

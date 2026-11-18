@@ -87,3 +87,5 @@ Teacher first checks saved reflections and authorizes any field correction. Publ
 * Analytical rubric for the Public Defense (Prompt Engineering, Language Application, Final Website, Public Defense — see course guide).
 * The reflection questions are already written into the script above — nothing further to prepare.
 * **Photo Protocol**: During the course, no real photos of children's faces were uploaded — only AI-generated stylized avatars. Publishing at the end of this lesson is literally the export/handover step. The full export (files or a link to a personal hosting site) is transferred to the family. The family chooses further use; transfer does not automatically end the platform’s retention and access obligations. The school's AI-facing system retains only pseudonyms and the digital mask.
+
+**Defense example with core work:** “My avatar shows my sketchbook. The blue palette is softer than the red one. I chose it because my site is about quiet drawing time.” A student can demonstrate a before/after using avatar versions or the two theme options.

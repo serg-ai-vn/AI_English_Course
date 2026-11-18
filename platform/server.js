@@ -66,6 +66,14 @@ function getProgress(studentId) {
   });
   if ((p.schemaVersion && p.schemaVersion !== 1) || (p.courseVersion && p.courseVersion !== 'pilot-1')) throw new Error('Unsupported progress schema');
   p.schemaVersion = 1; p.courseVersion = p.courseVersion || 'pilot-1';
+  if (p.published) p.everPublished = true;
+  const bg = p.fields.background;
+  if (bg && Array.isArray(bg.iterations)) {
+    bg.iterations.forEach((it, i) => { it.version ||= i + 1; });
+    if (bg.status === 'done') bg.publishedVersion ||= bg.iterations.find(it => it.image?.path === bg.value)?.version;
+    else bg.nextStep = bg.iterations.length ? 'I' + bg.iterations.length + '-review' : 'I1-prompt';
+  }
+  p.complete = isComplete(p, lessonCfg(p.lesson || DEFAULT_LESSON));
   return p;
 }
 function saveProgress(p) { p.schemaVersion=1; p.courseVersion=p.courseVersion || 'pilot-1'; p.revision=(p.revision||0)+1; writeJson(progressFile(p.studentId), p); }
@@ -514,6 +522,8 @@ function handleReset(req, res, a) {
 function handleResetAll(req, res, a) {
   const progress = getProgress(a.session.studentId);
   progress.fields = {};
+  delete progress.everPublished;
+  delete progress.editGrants;
   progress.lesson = DEFAULT_LESSON;
   progress.unlockedLessons = [DEFAULT_LESSON];
   progress.complete = false;
@@ -892,6 +902,14 @@ function handleImagePublish(req, res, a, body) {
 
   const last = body.version ? f.iterations.find(it=>it.version===Number(body.version)) : f.iterations[f.iterations.length-1];
   if(!last) return sendJson(res,400,{ok:false,error:'Unknown image version'});
+  if (progress.everPublished) {
+    const grant = progress.editGrants?.[def.id];
+    const reason = String(body.reason || '').trim();
+    if (!grant || !reason) return sendJson(res, 400, {error:'A teacher grant and a reason are required.'});
+    (f.corrections ||= []).push({before:f.value, after:last.image.path, reason, ts:Date.now(), teacherGrant:grant});
+    delete progress.editGrants[def.id];
+  }
+  if (progress.built || progress.everPublished || progress.fields.audit) invalidate(progress, def.id);
   f.publishedVersion = last.version;
   f.value = last.image.path;
   f.status = 'done';
@@ -1154,7 +1172,10 @@ async function runExport(req,res,student,mark) {
  if(state && state.status==='done') slots[f.id]=String(state.value||'').replace(/^<p>/i,'').replace(/<\/p>$/i,''); }
  slots['author-name']=student.name;
  for(const n of [3,4]) for(const f of lessons[n].fields) if(f.input.startsWith('ai-image-')) {
- const state=p.fields[f.id]; if(!state || !state.value) throw new Error('Missing image: '+f.id);
+ const state=p.fields[f.id]; if(!state || state.status !== 'done' || !state.value) {
+   if(f.required) throw new Error('Missing image: '+f.id);
+   continue;
+ }
  images[f.id]={src:state.value,alt:(f.alt || '').replace('{author-name}',student.name).replace(/\{(hobby-title-\d)\}/g,(_,key)=>slots[key]||'')}; }
  const cfg={name:student.id,pageTitle:slots['site-title'],theme:p.theme||'sunny-day',slots,images,particles:{}};
  const avatar=builder.resolveAsset(TRACK_ROOT,DATA,images.avatar.src);
@@ -1166,7 +1187,7 @@ async function runExport(req,res,student,mark) {
  const file=path.join(DATA,'sites',student.id+'.html');
  await builder.exportSite({rootDir:TRACK_ROOT,dataDir:DATA,config:cfg,outPath:file});
  p.built={ts:Date.now(),file:'dist/'+student.id+'.html',size:fs.statSync(file).size};
- if(mark==='published') { const token=crypto.randomBytes(24).toString('hex'); const pub=path.join(DATA,'published',token+'.html'); fs.mkdirSync(path.dirname(pub),{recursive:true});fs.copyFileSync(file,pub);p.published={ts:Date.now(),file:token+'.html',url:'/published/'+token+'.html',size:p.built.size}; }
+ if(mark==='published') { p.everPublished=true; const token=crypto.randomBytes(24).toString('hex'); const pub=path.join(DATA,'published',token+'.html'); fs.mkdirSync(path.dirname(pub),{recursive:true});fs.copyFileSync(file,pub);p.published={ts:Date.now(),file:token+'.html',url:'/published/'+token+'.html',size:p.built.size}; }
  saveProgress(p);sendJson(res,200,{ok:true,file:p.built.file,size:p.built.size,url:mark==='published'?p.published.url:'/preview/dist/'+student.id+'.html',published:!!p.published});
 }
 
@@ -1357,7 +1378,7 @@ function buildStudentView(student, selLesson) {
     currentLesson: cur,
     unlockedLessons: unlocked,
     state: state, needsAttention: needsAttention, complete: complete,
-    progress: { done: doneCount, total: required.length },
+    progress: { done: doneCount, total: required.length, bonusDone: fields.filter(f => !f.required && p.fields[f.id]?.status==='done').length, bonusTotal: fields.length-required.length },
     setup: { done: setupDone, total: setupFields.length },
     lessonsStatus: lessonsStatus,
     readyToBuild: readyToBuild,
@@ -1371,7 +1392,7 @@ function buildStudentView(student, selLesson) {
     })),
     lastActivity: lastField ? { label: lastField, prompt: lastPrompt, ts: lastTs } : null,
     corrections: Object.entries(p.fields).flatMap(([id,f])=>(f.corrections||[]).map(c=>({field:id,...c}))),
-    completedFields: Object.values(lessons).flatMap(c=>c.fields.filter(f=>f.input!=='checklist'&&p.fields[f.id]?.status==='done').map(f=>({id:f.id,label:f.label,input:f.input,lesson:c.lesson,grant:p.editGrants?.[f.id]||null}))),
+    completedFields: Object.values(lessons).flatMap(c=>c.fields.filter(f=>f.input!=='checklist'&&(p.fields[f.id]?.status==='done'||(p.everPublished&&f.input==='ai-image-rapid'))).map(f=>({id:f.id,label:f.label,input:f.input,lesson:c.lesson,grant:p.editGrants?.[f.id]||null}))),
     l1Ready: p.l1Ready || null,
     journal: journal
   };
@@ -1591,7 +1612,7 @@ const server = http.createServer(async (req, res) => {
               return sendJson(res, 400, { ok: false, error: 'Student, field and reason required' });
             const p = getProgress(body.studentId);
             if(fieldDef(body.field).input==='checklist')return sendJson(res,400,{ok:false,error:'Checklist is rechecked after a content correction.'});
-            if(p.fields[body.field]?.status!=='done')return sendJson(res,400,{ok:false,error:'Choose a completed field.'});
+            if(p.fields[body.field]?.status!=='done' && !(p.everPublished && fieldDef(body.field).input==='ai-image-rapid'))return sendJson(res,400,{ok:false,error:'Choose a completed field.'});
             p.editGrants = p.editGrants || {};
             p.editGrants[body.field] = { reason: String(body.reason), ts: Date.now() };
             saveProgress(p);
@@ -1624,6 +1645,8 @@ const server = http.createServer(async (req, res) => {
             error: 'This lesson is locked by your teacher.',
             errors: [{ rule: 'lesson-locked', hint: 'This lesson is locked by your teacher.' }],
           });
+        if (def?.input === 'ai-image-rapid' && p.everPublished && !p.editGrants?.[def.id] && u !== '/api/correct-field')
+          return sendJson(res, 403, {error:'Ask your teacher to open this bonus after publication.'});
         if (def && p.fields[def.id]?.status === 'done' && u !== '/api/correct-field')
           return sendJson(res, 409, {
             ok: false,
@@ -1665,7 +1688,7 @@ const server = http.createServer(async (req, res) => {
         }
         const before = JSON.stringify(p.fields);
         await fn(req, res, a, body);
-        if (req.method === 'POST' && def) {
+        if (req.method === 'POST' && def && def.input !== 'ai-image-rapid') {
           const after = getProgress(a.session.studentId);
           if (JSON.stringify(after.fields) !== before && (after.built || after.published)) {
             invalidate(after, def.id);
