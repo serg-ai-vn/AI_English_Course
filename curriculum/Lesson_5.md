@@ -89,3 +89,5 @@ Teacher first checks saved reflections and authorizes any field correction. Publ
 * **Photo Protocol**: During the course, no real photos of children's faces were uploaded — only AI-generated stylized avatars. Publishing at the end of this lesson is literally the export/handover step. The full export (files or a link to a personal hosting site) is transferred to the family. The family chooses further use; transfer does not automatically end the platform’s retention and access obligations. The school's AI-facing system retains only pseudonyms and the digital mask.
 
 **Defense example with core work:** “My avatar shows my sketchbook. The blue palette is softer than the red one. I chose it because my site is about quiet drawing time.” A student can demonstrate a before/after using avatar versions or the two theme options.
+
+**Teacher, with points enabled:** “Show me one change and tell me why you made it. Look how far the class has come together.”

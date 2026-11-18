@@ -90,6 +90,8 @@ test('corrupt storage is preserved and backup restores bytes', () => {
     restore = path.join(dir, 'restore');
   fs.mkdirSync(data);
   storage.writeJson(path.join(data, 'classes.json'), { classes: [] });
+  const history = {points:{events:[{id:'teacher:sample-1',source:'teacher',lesson:1,pts:5}]}};
+  storage.writeJson(path.join(data,'progress','demo.json'),history);
   storage.writeJson(path.join(data, 'example.json'), { x: 1 });
   let p = cp.spawnSync(process.execPath, ['tools/backup.js', 'backup', backup], {
     cwd: root,
@@ -104,6 +106,7 @@ test('corrupt storage is preserved and backup restores bytes', () => {
   });
   assert.equal(p.status, 0, p.stderr);
   assert.deepEqual(storage.readJson(path.join(restore, 'example.json')), { x: 1 });
+  assert.deepEqual(storage.readJson(path.join(restore,'progress','demo.json')),history);
   fs.writeFileSync(path.join(data, 'bad.json'), '{');
   assert.throws(() => storage.readJson(path.join(data, 'bad.json'), {}));
   assert.equal(fs.readFileSync(path.join(data, 'bad.json'), 'utf8'), '{');
@@ -311,6 +314,17 @@ test('complete L2-L5 flow, permissions, corrections, export and restart', async 
       );
     const published = await ok('/api/teacher/export-site', { studentId: 'ziggy' }, teacher);
     assert.equal((await call(published.url)).status, 200);
+    const award={all:true,lesson:1,kind:'activity',requestId:'class-award-001'};
+    assert.equal((await call('/api/teacher/points', award,student)).status,403);
+    const batch=await ok('/api/teacher/points',award,teacher);
+    assert(batch.results.every(r=>r.status==='Awarded'));
+    const repeated=await ok('/api/teacher/points',award,teacher);
+    assert(repeated.results.every(r=>r.status==='Already recorded'));
+    const personal=(await call('/api/me',undefined,student)).data;
+    assert.equal(personal.rewards.goal,840);
+    assert.deepEqual(Object.keys(personal.rewards).sort(),['classTotal','goal','total']);
+    assert.equal(personal.rewards.total,177+2+30+3);
+    assert.equal((await call(published.url)).status,200);
     assert.match(
       (await call(published.url + '?download=1')).headers['content-disposition'],
       /attachment/,

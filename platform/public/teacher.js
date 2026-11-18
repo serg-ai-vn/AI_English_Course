@@ -58,7 +58,7 @@ async function refreshOverview() {
   try {
     var q = state.lesson ? '?lesson=' + state.lesson : '';
     state.overview = await api('/api/teacher/overview' + q, 'GET');
-    if(!activeCorrection || !document.body.contains(activeCorrection))render();
+    if ((!activeCorrection || !document.body.contains(activeCorrection)) && !document.querySelector('.award-controls[open]')) render();
   } catch (e) { /* redirected to login by api() */ }
 }
 
@@ -179,6 +179,67 @@ function lessonPill(n, ls, stu) {
     refreshOverview();
   });
   return pill;
+}
+
+function awardControls(stu) {
+  const settings = state.overview.awardSettings;
+  const box = el('details','award-controls');
+  const summary = el('summary',null,'Points & awards');
+  box.appendChild(summary);
+  box.addEventListener('click',e=>e.stopPropagation());
+  function input(label,tag) {
+    const wrap=el('label',null,label+' ');
+    const control=document.createElement(tag);
+    control.setAttribute('aria-label',label);
+    wrap.appendChild(control); box.appendChild(wrap); return control;
+  }
+  const lesson=input('Award lesson','select');
+  for (let n=1;n<=5;n++) lesson.add(new Option('Lesson '+n,String(n)));
+  lesson.value=String(state.overview.lesson);
+  const recipient=input('Give to','select');
+  recipient.add(new Option(stu.name,'one')); recipient.add(new Option('Whole class','all'));
+  const kind=input('Award','select');
+  for (const [key,preset] of Object.entries(settings.presets)) kind.add(new Option(preset.label+' +'+preset.pts,key));
+  kind.add(new Option('Custom award','custom'));
+  const amount=input('Custom points','input'); amount.type='number'; amount.min=1; amount.max=settings.customMax; amount.value='1';
+  amount.parentNode.hidden=true;
+  kind.onchange=()=>{ amount.parentNode.hidden=kind.value!=='custom'; };
+  const reason=input('Reason (required for custom or revoke)','input');
+  const button=el('button','btn btn-primary','Give points');
+  const status=el('p','iteration-note',''); status.setAttribute('role','status');
+  const cap=el('p','iteration-note'); const history=el('ul');
+  box.append(button,status,cap,history);
+  let log=stu.awards || [], pendingId=null;
+  box.addEventListener('input',()=>{pendingId=null;});
+  async function submit(action,revokes) {
+    if (box.dataset.busy) return;
+    box.dataset.busy='yes'; button.disabled=true;
+    try {
+      pendingId ||= (globalThis.crypto.randomUUID?.() || Date.now().toString(36)+'-'+Math.random().toString(36).slice(2));
+      const result=await api('/api/teacher/points','POST',{studentId:stu.id,lesson:Number(lesson.value),
+        kind:action,revokes,amount:Number(amount.value),reason:reason.value,requestId:pendingId,all:action!=='revoke'&&recipient.value==='all'});
+      status.textContent=result.results?.map(r=>r.name+' · '+r.status).join(', ') || result.error;
+      if (!result.results) return;
+      pendingId=null;
+      await refreshOverview();
+      log=state.overview.students.find(s=>s.id===stu.id).awards; draw();
+    } finally {delete box.dataset.busy; button.disabled=false;}
+  }
+  function draw() {
+    summary.textContent=log.reduce((n,e)=>n+e.pts,0)+' points · Awards';
+    const rows=log.filter(e=>e.lesson===Number(lesson.value));
+    cap.textContent='Teacher awards: '+rows.filter(e=>e.source==='teacher').reduce((n,e)=>n+e.pts,0)+' / '+settings.cap;
+    history.replaceChildren();
+    for (const event of rows.slice().reverse()) {
+      const li=el('li',null,(event.pts>0?'+':'')+event.pts+' · '+event.label+(event.reason?' · '+event.reason:''));
+      if (event.source==='teacher' && event.pts>0 && !rows.some(e=>e.revokes===event.id)) {
+        const revoke=el('button','btn btn-ghost mini-btn','Revoke');
+        revoke.onclick=()=>submit('revoke',event.id); li.append(' ',revoke);
+      }
+      history.appendChild(li);
+    }
+  }
+  lesson.onchange=draw; button.onclick=()=>submit(kind.value); draw(); return box;
 }
 
 function addTeacherCorrection(cell, stu) {
@@ -326,6 +387,7 @@ function renderRow(stu) {
   bar.appendChild(fill);
   p.appendChild(bar);
   c2.appendChild(p);
+  if (state.overview.awardSettings) c2.appendChild(awardControls(stu));
   tr.appendChild(c2);
 
   /* 3 - AI field chips */

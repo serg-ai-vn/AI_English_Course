@@ -1,0 +1,108 @@
+{
+  "enabled": true,
+  "version": 1,
+  "classGoalPerStudent": 140,
+  "manualCap": 20,
+  "avatarVersions": 3,
+  "customMax": 5,
+  "steps": {
+    "direct": {
+      "pts": 2,
+      "label": "Saved"
+    },
+    "aboutPrompt": {
+      "pts": 4,
+      "label": "First prompt"
+    },
+    "aboutRevised": {
+      "pts": 5,
+      "label": "Prompt improved"
+    },
+    "review": {
+      "pts": 4,
+      "label": "Review saved"
+    },
+    "aboutFinal": {
+      "pts": 8,
+      "label": "Final edit"
+    },
+    "hobbyPrompt": {
+      "pts": 4,
+      "label": "Hobby draft"
+    },
+    "hobbyFinal": {
+      "pts": 6,
+      "label": "Hobby published"
+    },
+    "hobbyBonus": {
+      "pts": 3,
+      "label": "Edit explained"
+    },
+    "avatarPrompt": {
+      "pts": 2,
+      "label": "Avatar prompt"
+    },
+    "avatarReview": {
+      "pts": 3,
+      "label": "Version reviewed"
+    },
+    "best": {
+      "pts": 5,
+      "label": "Best explained"
+    },
+    "worst": {
+      "pts": 5,
+      "label": "Alternative explained"
+    },
+    "avatarFinal": {
+      "pts": 10,
+      "label": "Avatar accepted"
+    },
+    "imagePrompt": {
+      "pts": 3,
+      "label": "Image prompt"
+    },
+    "imageFinal": {
+      "pts": 7,
+      "label": "Image accepted"
+    },
+    "themeOption": {
+      "pts": 5,
+      "label": "Theme option"
+    },
+    "choice": {
+      "pts": 5,
+      "label": "Theme chosen"
+    },
+    "justify": {
+      "pts": 15,
+      "label": "Choice explained"
+    },
+    "audit": {
+      "pts": 15,
+      "label": "Audit complete"
+    },
+    "reflection": {
+      "pts": 5,
+      "label": "Reflection saved"
+    }
+  },
+  "presets": {
+    "mistake": {
+      "pts": 5,
+      "label": "Spotted an AI mistake"
+    },
+    "explanation": {
+      "pts": 5,
+      "label": "Strong explanation"
+    },
+    "helper": {
+      "pts": 5,
+      "label": "Helped a classmate"
+    },
+    "activity": {
+      "pts": 3,
+      "label": "Participated in an activity"
+    }
+  }
+}

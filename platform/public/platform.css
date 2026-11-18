@@ -1751,3 +1751,12 @@ html[data-ui-theme="classroom-light"] .hobby-group > .field-card { background: n
   .live-gates { padding: 10px; }
   .gate-chip { flex: 1 1 100px; text-align: center; }
 }
+
+#points-panel:not([hidden]) { display:flex; flex-wrap:wrap; align-items:center; gap:.35rem .8rem; font-size:.85rem; }
+#points-panel progress { width:4rem; vertical-align:middle; }
+#award-notice { font-weight:600; }
+.award-controls { max-width:26rem; white-space:normal; }
+.award-controls label { display:block; margin:.35rem 0; }
+.award-controls select,.award-controls input { max-width:100%; }
+
+.field-award { font-weight:700; margin:.4rem 0; }

@@ -32,6 +32,31 @@ function el(tag, className, text) {
 
 /* ---------- boot ---------- */
 
+var observedAwards = null;
+function renderRewards(me) {
+  var panel = document.getElementById('points-panel');
+  panel.hidden = !me.rewards;
+  if (!me.rewards) return;
+  var r=me.rewards, log=me.progress.points?.events || [];
+  document.getElementById('personal-points').textContent=r.total+' points';
+  var bar=document.getElementById('class-points'); bar.max=r.goal || 1; bar.value=Math.min(r.classTotal,r.goal);
+  document.getElementById('class-total').textContent=r.classTotal+' / '+r.goal;
+  if (observedAwards) {
+    var added=log.filter(e=>!observedAwards.has(e.id));
+    var messages=added.map(e=>(e.pts>0?'+':'')+e.pts+' · '+e.label);
+    document.getElementById('award-notice').textContent=messages.join(' · ');
+    added.forEach(function(event,index) {
+      var card=event.field && document.getElementById('card-'+event.field);
+      if (card) {
+        var note=el('p','field-award',messages[index]);
+        var heading=card.querySelector('.field-head');
+        if (heading) heading.after(note); else card.prepend(note);
+      }
+    });
+  }
+  observedAwards=new Set(log.map(e=>e.id));
+}
+
 async function boot() {
   if (!token()) { location.href = '/login.html'; return; }
   state.me = await api('/api/me', 'GET');
@@ -89,6 +114,7 @@ function render() {
   renderCompleteBanner(me, cfg);
   renderL5VocabWarning(me, cfg);
   enhanceWorkspace(cfg);
+  renderRewards(me);
 }
 
 /* Lesson 5 soft gate: after all reflections are saved, at least one of
@@ -313,6 +339,7 @@ function renderField(def) {
     head.appendChild(check);
   }
   head.appendChild(el('span', 'field-label', def.label));
+  if (!def.required && me.rewards) head.appendChild(el('small','iteration-note','Bonus'));
   if (isDone) head.appendChild(el('span', 'status done', completionLabel(def)));
   card.appendChild(head);
   if (!isDone && def.brief && !(me.lesson === 2 && /ai-text-3step|ai-cycle-bonus/.test(def.input))) card.appendChild(el('p', 'field-brief', def.brief));
