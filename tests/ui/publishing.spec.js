@@ -25,7 +25,7 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
     await login(teacher, true);
     const row = teacher.locator('tr').filter({ has: teacher.locator('.stu-name').getByText('Nia', { exact: true }) });
     const imagePrompt = (field, n) => `Subject: a fictional ${field}. Style: concept art. Framing: close-up. Lighting: soft light number ${n}.`;
-    for (const field of ['avatar', 'background']) {
+    for (const field of ['avatar']) {
       const card = page.locator('#card-' + field);
       for (const n of [1, 2, 3]) {
         await card.locator('.prompt-area').fill(imagePrompt(field, n));
@@ -47,11 +47,7 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
       await card.getByRole('button', { name: /Accept this image/ }).click();
       await expect(card.locator('.status')).toHaveText('Accepted');
     }
-    await teacher.getByRole('button', { name: 'Refresh', exact: true }).click();
-    await row.getByRole('button', { name: 'Unlock Lesson 4', exact: true }).click();
-    await page.reload();
-    await expect(page.locator('#lesson-tag')).toContainText('Lesson 4');
-    for (const i of [1, 2, 3]) {
+    for (const i of [2]) {
       const card = page.locator('#card-hobby-image-' + i);
       await card.locator('.prompt-area').fill(imagePrompt('hobby-image-' + i, 1));
       await card.getByRole('button', { name: /^Generate Image/ }).click();
@@ -64,6 +60,10 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
       await card.getByRole('button', { name: /Publish to Website/ }).click();
       await expect(card.locator('.status')).toHaveText('Published');
     }
+    await teacher.getByRole('button', { name: 'Refresh', exact: true }).click();
+    await row.getByRole('button', { name: 'Unlock Lesson 4', exact: true }).click();
+    await page.reload();
+    await expect(page.locator('#lesson-tag')).toContainText('Lesson 4');
     const themeCard = page.locator('#card-theme');
     const prompt = word => `Role: designer Context: My site shows hobbies Task: suggest theme Format: ${word}`;
     await themeCard.locator('.prompt-area').fill(prompt('natural'));
@@ -87,6 +87,10 @@ test('L3–L5 browser workflow: images, choices, unlock, build, preview, publish
     const popup = await popupPromise;
     await popup.waitForLoadState();
     await expect(popup.locator('body')).toContainText('Lumi'); // supplied synthetic L2 content
+    await expect(popup.locator('#slot-hobby-image-1')).toBeHidden();
+    await expect(popup.locator('#slot-hobby-image-2 img')).toBeVisible();
+    await expect(popup.locator('#slot-background img')).toHaveCount(0);
+    await expect(popup.locator('.slot-hint')).toHaveCount(0);
     await popup.close();
     await row.getByRole('button', { name: 'Unlock Lesson 5', exact: true }).click();
     await page.reload();

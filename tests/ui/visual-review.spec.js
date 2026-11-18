@@ -57,7 +57,7 @@ test('review fixes: lesson landmarks, single-line helpers, one completion signal
       await page.locator('#card-about-me .iteration-panel').first().locator('summary').click();
       await captureCard(page, page.locator('#card-about-me'), info.outputPath('L2-completed.png'));
     } else {
-      const image = page.locator(lesson === 3 ? '#card-avatar' : '#card-hobby-image-1');
+      const image = page.locator(lesson === 3 ? '#card-avatar' : '#card-background');
       await image.locator('.iteration-panel').first().locator('summary').click();
       await captureCard(page, image, info.outputPath('L' + lesson + '-completed.png'));
     }

@@ -27,7 +27,7 @@ test('learning support: independent glossary cards, useful language, image feedb
     const words = panels.nth(1);
     await words.locator(':scope > summary').click();
     const cards = words.locator('.word-help');
-    await expect(cards).toHaveCount(({ 2: 6, 3: 10, 4: 18 })[lesson]);
+    await expect(cards).toHaveCount(({ 2: 6, 3: 9, 4: 15 })[lesson]);
     for (const card of await cards.all()) {
       expect(await card.locator('.word-meaning p').textContent()).toBeTruthy();
       expect(await card.locator('p[lang="vi"]').textContent()).toBeTruthy();
@@ -98,11 +98,13 @@ test('learning support: independent glossary cards, useful language, image feedb
       await capture(page, first, info.outputPath('L3-image-feedback-320.png'));
       await page.setViewportSize({ width: 1280, height: 900 });
     }
-    if (lesson === 4) {
+    if (lesson === 3) {
       const imageCard = page.locator('#card-hobby-image-1');
       await imageCard.locator('.iteration-panel').nth(1).locator('summary').click();
       await expect(imageCard.locator('.image-review-card.change')).toContainText('Why I changed it');
-      await capture(page, imageCard, info.outputPath('L4-image-history.png'));
+      await capture(page, imageCard, info.outputPath('L3-image-history.png'));
+    }
+    if (lesson === 4) {
       const history = page.locator('#card-theme .theme-history');
       const options = history.locator('.iteration-panel');
       await expect(options).toHaveCount(2);

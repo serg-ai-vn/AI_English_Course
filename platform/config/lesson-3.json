@@ -1,9 +1,19 @@
 {
   "lesson": 3,
-  "title": "Visuals: prompt & hallucination",
+  "title": "Pictures: my avatar and my hobbies",
   "drivingQuestion": "How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?",
-  "source": "Lesson_3.md (sections 2, 5, 6, 7) - v2 model",
-  "targetVocabulary": ["prompt", "avatar", "background", "generate", "concept art", "close-up", "volumetric lighting", "hallucination", "fact", "detail"],
+  "source": "curriculum/Lesson_3.md",
+  "targetVocabulary": [
+    "prompt",
+    "avatar",
+    "generate",
+    "concept art",
+    "close-up",
+    "volumetric lighting",
+    "hallucination",
+    "fact",
+    "detail"
+  ],
   "rules": {
     "minImageIterations": 3,
     "maxImageIterations": 6,
@@ -13,37 +23,108 @@
     "prosMinWords": 3,
     "consMinWords": 3,
     "promptMinTargetWords": 1,
-    "imageStructureFields": ["subject", "style", "framing", "lighting"],
+    "imageStructureFields": [
+      "subject",
+      "style",
+      "framing",
+      "lighting"
+    ],
     "structuralWords": [],
-    "presentPerfectFields": []
+    "presentPerfectFields": [],
+    "changeReasonMinWords": 3
   },
   "hints": {
     "structure": "Use the formula: Subject:, Style:, Framing:, Lighting:.",
     "diff": "Change at least one of Subject / Style / Framing / Lighting from your last prompt.",
-    "vocab": "Try using one of today's visual words: concept art, close-up, volumetric lighting, avatar, background, generate, hallucination, fact, detail.",
+    "vocab": "Use a visual word from the bank for this image.",
     "prosRequired": "Tell what you like about this image (at least 3 words).",
     "consRequired": "Tell what you don't like or what could be improved (at least 3 words).",
     "bestReason": "Say why this is your best image.",
     "worstReason": "Say why this is your worst image.",
     "empty": "Write a prompt - the text instructions you give to the image AI.",
     "accept": "You can accept this field once you have at least 3 rated iterations, one best with a reason, and one worst with a reason.",
-    "build": "Image gates open. You can now generate the next field, or ask your teacher to build your site."
+    "build": "Your avatar is ready. Illustrate a hobby or ask your teacher to open Lesson 4.",
+    "reasonRequired": "Please explain in English why you want to change this image before generating a new one.",
+    "reasonShort": "Your reason needs at least 3 words. Tell the AI what is wrong with the image.",
+    "publish": "This image will go on your website. You can publish it now or keep improving it - you have up to 6 attempts total.",
+    "noMore": "No attempts left. Publish a version from your history."
   },
   "fields": [
-    { "id": "avatar", "label": "Avatar", "input": "ai-image-cycle", "required": true,
-      "spec": { "width": 256, "height": 256, "format": "png", "transparent": true },
+    {
+      "id": "avatar",
+      "label": "Avatar",
+      "input": "ai-image-cycle",
+      "required": true,
+      "spec": {
+        "width": 256,
+        "height": 256,
+        "format": "png",
+        "transparent": true
+      },
       "alt": "AI-generated avatar of {author-name}",
       "particles": true,
       "brief": "Pick a prompt that builds a stylized image of YOU - not a photo. Use the formula Subject: ... Style: ... Framing: ... Lighting: ... . Generate at least 3 versions, rate each one (pros/cons), then pick your best and your worst with reasons.",
-      "guidance": "AI-generated only - no real photos. Transparent background so particles follow the shape. Catch hallucinations (extra fingers, melted hands, wrong details) in your cons and mark that image as worst."
+      "guidance": "Check the details. Explain why one version fits your idea better than another."
     },
-    { "id": "background", "label": "Background", "input": "ai-image-cycle", "required": true,
-      "spec": { "width": 1600, "height": 900, "format": "jpg" },
-      "alt": "",
-      "brief": "A thematic picture that sits behind your avatar - your story, your mood. NO people, NO text, NO watermarks. Use the formula Subject: ... Style: ... Framing: ... Lighting: ... . Generate at least 3 versions, rate each one (pros/cons), then pick your best and your worst with reasons.",
-      "guidance": "Catch hallucinations (people, readable text, watermarks) in your cons and mark that image as worst - those are AI flaws you must catch as the Operator."
+    {
+      "id": "hobby-image-1",
+      "label": "Hobby 1 - image",
+      "input": "ai-image-rapid",
+      "required": false,
+      "group": "hobby-1",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
+      "alt": "{hobby-title-1}",
+      "brief": "Picture for your first hobby. You can publish the first image or keep improving it - up to 6 attempts."
+    },
+    {
+      "id": "hobby-image-2",
+      "label": "Hobby 2 - image",
+      "input": "ai-image-rapid",
+      "required": false,
+      "group": "hobby-2",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
+      "alt": "{hobby-title-2}",
+      "brief": "Picture for your second hobby. You can publish the first image or keep improving it - up to 6 attempts."
+    },
+    {
+      "id": "hobby-image-3",
+      "label": "Hobby 3 - image",
+      "input": "ai-image-rapid",
+      "required": false,
+      "group": "hobby-3",
+      "maxAttempts": 6,
+      "spec": {
+        "width": 640,
+        "height": 480,
+        "format": "jpg"
+      },
+      "alt": "{hobby-title-3}",
+      "brief": "Picture for your third hobby. You can publish the first image or keep improving it - up to 6 attempts."
     }
   ],
   "order": 3,
-  "requiresLesson": 2
+  "requiresLesson": 2,
+  "vocabByField": {
+    "avatar": [
+      "avatar",
+      "concept art",
+      "close-up",
+      "volumetric lighting"
+    ],
+    "hobby-image": [
+      "concept art",
+      "close-up",
+      "volumetric lighting"
+    ]
+  }
 }

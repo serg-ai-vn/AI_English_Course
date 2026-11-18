@@ -45,6 +45,12 @@
   });
 
   var images = d.images || {};
+  document.querySelectorAll('[data-slot-type="image"]').forEach(function (slot) {
+    if (images[slot.dataset.slot]) return;
+    slot.replaceChildren();
+    if (slot.dataset.slot.startsWith('hobby-image-')) slot.style.display = 'none';
+  });
+  document.querySelectorAll('.slot-hint').forEach(function (hint) { hint.remove(); });
   Object.keys(images).forEach(function (name) {
     var el = document.querySelector('[data-slot="' + name + '"]');
     if (!el) return;

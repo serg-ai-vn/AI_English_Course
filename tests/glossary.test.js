@@ -15,7 +15,7 @@ test('every lesson glossary term, including L4 design-bank words, has an explana
       const help = browser.workspaceWordHelp[word.toLowerCase()];
       assert(help && help[0].trim() && help[1].trim(), 'Missing glossary entry: ' + lesson + ' ' + word);
     }
-    if (lesson === 3) assert.equal(words.length, 10);
+    if (lesson === 3) assert.equal(words.length, 9);
     if (lesson === 4) for (const word of ['theme', 'palette', 'font', 'contrast', 'avatar']) assert(words.includes(word));
     assert.equal(JSON.stringify(cfg), original, 'Display helper must not mutate lesson config');
   }

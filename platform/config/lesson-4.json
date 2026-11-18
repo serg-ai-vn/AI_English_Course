@@ -1,33 +1,25 @@
 {
   "lesson": 4,
-  "title": "Site: theme & hobby images",
-  "source": "Product spec L4 (Scaffolding Removal + R.C.T.F. theme comparison)",
+  "title": "My site's look: theme and background",
+  "source": "curriculum/Lesson_4.md",
   "drivingQuestion": "How can I critically partner with Artificial Intelligence to build a digital portfolio that authentically represents who I am to the world?",
   "targetVocabulary": [
-    "concept art",
-    "close-up",
-    "volumetric lighting",
+    "theme",
+    "palette",
+    "mood",
+    "contrast",
+    "font",
+    "bold",
+    "soft",
+    "match",
     "background",
     "section",
     "layout",
-    "portrait",
-    "soft light",
-    "bold colors"
+    "concept art",
+    "close-up",
+    "volumetric lighting"
   ],
   "vocabByField": {
-    "hobby-image": {
-      "new": [
-        "background",
-        "section",
-        "layout"
-      ],
-      "review": [
-        "concept art",
-        "close-up",
-        "volumetric lighting",
-        "avatar"
-      ]
-    },
     "theme": {
       "new": [
         "theme",
@@ -38,6 +30,19 @@
         "bold",
         "soft",
         "match"
+      ]
+    },
+    "background": {
+      "new": [
+        "background",
+        "section",
+        "layout"
+      ],
+      "review": [
+        "concept art",
+        "close-up",
+        "volumetric lighting",
+        "avatar"
       ]
     }
   },
@@ -174,56 +179,26 @@
   },
   "fields": [
     {
-      "id": "hobby-image-1",
-      "label": "Hobby 1 - image",
-      "input": "ai-image-rapid",
-      "required": true,
-      "group": "hobby-1",
-      "maxAttempts": 6,
-      "spec": {
-        "width": 640,
-        "height": 480,
-        "format": "jpg"
-      },
-      "alt": "{hobby-title-1}",
-      "brief": "Picture for your first hobby. You can publish the first image or keep improving it - up to 6 attempts."
-    },
-    {
-      "id": "hobby-image-2",
-      "label": "Hobby 2 - image",
-      "input": "ai-image-rapid",
-      "required": true,
-      "group": "hobby-2",
-      "maxAttempts": 6,
-      "spec": {
-        "width": 640,
-        "height": 480,
-        "format": "jpg"
-      },
-      "alt": "{hobby-title-2}",
-      "brief": "Picture for your second hobby. You can publish the first image or keep improving it - up to 6 attempts."
-    },
-    {
-      "id": "hobby-image-3",
-      "label": "Hobby 3 - image",
-      "input": "ai-image-rapid",
-      "required": true,
-      "group": "hobby-3",
-      "maxAttempts": 6,
-      "spec": {
-        "width": 640,
-        "height": 480,
-        "format": "jpg"
-      },
-      "alt": "{hobby-title-3}",
-      "brief": "Picture for your third hobby. You can publish the first image or keep improving it - up to 6 attempts."
-    },
-    {
       "id": "theme",
       "label": "Website Theme",
       "input": "theme-picker",
       "required": true,
       "brief": "Design your site's theme with the R.C.T.F. formula: generate two options, compare them, and justify your choice."
+    },
+    {
+      "id": "background",
+      "label": "Background",
+      "input": "ai-image-rapid",
+      "required": false,
+      "spec": {
+        "width": 1600,
+        "height": 900,
+        "format": "jpg"
+      },
+      "alt": "",
+      "brief": "Bonus: make a background that matches your theme palette. No people, text or watermarks.",
+      "guidance": "Keep the first suitable result or explain what you want to change.",
+      "maxAttempts": 6
     }
   ],
   "presets": [

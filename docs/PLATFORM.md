@@ -17,8 +17,8 @@ Node 24 + sharp, один процесс, JSON DATA_DIR. settings читает .
 |---|---|
 | L2 About Me | A1 prompt → draft/evaluation → A2 improved prompt → draft/evaluation → A3 manual edit/publish → done |
 | L2 hobby | B1 prompt/draft → publish либо manual edit + reason/bonus → done |
-| L3 avatar/background | prompt → image → pros/cons → повтор в рамках config → разные best/worst + причины → accept → done |
-| L4 hobby images | prompt → image → publish либо изменённая структура + причина → новая версия в пределах config → publish |
+| L3 avatar | prompt → image → pros/cons → повтор в рамках config → разные best/worst + причины → accept → done |
+| L3 hobby images / L4 background | prompt → image → publish либо изменённая структура + причина → новая версия в пределах config → publish |
 | L4 theme | option1 → option2 → choose → comparative design justification → done |
 | L5 | checklist + 6 reflections + общий словарный гейт → teacher export |
 | Коррекция | done → одноразовое разрешение учителя → валидная новая версия и причина → done с corrections; reflection-* без разрешения |

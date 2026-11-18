@@ -139,7 +139,9 @@ function renderVocabStrip(cfg) {
    review:[...]}, used by Lesson 4) renders as two labeled chip rows. */
 function renderVocabBank(cfg, fieldId) {
   var bank = el('div', 'vocab-bank-field');
-  var list = (cfg.vocabByField && cfg.vocabByField[fieldId]) || cfg.targetVocabulary || [];
+  var keys = Object.keys(cfg.vocabByField || {}).sort(function(a,b){ return b.length-a.length; });
+  var key = keys.find(function(k){ return fieldId === k || fieldId.startsWith(k + '-'); });
+  var list = (cfg.vocabByField && cfg.vocabByField[key]) || cfg.targetVocabulary || [];
   if (list && !Array.isArray(list) && (list.new || list.review)) {
     if (list.new && list.new.length) {
       bank.appendChild(el('span', 'bank-label', 'New words:'));
@@ -172,12 +174,12 @@ function renderLessonTabs(me) {
 
 function groupsFor(cfg) {
   if (cfg.lesson === 3) {
-    return [{ title: '01 Visuals', match: function (f) { return f.input === 'ai-image-cycle'; } }];
+    return [{ title: 'Core · My avatar', match: f => f.id === 'avatar' }, { title: 'Bonus · Hobby pictures', match: f => f.input === 'ai-image-rapid' }];
   }
   if (cfg.lesson === 4) {
     return [
-      { title: '01 Hobby images', match: function (f) { return f.input === 'ai-image-rapid'; } },
-      { title: '02 Website theme', match: function (f) { return f.id === 'theme'; } }
+      { title: 'Core · Website theme', match: f => f.id === 'theme' },
+      { title: 'Bonus · Matching background', match: f => f.id === 'background' }
     ];
   }
   if (cfg.lesson === 5) {
@@ -212,14 +214,15 @@ function renderRules(cfg) {
     items = [
       ['Use all four parts:', '<b>Subject → Style → Framing → Lighting</b>'],
       ['Use visual vocabulary to describe your idea.', 'Try <b>Concept art</b>, <b>Close-up</b> or <b>Volumetric lighting</b>.'],
-      ['Create at least <b>' + r.minImageIterations + '</b> versions, up to <b>' + r.maxImageIterations + '</b>.', 'In each new prompt, change at least <b>one</b> formula part.'],
-      ['After <b>every</b> image, write two comments:', '<b>What I like:</b> at least ' + r.prosMinWords + ' words.', '<b>What needs to change:</b> at least ' + r.consMinWords + ' words.'],
+      ['For your avatar, create at least <b>' + r.minImageIterations + '</b> versions, up to <b>' + r.maxImageIterations + '</b>.', 'In each new prompt, change at least <b>one</b> formula part.'],
+      ['After <b>every avatar</b> image, write two comments:', '<b>What I like:</b> at least ' + r.prosMinWords + ' words.', '<b>What needs to change:</b> at least ' + r.consMinWords + ' words.'],
       ['Pick <b>different</b> best and worst images.', 'Write an English reason for <b>each</b> choice.', 'Your best image goes on your site. The less suitable one stays in your journal.'],
+      ['Bonus hobby pictures: keep your first image, or change a formula part and give a reason of at least three words.'],
       ['Be the Operator: check for <b>AI hallucinations</b> and unsuitable details.', 'Look for extra fingers, distorted hands, fake text, watermarks or real faces.', 'Describe any problem under <b>What needs to change</b>.']
     ];
   } else if (cfg.lesson === 4) {
     items = [
-      ['Use <b>Subject → Style → Framing → Lighting</b>.', 'Keep the first image, or improve it — up to <b>' + r.maxImageIterations + '</b> versions.'],
+      ['Use <b>Subject → Style → Framing → Lighting</b>.', 'For your bonus background, keep the first image, or improve it — up to <b>' + r.maxImageIterations + '</b> versions.'],
       ['Before you regenerate, write <b>why</b> the image should change: at least ' + (r.changeReasonMinWords || 3) + ' words.', 'Change at least <b>one</b> formula part in the next prompt.'],
       ['Use <b>Role → Context → Task → Format</b>.', 'In Format, describe a mood: <b>warm, calm, natural, bold, energetic</b> or <b>mysterious</b>. Related mood words also work.'],
       ['Generate <b>two</b> theme options and compare them.', 'Choose one, then explain why.', 'Use a comparison, such as <b>brighter than</b>, <b>calmer than</b> or <b>the boldest</b>.'],
@@ -262,15 +265,15 @@ function renderCompleteBanner(me, cfg) {
       var msg = document.getElementById('proceed-msg');
       if (!msg) return;
       msg.hidden = false;
-      msg.textContent = 'Lesson 3 is still locked. Your teacher will unlock the visuals next - you will design your avatar and background there.';
+      msg.textContent = 'Lesson 3 is still locked. Your teacher will unlock the visuals next - you will create your avatar and optional hobby pictures there.';
     };
   } else if (cfg.lesson === 3) {
     title.textContent = 'Lesson 3 complete!';
-    body.textContent = 'Your avatar and background are ready. Complete Lesson 4 next; your teacher can build the site after that.';
+    body.textContent = 'Your avatar is ready. Hobby pictures are optional. Your background belongs in Lesson 4. Complete Lesson 4 next; your teacher can build the site after that.';
     proceedBtn.hidden = true;
   } else if (cfg.lesson === 4) {
     title.textContent = 'Lesson 4 complete!';
-    body.textContent = 'Your hobby images and your website theme are ready. Your teacher can now build your site.';
+    body.textContent = 'Your theme is ready. You can add a matching background. Your teacher can now build your site.';
     proceedBtn.hidden = true;
   } else if (cfg.lesson === 5) {
     title.textContent = 'Lesson 5 complete!';
@@ -324,6 +327,9 @@ function renderField(def) {
     return card;
   }
 
+  if (def.input === 'ai-image-rapid' && me.progress.everPublished && !me.progress.editGrants?.[def.id]) {
+    card.appendChild(el('p','iteration-note','Ask your teacher to open this bonus after publication.')); return card;
+  }
   if (def.input === 'direct') renderDirect(card, def, fstate);
   else if (def.input === 'checklist') renderChecklist(card, def, fstate);
   else if (def.input === 'ai-text-3step') renderAboutMe(card, def, fstate);
@@ -515,7 +521,7 @@ function renderDoneStripe(def, fstate) {
     rImg.alt = def.label;
     detail.appendChild(rImg);
     (fstate.iterations || []).forEach(function (it, i) {
-      detail.appendChild(renderReadOnlyIteration(it, i, 'rapid'));
+      detail.appendChild(renderReadOnlyIteration(it, i, it.pros || it.cons ? 'image' : 'rapid'));
     });
   } else if (def.input === 'theme-picker') {
     detail.appendChild(renderThemeDetail(fstate));
@@ -1356,7 +1362,7 @@ function renderHobbyImageRapid(card, def, fstate) {
       card.appendChild(el('div', 'stage-instruction',
         'Change at least one of Subject / Style / Framing / Lighting from your last prompt.'));
     }
-    card.appendChild(renderVocabBank(cfg, 'hobby-image'));
+    card.appendChild(renderVocabBank(cfg, def.id));
 
     var pl = el('div', 'draft-label', 'Your prompt');
     pl.appendChild(el('span', 'ai-badge', 'Subject: / Style: / Framing: / Lighting:'));
@@ -1364,7 +1370,7 @@ function renderHobbyImageRapid(card, def, fstate) {
 
     var prompt = document.createElement('textarea');
     prompt.className = 'prompt-area img-prompt-input';
-    prompt.placeholder = 'Subject: a soccer ball on the green grass.\nStyle: concept art.\nFraming: close-up.\nLighting: volumetric lighting.';
+    prompt.placeholder = def.id === 'background' ? 'Subject: a quiet lake background. Style: soft concept art. Framing: wide view. Lighting: pale morning light.' : 'Subject: a soccer ball on the green grass.\nStyle: concept art.\nFraming: close-up.\nLighting: volumetric lighting.';
     card.appendChild(prompt);
 
     var actions = el('div', 'field-actions');
@@ -1418,11 +1424,15 @@ function renderHobbyImageRapid(card, def, fstate) {
     }
     card.appendChild(act);
 
+    var lateReason;
+    if (state.me.progress.everPublished) {
+      lateReason = document.createElement('input'); lateReason.placeholder = 'Why are you adding this picture?'; lateReason.setAttribute('aria-label', lateReason.placeholder); card.appendChild(lateReason);
+    }
     pubBtn.addEventListener('click', async function () {
       clearErrors(card);
       pubBtn.disabled = true;
       try {
-        var res = await api('/api/image-publish', 'POST', { field: def.id,version:Number(versionSelect.value) });
+        var res = await api('/api/image-publish', 'POST', { field: def.id,version:Number(versionSelect.value), reason:lateReason?.value });
         pubBtn.disabled = false;
         if (!res.ok) { showErrors(card, res.errors); return; }
         refresh();
