@@ -18,6 +18,7 @@ require('./settings.js');
 const ROOT = __dirname;
 const storage = require('./storage.js');
 const ai = require('./ai-provider.js');
+const points = require('./points');
 const builder = require('../tools/site-builder.js');
 const PUBLIC = path.join(ROOT, 'public');
 const DATA = path.resolve(process.env.DATA_DIR || path.join(ROOT, 'data'));
@@ -76,7 +77,12 @@ function getProgress(studentId) {
   p.complete = isComplete(p, lessonCfg(p.lesson || DEFAULT_LESSON));
   return p;
 }
-function saveProgress(p) { p.schemaVersion=1; p.courseVersion=p.courseVersion || 'pilot-1'; p.revision=(p.revision||0)+1; writeJson(progressFile(p.studentId), p); }
+function saveProgress(p, def) {
+  if (def && points.rules.enabled) {
+    const previous = readJson(progressFile(p.studentId), null);
+    points.record(p, def, previous?.fields[def.id]);
+  }
+  p.schemaVersion=1; p.courseVersion=p.courseVersion || 'pilot-1'; p.revision=(p.revision||0)+1; writeJson(progressFile(p.studentId), p); }
 
 /* Look up a field definition across every loaded lesson: field IDs are
    globally unique, so the search order does not matter. Also returns
@@ -191,6 +197,7 @@ function handleMe(req, res, a) {
     lesson: cur,
     unlockedLessons: unlocked,
     config: publicConfig(cur),
+    rewards: studentRewards(progress,a.session.classCode),
     progress: progress
   });
 }
@@ -257,7 +264,7 @@ async function handlePrompt(req, res, a, body) {
     f.acceptedPrompts.push(String(body.prompt));
     f.nextStep = (stage === 1) ? 'A1-eval' : 'A2-eval';
     progress.fields[def.id] = f;
-    saveProgress(progress);
+    saveProgress(progress, def);
     return sendJson(res, 200, { ok: true, draft: draft, iteration: f.iterations.length, nextStep: f.nextStep });
   }
 
@@ -284,7 +291,7 @@ async function handlePrompt(req, res, a, body) {
     f.acceptedPrompts.push(String(body.prompt));
     f.nextStep = 'B1-fork';
     progress.fields[def.id] = f;
-    saveProgress(progress);
+    saveProgress(progress, def);
     return sendJson(res, 200, { ok: true, draft: draft, iteration: f.iterations.length, nextStep: f.nextStep });
   }
 
@@ -297,7 +304,7 @@ async function handlePrompt(req, res, a, body) {
   f.iterations.push({ prompt: String(body.prompt), draft: draft, ts: Date.now() });
   f.acceptedPrompts.push(String(body.prompt));
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
   sendJson(res, 200, { ok: true, draft: draft, iteration: f.iterations.length, iterationsLeft: validate.iterationsLeft(f.acceptedPrompts.length, cfg, def) });
 }
 
@@ -325,7 +332,7 @@ function handleSaveEval(req, res, a, body) {
   last.needsChange = needsChange;
   f.nextStep = (f.nextStep === 'A1-eval') ? 'A2-prompt' : 'A3-publish';
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
   sendJson(res, 200, { ok: true, nextStep: f.nextStep });
 }
 
@@ -368,7 +375,7 @@ function handleSubmitText(req, res, a, body) {
     f.nextStep = 'done';
     progress.fields[def.id] = f;
     progress.complete = isComplete(progress, cfg);
-    saveProgress(progress);
+    saveProgress(progress, def);
     return sendJson(res, 200, { ok: true, complete: progress.complete });
   }
 
@@ -413,7 +420,7 @@ function handleSubmitText(req, res, a, body) {
     f.bonusClaimed = isBonus;
     progress.fields[def.id] = f;
     progress.complete = isComplete(progress, cfg);
-    saveProgress(progress);
+    saveProgress(progress, def);
     return sendJson(res, 200, { ok: true, complete: progress.complete, bonusClaimed: f.bonusClaimed });
   }
 
@@ -434,7 +441,7 @@ function handleSubmitText(req, res, a, body) {
   }
   progress.fields[def.id] = f;
   progress.complete = isComplete(progress, cfg);
-  saveProgress(progress);
+  saveProgress(progress, def);
   sendJson(res, 200, { ok: true, complete: progress.complete });
 }
 
@@ -463,7 +470,7 @@ function handleSaveDirect(req, res, a, body) {
     progress.fields[def.id] = { value: String(body.value || '').trim(), status: 'done', ts: Date.now() };
   }
   progress.complete = isComplete(progress, cfg);
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, complete: progress.complete });
 }
@@ -522,6 +529,7 @@ function handleReset(req, res, a) {
 function handleResetAll(req, res, a) {
   const progress = getProgress(a.session.studentId);
   progress.fields = {};
+  delete progress.points;
   delete progress.everPublished;
   delete progress.editGrants;
   progress.lesson = DEFAULT_LESSON;
@@ -640,13 +648,13 @@ async function handleImagePrompt(req, res, a, body) {
   if (def.input === 'ai-image-rapid') {
     f.nextStep = 'I' + n + '-review';
     progress.fields[def.id] = f;
-    saveProgress(progress);
+    saveProgress(progress, def);
     return sendJson(res, 200, { ok: true, iteration: n, imageUrl: img.url, summary: rapidView(f, cfg) });
   }
 
   f.nextStep = 'I' + f.iterations.length + '-eval';
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   const view = imageView(f, cfg);
   sendJson(res, 200, { ok: true, iteration: f.iterations.length, imageUrl: img.url,
@@ -681,7 +689,7 @@ function handleImageEval(req, res, a, body) {
     f.nextStep = 'pick';
   }
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, summary: imageView(f, cfg) });
 }
@@ -710,7 +718,7 @@ function handleImageBest(req, res, a, body) {
   f.acceptedImage = it.image.path;
   f.nextStep = pickNextStep(f, cfg);
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, summary: imageView(f, cfg) });
 }
@@ -736,7 +744,7 @@ function handleImageWorst(req, res, a, body) {
   it.best = null;
   f.nextStep = pickNextStep(f, cfg);
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, summary: imageView(f, cfg) });
 }
@@ -807,7 +815,7 @@ function handleImageAccept(req, res, a, body) {
   f.value = f.acceptedImage;
   progress.fields[def.id] = f;
   progress.complete = isComplete(progress, cfg);
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, complete: progress.complete });
 }
@@ -916,7 +924,7 @@ function handleImagePublish(req, res, a, body) {
   f.nextStep = 'done';
   progress.fields[def.id] = f;
   progress.complete = isComplete(progress, cfg);
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, complete: progress.complete, publishedVersion: f.publishedVersion });
 }
@@ -951,7 +959,7 @@ function handleThemePrompt(req, res, a, body) {
   };
   f.nextStep = 'T2-prompt';
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, option: f.option1, nextStep: f.nextStep });
 }
@@ -991,7 +999,7 @@ function handleThemeSecond(req, res, a, body) {
   };
   f.nextStep = 'compare';
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, option: f.option2, nextStep: f.nextStep, warning: check.warning });
 }
@@ -1014,7 +1022,7 @@ function handleThemeChoose(req, res, a, body) {
   f.choice = choice;
   f.nextStep = 'justify';
   progress.fields[def.id] = f;
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, nextStep: f.nextStep });
 }
@@ -1046,7 +1054,7 @@ function handleThemeJustify(req, res, a, body) {
   progress.fields[def.id] = f;
   progress.theme = win.preset;
   progress.complete = isComplete(progress, cfg);
-  saveProgress(progress);
+  saveProgress(progress, def);
 
   sendJson(res, 200, { ok: true, complete: progress.complete, theme: win.preset });
 }
@@ -1378,6 +1386,7 @@ function buildStudentView(student, selLesson) {
     currentLesson: cur,
     unlockedLessons: unlocked,
     state: state, needsAttention: needsAttention, complete: complete,
+    awards: points.rules.enabled ? points.events(p) : undefined,
     progress: { done: doneCount, total: required.length, bonusDone: fields.filter(f => !f.required && p.fields[f.id]?.status==='done').length, bonusTotal: fields.length-required.length },
     setup: { done: setupDone, total: setupFields.length },
     lessonsStatus: lessonsStatus,
@@ -1398,6 +1407,33 @@ function buildStudentView(student, selLesson) {
   };
 }
 
+function studentRewards(p,code) {
+  if (!points.rules.enabled) return null;
+  const group = classes.classes.find(c => c.code === code).students;
+  return {total:points.sum(points.events(p)), goal:group.length * points.rules.classGoalPerStudent,
+    classTotal:group.reduce((total,s)=>total + points.sum(points.events(s.id===p.studentId ? p : getProgress(s.id))),0)};
+}
+
+async function awardPoints(res,a,body) {
+  if (!points.rules.enabled) return sendJson(res,409,{ok:false,error:'Points are switched off.'});
+  const group = classes.classes.find(c => c.code === a.session.classCode).students;
+  const recipients = body.all === true && body.kind !== 'revoke' ? group : group.filter(s=>s.id===body.studentId);
+  if (!recipients.length) return sendJson(res,400,{ok:false,error:'Choose a student in your class.'});
+  const results = [];
+  for (const student of recipients) {
+    const status = await serial(student.id,()=>{
+      const p = getProgress(student.id);
+      try {
+        const status = points.manual(p,body);
+        if (status==='Awarded' || status==='Revoked') saveProgress(p);
+        return status;
+      } catch (err) { return 'Error: '+err.message; }
+    });
+    results.push({name:student.name,status});
+  }
+  return sendJson(res,200,{ok:results.every(r=>!r.status.startsWith('Error:')),results});
+}
+
 function handleTeacherOverview(req, res, a) {
   if (a.session.role !== 'teacher') return sendJson(res, 403, { error: 'Teachers only.' });
   const cls = (classes.classes || []).find(c => c.code === a.session.classCode);
@@ -1411,6 +1447,7 @@ function handleTeacherOverview(req, res, a) {
     if (lessons[n]) sel = n;
   }
   const resp = {
+    awardSettings: points.rules.enabled ? {presets:points.rules.presets,cap:points.rules.manualCap,customMax:points.rules.customMax} : null,
     lesson: sel,
     title: lessons[sel].title,
     lessons: Object.keys(lessons).map(function (n) {
@@ -1601,6 +1638,7 @@ const server = http.createServer(async (req, res) => {
       if (u.startsWith('/api/teacher/')) {
         if (a.session.role !== 'teacher')
           return sendJson(res, 403, { ok: false, error: 'Teachers only' });
+        if (u === '/api/teacher/points' && req.method === 'POST') return await awardPoints(res,a,body);
         if(u==='/api/teacher/l1-ready'&&req.method==='POST')return await serial(body.studentId,()=>{if(!classStudent(a,body.studentId))return sendJson(res,400,{ok:false,error:'Unknown student in your class.'});if(typeof body.ready!=='boolean')return sendJson(res,400,{ok:false,error:'Readiness must be true or false.'});const p=getProgress(body.studentId);p.l1Checks=p.l1Checks||[];p.l1Checks.push({ready:body.ready,ts:Date.now()});p.l1Ready=body.ready?{ts:Date.now()}:null;saveProgress(p);return sendJson(res,200,{ok:true});});
         if (u === '/api/teacher/allow-correction' && req.method === 'POST')
           return await serial(body.studentId, () => {

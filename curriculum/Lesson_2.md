@@ -98,3 +98,5 @@ Rule / ConditionAction if Failed (System Prompt/Hint)**Minimum Iterations**"You 
 
 
 **Next time:** “We will design your avatar. You can also make a picture for one of your hobbies.”
+
+**Teacher, with points enabled:** “You saved your title. Look — two points. Each accepted step adds to our class goal.”

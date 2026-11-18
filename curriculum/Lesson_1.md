@@ -77,3 +77,5 @@ Rule / ConditionStatus (Check)**Card Sort Complete**The pair successfully placed
 * Structured paper blanks for the Prompt Journal.  
 * **Photo Protocol:** Для pilot-1 бумагу с псевдонимами хранит преподаватель отдельно. Загрузки фото в платформу нет. Учитель вручную проверяет готовность перед выдачей доступа L2; профиль технически начинает с L2.
 
+
+**Teacher, with points enabled:** “You explained your idea. Our class works towards one goal together. The teacher can award points for a paper activity.”

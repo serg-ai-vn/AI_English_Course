@@ -37,11 +37,17 @@ function initialize(data) {
   if (!fs.existsSync(path.join(data, 'classes.json'))) {
     if (process.env.APP_MODE === 'pilot')
       throw new Error('Provision non-demo classes.json before starting pilot');
+    const fresh = fs.readdirSync(path.join(__dirname,'../fixtures/progress')).filter(name => !fs.existsSync(path.join(data,'progress',name)));
     fs.cpSync(path.join(__dirname, '../fixtures'), data, {
       recursive: true,
       force: false,
       errorOnExist: false,
     });
+    for (const name of fresh) {
+      const file = path.join(data,'progress',name), profile = readJson(file);
+      require('./points').seed(profile);
+      if (profile.points) writeJson(file,profile);
+    }
   }
   const classes = readJson(path.join(data, 'classes.json'));
   const ids = new Set(), codes = new Set(), pinKeys = new Set();

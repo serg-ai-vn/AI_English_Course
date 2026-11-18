@@ -4,6 +4,7 @@
 
 | Приоритет / работа | Статус и конкретный следующий результат |
 |---|---|
+| TASK-11 баллы | В зависимой ветке feat/course-step-points; нужен просмотр владельца и независимая приёмка. |
 | TASK-10 реконструкция L3/L4 | Реализация в отдельной ветке; совместный просмотр с TASK-11 до merge и до пробного прогона. |
 | Остальные правки дизайна | DEFERRED: отдельный пакет; не блокирует принятие текущего дизайна. |
 | Пакет UI: [TASK-06](TASK-06-platform-ui-themes.md), [TASK-07](TASK-07-guided-workspace.md), [TASK-08](TASK-08-visual-review.md), [TASK-09](TASK-09-learning-support.md) | ACCEPTED, 2026-11-18: владелец подтвердил включение в main; независимая приёмка реализации 74f6585 PASS, checks #33 success. Финальная приёмка документационного дополнения и результат merge — [PR #3](https://github.com/serg-ai-vn/AI_English_Course/pull/3). Classroom Light — основной дизайн, Night Lab — альтернатива. [Отчёт о приёмке и резервных копиях](../docs/history/2026-11-18-ui-baseline-acceptance.md). Live/device/VPS ограничения ниже остаются. |
